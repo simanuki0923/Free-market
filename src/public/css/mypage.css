@@ -1,0 +1,119 @@
+/* public/css/mypage.css */
+
+/* ====== layout ====== */
+.product-list {
+  background: #fff;
+  padding: 16px 0 64px;
+}
+
+.product-list .container {
+  max-width: 2300px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 1) タブ全体のグレー線（残す） */
+.tab-buttons {
+  padding: 12px 0;
+  border-bottom: 5px solid grey; /* ← グレーの下線 */
+}
+
+/* 2) タブリンクは下線を入れない（アクティブ含む） */
+.tab-buttons .tab-link {
+  display: inline-block;
+  padding: 8px 2px;
+  color: #777;
+  text-decoration: none;
+  border: 0;                 /* 念のためリセット */
+  box-shadow: none;          /* 疑似下線リセット対策 */
+}
+.tab-buttons .tab-link:hover { color: #444; }
+
+/* 3) アクティブ表現は “色だけ” にする（下線は禁止） */
+.tab-buttons .tab-link.active {
+  color: #e60023;            /* 赤文字 */
+  border: 0 !important;      /* 下線が付く指定を強制無効化 */
+  box-shadow: none !important;
+}
+.tab-buttons .tab-link.active::after { content: none !important; } /* 擬似要素での線対策 */
+
+
+/* ====== product grid ====== */
+.product-list__section { margin-top: 16px; }
+
+.product-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 24px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;                       /* カードの間隔 */
+}
+
+.product-item { margin: 0; }
+
+/* ====== card ====== */
+.product-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-thumb {
+  margin: 0;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;            /* 正方形サムネ */
+  background: #eee;               /* no-image 用の台座 */
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+
+.product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;               /* トリミングして埋める */
+}
+
+.product-card:hover .product-thumb {
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+/* Sold バッジ（左上） */
+.sold-out-label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+  background: #111;
+  border-radius: 6px;
+}
+
+/* メタ情報（商品名） */
+.product-meta { margin-top: 8px; }
+
+.product-name {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;        /* 長い名前は省略 */
+}
+
+/* 空状態 */
+.product-empty {
+  grid-column: 1 / -1;
+  color: #888;
+  padding: 24px 0;
+  font-size: 14px;
+}
+
+

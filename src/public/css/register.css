@@ -1,0 +1,169 @@
+/* ========== Register page ========== */
+:root {
+  --bg: #f2f2f2;
+  --card-bg: #ffffff;
+  --text: #222;
+  --muted: #666;
+  --border: #d9d9d9;
+  --error: #e02424;
+  --primary: #ff5a5a;
+  --primary-grad-top: #ff6d6d;
+  --primary-grad-btm: #ff5151;
+  --link: #2780e3;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  line-height: 1.6;
+}
+
+/* Header (黒帯に白ロゴ) */
+header {
+  background: #111;          /* 黒帯 */
+  padding: 8px 16px;
+}
+header a {
+  display: inline-block;
+  line-height: 0;
+}
+header img {
+  height: 28px;              /* スクショ相当のサイズ感 */
+  display: block;
+}
+
+/* カードレイアウト */
+main {
+  padding: 24px 16px 48px;
+}
+.register__content {
+  max-width: 560px;      /* スクショの横幅感に調整 */
+  margin: 24px auto 0;
+  background: var(--card-bg);
+  border: 1px solid #eee;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  padding: 28px 28px 32px;
+}
+
+/* 見出し（中央・やや太め） */
+.register-form__heading {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* フォーム */
+.form {
+  margin-top: 12px;
+}
+.form__group {
+  display: block;
+  margin: 14px 0;
+}
+.form__label--item {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* 入力欄 */
+.form__group input[type="text"],
+.form__group input[type="email"],
+.form__group input[type="password"] {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.form__group input:focus {
+  border-color: #b7b7b7;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.04);
+}
+
+/* エラー表示（入力下に赤文字） */
+.form__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--error);
+  line-height: 1.4;
+}
+
+/* 送信ボタン（赤・横いっぱい） */
+.form__button-submit {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--primary-grad-top), var(--primary-grad-btm));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: transform .03s ease, filter .15s ease;
+}
+.form__button-submit:hover {
+  filter: brightness(1.05);
+}
+.form__button-submit:active {
+  transform: translateY(1px);
+}
+
+/* ログイン導線（ボタン下の青リンク・中央寄せ） */
+.login__link {
+  margin-top: 14px;
+  text-align: center;
+}
+.login__button-submit {
+  color: var(--link);
+  font-size: 13px;
+  text-decoration: none;
+}
+.login__button-submit:hover {
+  text-decoration: underline;
+}
+
+/* フラッシュメッセージ（任意） */
+.flash__message {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #3a3a3a;
+}
+
+/* レスポンシブ微調整 */
+@media (max-width: 420px) {
+  .register__content {
+    padding: 22px 16px 26px;
+    border-radius: 4px;
+  }
+  .register-form__heading {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Providers;
+
+use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\ResetUserPassword;
+use App\Actions\Fortify\UpdateUserPassword;
+use App\Actions\Fortify\UpdateUserProfileInformation;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
+use Laravel\Fortify\Fortify;
+
+// ★ Fortify レスポンス差し替え用 Contract
+use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use Laravel\Fortify\Contracts\VerifyEmailResponse as VerifyEmailResponseContract;
+
+// ★ 実装クラス（あなたのプロジェクトの App\Actions\Fortify\*）
+use App\Actions\Fortify\RegisterResponse;
+use App\Actions\Fortify\LoginResponse;
+use App\Actions\Fortify\VerifyEmailResponse;
+
+class FortifyServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        // 登録直後：/email/verify（認証依頼）へ
+        $this->app->singleton(RegisterResponseContract::class, RegisterResponse::class);
+
+        // 通常ログイン：/（mypage）へ
+        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+
+        // 認証リンク成功：/profile へ
+        $this->app->singleton(VerifyEmailResponseContract::class, VerifyEmailResponse::class);
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // --- Fortify の各種アクション ---
+        Fortify::createUsersUsing(CreateNewUser::class);
+        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
+        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
+        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
+
+        // --- View 紐づけ（resources/views/auth/*.blade.php を想定） ---
+        Fortify::loginView(fn () => view('auth.login'));                 // GET /login
+        Fortify::registerView(fn () => view('auth.register'));           // GET /register
+        Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password')); // GET /forgot-password
+        Fortify::resetPasswordView(fn ($request) => view('auth.reset-password', ['request' => $request])); // GET /reset-password/{token}
+        Fortify::verifyEmailView(fn () => view('auth.verify-email'));    // GET /email/verify
+
+        // --- レート制限 ---
+        RateLimiter::for('login', function (Request $request) {
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
+            return Limit::perMinute(5)->by($throttleKey);
+        });
+
+        RateLimiter::for('two-factor', function (Request $request) {
+            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+        });
+    }
+}
