@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Comment;
+use App\Models\Category;
+use App\Models\User;
+
 class Product extends Model
 {
     use HasFactory;
