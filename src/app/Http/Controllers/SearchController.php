@@ -92,7 +92,7 @@ class SearchController extends Controller
             ->paginate(24)
             ->withQueryString(); // ページ送りで検索条件を保持
 
-        return view('search.index', [
+        return view('search', [
             'products' => $products,
             'keyword'  => $keyword,
         ]);
