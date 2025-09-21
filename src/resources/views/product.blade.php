@@ -41,17 +41,18 @@
           @endif
         </p>
 
-        {{-- いいね数／コメント数（表示のみ） --}}
-        <aside class="action-buttons">
-          <span class="favorite-button {{ $isFavorited ? 'favorited' : '' }}">
-            <img class="iconstar" src="{{ asset('img/star.jpg') }}" alt="お気に入りアイコン">
-            <span id="favorite-count">{{ $favoritesCount }}</span>
-          </span>
-          <span class="comment-counter" aria-label="コメント数">
-            <img class="iconcomment" src="{{ asset('img/comment.jpg') }}" alt="コメントアイコン">
-            <span id="comment-count">{{ $commentsCount }}</span>
-          </span>
-        </aside>
+        {{-- いいね数コメント数（PNGアイコン下に数値） --}}
+<aside class="action-buttons">
+  <span class="favorite-button {{ $isFavorited ? 'favorited' : '' }}" aria-label="お気に入り数">
+    <img class="iconstar" src="{{ asset('img/star.png') }}" alt="お気に入り" aria-hidden="true">
+    <span class="action-count" id="favorite-count">{{ $favoritesCount }}</span>
+  </span>
+  <span class="comment-counter" aria-label="コメント数">
+    <img class="iconcomment" src="{{ asset('img/comment.png') }}" alt="コメント" aria-hidden="true">
+    <span class="action-count" id="comment-count">{{ $commentsCount }}</span>
+  </span>
+</aside>
+
 
         {{-- 購入導線（未実装ガード） --}}
         @php $purchaseReady = Route::has('purchase'); @endphp
