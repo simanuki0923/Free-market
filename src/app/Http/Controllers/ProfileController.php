@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 // 必要なら残してOK（一覧を将来使う場合）
 use App\Models\Product;
 use App\Models\Purchase;
-
 use App\Models\Profile;
 
 class ProfileController extends Controller

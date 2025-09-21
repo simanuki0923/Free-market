@@ -43,6 +43,12 @@ class Product extends Model
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
+    public function favoredBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')
+                ->withTimestamps();
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->latest();

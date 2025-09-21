@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
+// リレーション型
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -47,13 +47,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
-    public function profile()
+    // -------------------------
+    // Relations
+    // -------------------------
+
+    public function profile(): HasOne
     {
-    return $this->hasOne(\App\Models\Profile::class);
+        return $this->hasOne(Profile::class);
     }
 
     public function products(): HasMany
@@ -61,13 +65,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Product::class);
     }
 
+    /**
+     * 中間テーブル favorites をそのまま扱う（必要なら保持）
+     * Favorite モデルがある場合に利用
+     */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    public function favoriteProducts(): BelongsToMany
+    /**
+     * お気に入りの商品一覧（マイリスト表示用）
+     * 中間テーブル：favorites（user_id, product_id）
+     */
+    public function favoritedProducts()
     {
-        return $this->belongsToMany(Product::class, 'favorites')->withTimestamps();
+        // 中間テーブル名やカラム名が異なる場合は第2〜第4引数を合わせる
+        return $this->belongsToMany(Product::class, 'favorites') //, 'user_id', 'product_id'
+                    ->withTimestamps();
     }
 }
+
