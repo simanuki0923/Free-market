@@ -1,0 +1,130 @@
+/* ====== Layout ====== */
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ====== Card ====== */
+.card {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.card-header {
+  background-color: #f2f2f2;
+  color: #000;
+  font-size: 1.25rem;
+  text-align: center;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* ※ 入力ブロック防止：前面レイヤ & クリック可を保証 */
+.card-body {
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* ====== Inputs (Stripe Elements コンテナを含む) ====== */
+/* Stripe が iframe を埋め込む div を “入力欄” として扱う */
+.form-control {
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  width: 100%;
+  background: #fff;
+
+  /* 入力できない問題対策：高さ・レイヤ・クリック可を担保 */
+  min-height: 44px;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* フォーカス時の見やすさ */
+.form-control:focus-within {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  outline: 0;
+}
+
+/* ====== Stripe Elements の状態スタイル（任意だが推奨） ====== */
+.StripeElement {
+  width: 100%;
+  background: transparent;    /* 親の .form-control が背景を持つ */
+}
+.StripeElement--focus {
+  /* フォーカスは親の :focus-within が担当 */
+}
+.StripeElement--invalid {
+  /* エラー時の縁色を明示 */
+  /* 親 .form-control に適用されないため、内側の見た目調整だけ */
+}
+#card-errors {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  min-height: 1.2em; /* レイアウトのガタつき防止 */
+}
+
+/* ====== Buttons ====== */
+.btn-primary,
+.btn-secondary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+/* ====== Mobile ====== */
+@media (max-width: 768px) {
+  .container { padding: 10px; }
+  .card { border-radius: 5px; }
+  .card-header { font-size: 1rem; padding: 8px; }
+  .card-body { padding: 15px; }
+
+  .form-control {
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    border-radius: 4px;
+    min-height: 42px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+}
