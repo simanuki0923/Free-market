@@ -5,7 +5,6 @@ body {
   margin: 0;
   color: #222;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, "Noto Sans JP", sans-serif;
-  background: #f7f7f7;
 }
 
 /* ========== Header (黒帯＋ロゴ) ========== */
@@ -32,8 +31,7 @@ main {
 .login__content {
   width: min(420px, 100%);
   background: #fff;
-  border: 2px solid #ff59c7; /* ピンクの枠（スクショの輪郭） */
-  border-radius: 4px;
+  
   padding: 28px 28px 20px;
   box-shadow: 0 1px 2px rgba(0,0,0,.02);
 }

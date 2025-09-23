@@ -9,53 +9,38 @@ use App\Models\Product;
 class ItemListController extends Controller
 {
     /**
-     * マイリスト一覧（/?tab=mylist）
-     * - 未ログイン時もリダイレクトせず、空一覧＋ログイン誘導を表示
-     * - 検索 q、件数 per_page をサポート
-     * - ページネーションで ?tab=mylist 等のクエリを保持
+     * マイリスト（お気に入り）
+     * 要件:
+     *  - 未認証は「何も表示しない」（文言も出さない）
+     *  - 認証済みは「お気に入りした商品」を表示
+     *  - 売却済みは blade 側で "Sold" バッジ表示（$p->is_sold）
      */
     public function index(Request $request)
     {
-        $keyword = trim((string) $request->query('q', ''));
-        $perPage = max(1, min(60, (int) $request->integer('per_page', 20)));
+        $tab = 'mylist';
 
-        // ゲスト：空一覧を返して itemlist.blade.php を表示（タブは赤のまま）
+        // 未認証は空で返して blade 側で完全非表示
         if (!Auth::check()) {
-            return view('itemlist', [
-                'tab'           => 'mylist',
-                'isGuest'       => true,
-                'products'      => collect(),
-                'myFavoriteIds' => [],
-            ]);
+            $isGuest  = true;
+            $products = collect(); // 空コレクション
+            return view('itemlist', compact('products', 'isGuest', 'tab'));
         }
 
-        // ログイン時：favorites 経由でユーザーのお気に入り商品を取得
-        $query = Product::query()
-            ->join('favorites', 'favorites.product_id', '=', 'products.id')
-            ->where('favorites.user_id', Auth::id())
-            ->select('products.*')
-            ->distinct()
-            ->with(['categories:id,name'])
-            ->withCount(['favoredByUsers as favorites_count', 'comments'])
-            ->latest('products.id');
+        $perPage = 24;
+        $userId  = Auth::id();
 
-        if ($keyword !== '') {
-            $query->where('products.name', 'LIKE', "%{$keyword}%");
-        }
+        // Product モデルに favoredByUsers()（favorites 中間テーブル）定義前提
+        $products = Product::query()
+            ->whereHas('favoredByUsers', function ($q) use ($userId) {
+                $q->where('users.id', $userId);
+            })
+            // 必要に応じて ->with([...]) を追加
+            ->latest('id')
+            ->paginate($perPage)
+            ->appends($request->query());
 
-        $products = $query->paginate($perPage)->withQueryString();
+        $isGuest = false;
 
-        $myFavoriteIds = Product::query()
-            ->join('favorites', 'favorites.product_id', '=', 'products.id')
-            ->where('favorites.user_id', Auth::id())
-            ->pluck('products.id')
-            ->all();
-
-        return view('itemlist', [
-            'tab'           => 'mylist',
-            'isGuest'       => false,
-            'products'      => $products,
-            'myFavoriteIds' => $myFavoriteIds,
-        ]);
+        return view('itemlist', compact('products', 'isGuest', 'tab'));
     }
 }

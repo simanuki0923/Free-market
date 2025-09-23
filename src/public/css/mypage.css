@@ -8,7 +8,7 @@
 
 /* 任意：全体幅をそろえる（既存 .container があれば不要） */
 .mypage__main.container {
-  max-width: 1100px;
+  max-width: 1350px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -50,19 +50,20 @@
 }
 .user-name {
   margin: 0;
-  font-size: 20px;
+  font-size: 40px;
   font-weight: 700;
   color: #111827;
   line-height: 1.3;
+  margin-left: 50px;
 }
 
 /* 「プロフィールを編集」ボタン：白地に赤枠 */
 .edit-profile-btn {
   display: inline-block;
-  padding: 8px 16px;
-  font-size: 12px;
+  padding: 16px 42px;
+  font-size: 20px;
   line-height: 1;
-  border-radius: 9999px;
+  border-radius: 10px;
   border: 1px solid #f3a1a1;
   background: #fff5f5;
   color: #de4a4a;
@@ -81,21 +82,34 @@
   gap: 24px;
   align-items: flex-end;
   padding: 10px 0;
-  border-bottom: 5px solid gray; /* グレー線は常時表示 */
+  /* border-bottom: 5px solid gray;  ← コンテナ幅に制限されるため無効化 */
   margin-bottom: 20px;
+  position: relative;             /* ← 疑似要素の基準にする */
 }
+
+.toggle-links::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -20px;                  /* margin-bottom と合わせて線の下端を揃える */
+  transform: translateX(-50%);
+  width: 100vw;                   /* 画面幅いっぱい */
+  height: 5px;                    /* 線の太さ */
+  background: gray;               /* グレー線 */
+  pointer-events: none;           /* クリックを邪魔しない */
+}
+
+/* 既存のタブリンク */
 .toggle-link {
   display: inline-block;
   padding: 12px 0 12px 50px;
-  text-decoration: none;   /* タブ自体には下線を付けない */
+  text-decoration: none;
   color: #6b7280;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
 }
 .toggle-link:hover { color: #374151; }
-.toggle-link.active {
-  color: #e60023;          /* アクティブは赤文字のみ（下線は付けない） */
-}
+.toggle-link.active { color: #e60023; }
 
 /* =========================
    商品一覧（カード）
@@ -103,7 +117,7 @@
 .product-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr)); /* PC: 4列 */
-  gap: 24px;
+  column-gap: 50px;
   margin-top: 16px;
 }
 
@@ -143,10 +157,10 @@
   left: 8px;
   top: 8px;
   padding: 4px 8px;
-  font-size: 10px;
+  font-size: 20px;
   line-height: 1;
   text-transform: uppercase;
-  background: #111827;
+  background: #e60023;
   color: #fff;
   border-radius: 9999px;
 }
@@ -155,7 +169,7 @@
 .product-meta { padding: 8px 2px 0; }
 .product-name {
   margin: 0 0 12px 35px;
-  font-size: 15px;
+  font-size: 20px;
   color: #111827;
   line-height: 1.4;
   overflow: hidden;

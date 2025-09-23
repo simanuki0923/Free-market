@@ -1,4 +1,3 @@
-{{-- resources/views/mypage.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -6,34 +5,33 @@
 @endsection
 
 @section('content')
+@php
+  $displayName = $displayName ?? ($user->profile->display_name ?? $user->name ?? 'ユーザー');
+  $iconPath = ($user->profile && $user->profile->icon_image_path)
+      ? asset('storage/'.$user->profile->icon_image_path)
+      : asset('img/sample.jpg');
+@endphp
+
 <main class="mypage__main container">
 
   {{-- プロフィールヘッダー --}}
   <section class="profile-section" aria-label="プロフィール">
     <figure class="profile-icon" aria-hidden="true">
-      <img
-        src="{{ ($user->profile && $user->profile->icon_image_path)
-                ? asset('storage/'.$user->profile->icon_image_path)
-                : asset('img/sample.jpg') }}"
-        alt="{{ ($user_name ?? $user->name).' のアイコン' }}">
+      <img src="{{ $iconPath }}" alt="{{ $displayName.' のアイコン' }}">
     </figure>
 
     <div class="profile-info">
       <div class="profile-info-content">
-        <p class="user-name">{{ $user_name ?? $user->name }}</p>
+        <p class="user-name">{{ $displayName }}</p>
       </div>
-      <a href="{{ route('profile.edit') }}" class="edit-profile-btn">プロフィールを編集</a>
+      <a href="{{ route('mypage.profile') }}" class="edit-profile-btn">プロフィールを編集</a>
     </div>
   </section>
 
   {{-- タブ（出品した商品 / 購入した商品） --}}
   <nav class="toggle-links" aria-label="商品切替タブ">
-    <a href="javascript:void(0);" id="toggleListed" class="toggle-link active" role="button" aria-pressed="true">
-      出品した商品
-    </a>
-    <a href="javascript:void(0);" id="togglePurchased" class="toggle-link" role="button" aria-pressed="false">
-      購入した商品
-    </a>
+    <a href="javascript:void(0);" id="toggleListed" class="toggle-link active" role="button" aria-pressed="true">出品した商品</a>
+    <a href="javascript:void(0);" id="togglePurchased" class="toggle-link" role="button" aria-pressed="false">購入した商品</a>
   </nav>
 
   {{-- 出品した商品 --}}
@@ -47,13 +45,12 @@
                 : asset('storage/'.$product->image_url))
             : asset('img/no-image.png');
         @endphp
-
         <article class="product-item" role="listitem">
           <a href="{{ route('item.show', ['item_id' => $product->id]) }}" class="product-card" aria-label="{{ $product->name }}">
             <figure class="product-thumb">
               <img src="{{ $thumb }}" alt="{{ $product->name }}">
               @if ($product->is_sold)
-                <span class="sold-out-label" aria-label="売り切れ">sold out</span>
+                <span class="sold-out-label" aria-label="売り切れ">sold</span>
               @endif
             </figure>
             <div class="product-meta">
@@ -67,20 +64,21 @@
     @endif
   </section>
 
-  {{-- 購入した商品（初期は非表示） --}}
+  {{-- 購入した商品 --}}
   <section id="purchasedProducts" class="product-list" role="list" style="display:none;">
     @if ($purchasedProducts->isNotEmpty())
       @foreach ($purchasedProducts as $product)
         @php
-          // 購入履歴は配列でもコレクションでも対応できるようにアクセサ
-          $pid   = is_array($product) ? $product['id']        : $product->id;
+          // コレクション要素が配列/オブジェクトどちらでも動くように
+          $pid   = is_array($product) ? $product['id'] : ($product->id ?? null);
           $pname = is_array($product) ? ($product['name'] ?? '') : ($product->name ?? '');
           $pimg  = is_array($product) ? ($product['image_url'] ?? null) : ($product->image_url ?? null);
           $thumb = $pimg
-            ? (\Illuminate\Support\Str::startsWith($pimg, ['http://','https://'])
-                ? $pimg
-                : asset('storage/'.$pimg))
+            ? (\Illuminate\Support\Str::startsWith($pimg, ['http://','https://']) ? $pimg : asset('storage/'.$pimg))
             : asset('img/no-image.png');
+
+          $pstatus = is_array($product) ? ($product['purchase_status'] ?? null) : ($product->purchase_status ?? null);
+          $pdate   = is_array($product) ? ($product['purchased_at'] ?? null)   : ($product->purchased_at ?? null);
         @endphp
 
         <article class="product-item" role="listitem">
@@ -90,6 +88,8 @@
             </figure>
             <div class="product-meta">
               <p class="product-name">{{ $pname }}</p>
+              @if($pstatus || $pdate)
+              @endif
             </div>
           </a>
         </article>
@@ -101,7 +101,6 @@
 
 </main>
 
-{{-- タブ切替スクリプト --}}
 <script>
   (function () {
     const $listed     = document.getElementById('listedProducts');
@@ -128,8 +127,6 @@
 
     $btnListed.addEventListener('click', showListed);
     $btnBought.addEventListener('click', showPurchased);
-
-    // 初期表示（出品した商品）
     showListed();
   })();
 </script>

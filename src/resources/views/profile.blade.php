@@ -5,31 +5,21 @@
 @endsection
 
 @section('content')
-@php
-    // ここで未定義変数を安全に初期化（コントローラ未実装でも落ちない）
-    $user = $user ?? auth()->user();
-    $user_name = $user_name ?? ($user->name ?? 'ユーザー');
-    $listedProducts = $listedProducts ?? collect();
-    $purchasedProducts = $purchasedProducts ?? collect();
-@endphp
-
 <main class="contact-form__main">
 
     {{-- プロフィール（ユーザー情報） --}}
     <section class="profile-section">
         <div class="profile-icon">
             <img
-                src="{{ ($user && $user->profile && $user->profile->icon_image_path)
-                        ? asset('storage/' . $user->profile->icon_image_path)
-                        : asset('img/sample.jpg') }}"
-                alt="{{ $user_name . 'のアイコン' }}"
+                src="{{ $user->profile && $user->profile->icon_image_path ? asset('storage/' . $user->profile->icon_image_path) : asset('img/sample.jpg') }}"
+                alt="{{ ($user_name ?? $user->name) . 'のアイコン' }}"
             >
         </div>
         <div class="profile-info">
             <div class="profile-info-content">
-                <p class="user-name">{{ $user_name }}</p>
+                <p class="user-name">{{ $user_name ?? $user->name }}</p>
             </div>
-            <a href="{{ route('profile.edit') }}" class="edit-profile-btn" aria-label="プロフィール編集へ">
+            <a href="{{ route('mypage.profile') }}" class="edit-profile-btn" aria-label="プロフィール編集へ">
                 プロフィールを編集
             </a>
         </div>
@@ -47,55 +37,53 @@
 
     {{-- 出品した商品一覧 --}}
     <section id="listedProducts" class="product-list" role="tabpanel" aria-labelledby="toggleListed">
-        @forelse ($listedProducts as $product)
-            <article class="product-item">
-                <a href="{{ route('product', ['id' => $product->id ?? null]) }}"
-                   class="product-link"
-                   aria-label="{{ ($product->name ?? '商品') . 'の詳細へ' }}">
-                    <img
-                        src="{{ !empty($product->image_url)
-                                ? asset('storage/' . $product->image_url)
-                                : asset('storage/img/no-image.png') }}"
-                        alt="{{ $product->name ?? '商品画像' }}"
-                    >
-                    @if (!empty($product->is_sold))
-                        <span class="sold-out-label" aria-label="売り切れ">sold out</span>
-                    @endif
-                </a>
-                <h3 class="product-name">{{ $product->name ?? '商品名' }}</h3>
-            </article>
-        @empty
+        @if($listedProducts->isNotEmpty())
+            @foreach ($listedProducts as $product)
+                <article class="product-item">
+                    <a href="{{ route('product', ['id' => $product->id]) }}" class="product-link" aria-label="{{ $product->name }}の詳細へ">
+                        <img
+                            src="{{ $product->image_url ? asset('storage/' . $product->image_url) : asset('storage/img/no-image.png') }}"
+                            alt="{{ $product->name }}"
+                        >
+                        @if ($product->is_sold)
+                            <span class="sold-out-label" aria-label="売り切れ">sold out</span>
+                        @endif
+                    </a>
+                    <h3 class="product-name">{{ $product->name }}</h3>
+                </article>
+            @endforeach
+        @else
             <p class="empty-notice">出品した商品はありません。</p>
-        @endforelse
+        @endif
     </section>
 
     {{-- 購入した商品一覧 --}}
     <section id="purchasedProducts" class="product-list" role="tabpanel" aria-labelledby="togglePurchased" style="display:none;">
-        @forelse ($purchasedProducts as $product)
-            @php
-                // オブジェクト/配列どちらでも対応
-                $pId   = $product->id   ?? $product['id']   ?? null;
-                $pName = $product->name ?? $product['name'] ?? '商品名';
-                $pImg  = $product->image_url ?? $product['image_url'] ?? null;
-                $pSold = $product->is_sold   ?? $product['is_sold']   ?? false;
-            @endphp
-            <article class="product-item">
-                <a href="{{ $pId ? route('product', ['id' => $pId]) : 'javascript:void(0);' }}"
-                   class="product-link"
-                   aria-label="{{ $pName }}の詳細へ">
-                    <img
-                        src="{{ $pImg ? asset('storage/' . $pImg) : asset('storage/img/no-image.png') }}"
-                        alt="{{ $pName }}"
-                    >
-                    @if ($pSold)
-                        <span class="sold-out-label" aria-label="売り切れ">sold out</span>
-                    @endif
-                </a>
-                <h3 class="product-name">{{ $pName }}</h3>
-            </article>
-        @empty
+        @if($purchasedProducts->isNotEmpty())
+            @foreach ($purchasedProducts as $product)
+                @php
+                    // オブジェクト/配列どちらでも対応（join結果などの配列対応用）
+                    $pId   = $product->id   ?? $product['id']   ?? null;
+                    $pName = $product->name ?? $product['name'] ?? '商品名';
+                    $pImg  = $product->image_url ?? $product['image_url'] ?? null;
+                    $pSold = $product->is_sold   ?? $product['is_sold']   ?? false;
+                @endphp
+                <article class="product-item">
+                    <a href="{{ $pId ? route('product', ['id' => $pId]) : 'javascript:void(0);' }}" class="product-link" aria-label="{{ $pName }}の詳細へ">
+                        <img
+                            src="{{ $pImg ? asset('storage/' . $pImg) : asset('storage/img/no-image.png') }}"
+                            alt="{{ $pName }}"
+                        >
+                        @if ($pSold)
+                            <span class="sold-out-label" aria-label="売り切れ">sold</span>
+                        @endif
+                    </a>
+                    <h3 class="product-name">{{ $pName }}</h3>
+                </article>
+            @endforeach
+        @else
             <p class="empty-notice">購入した商品はありません。</p>
-        @endforelse
+        @endif
     </section>
 </main>
 
@@ -127,7 +115,10 @@
         });
 
         // 初期表示
-        showSection($listedSection, $purchasedSection, $listedTab, $purchasedTab);
+        $listedSection.style.display = 'grid';
+        $purchasedSection.style.display = 'none';
+        $listedTab.setAttribute('aria-selected', 'true');
+        $purchasedTab.setAttribute('aria-selected', 'false');
     })();
 </script>
 @endsection

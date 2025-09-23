@@ -3,7 +3,7 @@
   padding: 16px 0 64px;
 }
 .product-list .container {
-  max-width: 1200px;
+  max-width: 1350px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -13,22 +13,38 @@
   display: flex;
   gap: 20px;
   align-items: flex-end;
-  padding: 12px 0;
-  border-bottom: 5px solid grey; /* ← 残すグレー線 */
+  /* もとの下線は消す */
+  border-bottom: none;
+  /* 下に線の高さ分の余白を足す */
+  padding: 12px 0 22px;
+  position: relative; /* 疑似要素の基準 */
 }
+
+.tab-buttons::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;                 /* 線の位置 */
+  transform: translateX(-50%);
+  width: 100vw;              /* 画面幅いっぱい */
+  height: 5px;               /* 線の太さ */
+  background: grey;          /* 線の色 */
+  pointer-events: none;      /* クリックに干渉しない */
+}
+
 .tab-buttons .tab-link {
   display: inline-block;
   padding: 12px 0 12px 50px;
   color: #777;
-  text-decoration: none;         /* 下線なし */
+  text-decoration: none;
   border: 0;
   box-shadow: none;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
 }
 .tab-buttons .tab-link:hover { color: #444; }
 .tab-buttons .tab-link.active {
-  color: #e60023;                /* アクティブは赤文字のみ */
+  color: #e60023;
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -45,28 +61,25 @@
 
   display: grid;
   grid-template-columns: repeat(4, 260px); /* ← 4列固定 */
-  gap: 24px;                                /* 縦横の間隔 */
+  column-gap: 50px;                               /* 縦横の間隔 */
   justify-content: start;                   /* 左詰め */
 }
 
 .product-item { margin: 0; }
 
 /* ====== Card ====== */
-.product-card{
+.product-card {
   display: block;
   color: inherit;
   text-decoration: none;
-  padding: 0;                   /* 間隔は gap で管理 */
-  text-align: left;             /* 左寄せ */
 }
 
-/* サムネ（220px 正方形） */
-.product-thumb{
-  margin: 0 0 8px 0;
+/* サムネは正方形を維持 */
+.product-thumb {
   position: relative;
-  width: 220px;
+  width: 100%;
   aspect-ratio: 1 / 1;
-  background: #eee;
+  background: #eee;             /* no-image の台座 */
   border-radius: 10px;
   overflow: hidden;
 
@@ -74,9 +87,9 @@
   align-items: center;
   justify-content: center;
 
-  transition: box-shadow .15s ease, transform .15s ease;
+
 }
-.product-thumb img{
+.product-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -94,17 +107,18 @@
   top: 8px;
   left: 8px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 20px;
   line-height: 1;
   color: #fff;
-  background: #111;
+  background: #e60023;
   border-radius: 6px;
 }
 
 /* 商品名（サムネと左端を揃える） */
 .product-meta{ width: 220px; text-align: left; }
 .product-name{
-  font-size: 14px;
+  margin: 0 0 12px 36px;
+  font-size: 20px;
   color: #333;
   white-space: nowrap;
   overflow: hidden;

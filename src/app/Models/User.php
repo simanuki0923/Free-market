@@ -55,9 +55,9 @@ class User extends Authenticatable implements MustVerifyEmail
     // Relations
     // -------------------------
 
-    public function profile(): HasOne
+    public function profile()
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasOne(\App\Models\Profile::class);
     }
 
     public function products(): HasMany

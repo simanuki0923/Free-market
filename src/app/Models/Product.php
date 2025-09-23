@@ -51,7 +51,7 @@ class Product extends Model
 
     public function comments(): HasMany
     {
-        return $this->hasMany(Comment::class)->latest();
+        return $this->hasMany(Comment::class);
     }
 
     public function categories(): BelongsToMany

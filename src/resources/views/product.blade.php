@@ -1,23 +1,26 @@
+{{-- resources/views/product.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/product.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/product.css') }}">
 @endsection
 
 @section('content')
 <main class="product-detail__main container">
-
-  {{-- 商品本体 --}}
   @php
+    // 画像URL（外部URL/ストレージ/no-image）
     $src = $product->image_url
       ? (\Illuminate\Support\Str::startsWith($product->image_url, ['http://','https://'])
           ? $product->image_url
           : asset('storage/'.$product->image_url))
-      : asset('img/no-image.png');   // public/img/no-image.png を用意
+      : asset('img/no-image.png');
 
-    $favoritesCount = $product->favorites_count ?? ($product->favorites->count() ?? 0);
-    $commentsCount  = $product->comments_count  ?? ($product->comments->count()  ?? 0);
-    $isFavorited    = $isFavorited ?? false;
+    // 件数（withCount を最優先、無ければリレーションでフォールバック）
+    $favoritesCount = $product->favorites_count ?? ($product->favoredByUsers()->count() ?? 0);
+    $commentsCount  = $commentsCount ?? ($product->comments_count ?? ($product->comments()->count() ?? 0));
+
+    // お気に入り状態（コントローラから渡されていればそれを使用）
+    $isFavorited = $isFavorited ?? false;
   @endphp
 
   <article class="product-detail__container">
@@ -26,45 +29,67 @@
       <img src="{{ $src }}" alt="{{ $product->name ?? '商品画像' }}">
     </figure>
 
-    {{-- ★右：商品名〜コメント送信ボタンをまとめて青枠で囲う --}}
+    {{-- 右：商品名〜コメント送信ボタン（青枠エリアはCSS側で .product-pane に定義想定） --}}
     <div class="product-pane">
-      {{-- 右：テキスト情報 --}}
+      {{-- 基本情報 --}}
       <section class="product-detail__info">
         <h2 class="product-title">{{ $product->name ?? '商品名がありません' }}</h2>
         <p class="brand">{{ $product->brand ?? 'ブランド情報がありません' }}</p>
 
         <p class="price">
           @if (!is_null($product->price))
-            ¥{{ number_format($product->price) }} <small>（税込）</small>
+            ¥{{ number_format((int) $product->price) }} <small>（税込）</small>
           @else
             価格が設定されていません
           @endif
         </p>
 
-        {{-- いいね数コメント数（PNGアイコン下に数値） --}}
-<aside class="action-buttons">
-  <span class="favorite-button {{ $isFavorited ? 'favorited' : '' }}" aria-label="お気に入り数">
-    <img class="iconstar" src="{{ asset('img/star.png') }}" alt="お気に入り" aria-hidden="true">
-    <span class="action-count" id="favorite-count">{{ $favoritesCount }}</span>
-  </span>
-  <span class="comment-counter" aria-label="コメント数">
-    <img class="iconcomment" src="{{ asset('img/comment.png') }}" alt="コメント" aria-hidden="true">
-    <span class="action-count" id="comment-count">{{ $commentsCount }}</span>
-  </span>
-</aside>
+        {{-- いいね・コメント（PNGアイコンの下に数値） --}}
+        <aside class="action-buttons">
+          {{-- お気に入りトグル --}}
+          @auth
+            <form action="{{ route('product.favorite.toggle', ['product' => $product->id]) }}"
+                  method="POST"
+                  style="display:inline;">
+              @csrf
+              <button type="submit"
+                      class="favorite-button {{ $isFavorited ? 'favorited' : '' }}"
+                      aria-label="お気に入りに追加/解除">
+                <img class="iconstar" src="{{ asset('img/star.png') }}" alt="お気に入り" aria-hidden="true">
+                <span class="action-count" id="favorite-count">{{ $favoritesCount }}</span>
+              </button>
+            </form>
+          @endauth
 
+          @guest
+            <a href="{{ route('login') }}"
+               class="favorite-button"
+               aria-label="ログインしてお気に入りに追加">
+              <img class="iconstar" src="{{ asset('img/star.png') }}" alt="お気に入り" aria-hidden="true">
+              <span class="action-count" id="favorite-count">{{ $favoritesCount }}</span>
+            </a>
+          @endguest
 
-        {{-- 購入導線（未実装ガード） --}}
-        @php $purchaseReady = Route::has('purchase'); @endphp
-        @if ($purchaseReady)
-          <a class="purchase-button" href="{{ route('purchase', ['product' => $product->id]) }}">
-            購入
-          </a>
-        @else
-          <button class="purchase-button purchase-button--disabled" type="button" disabled title="現在準備中です">
-            購入（準備中）
-          </button>
-        @endif
+          {{-- コメント件数（表示のみ） --}}
+          <span class="comment-counter" aria-label="コメント数">
+            <img class="iconcomment" src="{{ asset('img/comment.png') }}" alt="コメント" aria-hidden="true">
+            <span class="action-count" id="comment-count">{{ $commentsCount }}</span>
+          </span>
+        </aside>
+
+        {{-- 購入ボタン：/purchase/{item_id} --}}
+<div class="action-right">
+  @if(!$product->is_sold && (!auth()->check() || $product->user_id !== auth()->id()))
+    {{-- ログイン済/未ログインどちらでも購入URLへ（未ログインはloginへリダイレクト→ログイン後に購入画面へ復帰） --}}
+    <a href="{{ route('purchase', ['item_id' => $product->id]) }}" class="purchase-button">
+      購入する
+    </a>
+  @elseif(auth()->check() && $product->user_id === auth()->id())
+    <button class="purchase-button" disabled>自分の商品は購入できません</button>
+  @else
+    <button class="purchase-button" disabled>SOLD</button>
+  @endif
+</div>
 
         {{-- 商品説明 / 商品情報 --}}
         <div class="product-info-item">
@@ -73,40 +98,35 @@
 
           <strong>商品の情報</strong>
           @php
-            // 複数カテゴリ(多対多: categories)優先、なければ単一(category)にフォールバック
+            // 複数カテゴリ(多対多: categories)優先、無ければ単一(category)へフォールバック
             $categoryNames = collect();
             if (method_exists($product, 'categories') && $product->relationLoaded('categories') && $product->categories->count()) {
-                $categoryNames = $product->categories->pluck('name');
+              $categoryNames = $product->categories->pluck('name');
             } elseif (!empty($product->category) && !empty($product->category->name)) {
-                $categoryNames = collect([$product->category->name]);
+              $categoryNames = collect([$product->category->name]);
             }
           @endphp
           <p class="category">
-            カテゴリー
+            カテゴリー：
             @if ($categoryNames->count())
               {{ $categoryNames->join(' / ') }}
             @else
-              カテゴリが設定されていません
+              設定なし
             @endif
           </p>
-          <p class="condition">商品の状態　{{ $product->condition ?? '状態情報がありません' }}</p>
+          <p class="condition">商品の状態：{{ $product->condition ?? '—' }}</p>
         </div>
       </section>
 
       {{-- =========================
-           コメント（表示・入力・送信ボタン）
-           ※ 常にフォーム表示
+           コメント（一覧・入力・送信）
          ========================= --}}
-      @php
-        $commentsCount = $product->comments_count ?? ($product->comments->count() ?? 0);
-      @endphp
-
       <section class="product-comments">
         <h3 class="comments-heading">
           コメント（<span id="comments-total">{{ $commentsCount }}</span>件）
         </h3>
 
-        {{-- コメント一覧 --}}
+        {{-- 一覧 --}}
         <ul id="comment-list" class="comment-list">
           @forelse (($product->comments ?? collect()) as $comment)
             <li class="comment-item" data-comment-id="{{ $comment->id }}">
@@ -114,14 +134,16 @@
                 @php
                   $profile = $comment->user->profile ?? null;
                   $icon = $profile && $profile->icon_image_path
-                      ? asset('storage/'.$profile->icon_image_path)
-                      : asset('img/sample.jpg');  // public/img/sample.jpg を用意
+                    ? asset('storage/' . $profile->icon_image_path)
+                    : asset('img/sample.jpg');
                 @endphp
-                <img class="comment-user__icon" src="{{ $icon }}" alt="{{ $comment->user->name ?? 'ユーザー' }}のアイコン">
+                <img class="comment-user__icon"
+                     src="{{ $icon }}"
+                     alt="{{ $comment->user->name ?? 'ユーザー' }}のアイコン">
                 <div class="comment-user__meta">
                   <span class="comment-user__name">{{ $comment->user->name ?? 'ユーザー' }}</span>
                   <time class="comment-created_at" datetime="{{ $comment->created_at }}">
-                    {{ $comment->created_at?->format('Y/m/d H:i') }}
+                    {{ optional($comment->created_at)->format('Y/m/d H:i') }}
                   </time>
                 </div>
               </div>
@@ -132,31 +154,38 @@
           @endforelse
         </ul>
 
-        {{-- コメント送信フォーム（常に表示） --}}
+        {{-- 送信フォーム（ログイン時は保存、未ログイン時はログイン画面へ遷移） --}}
+        @php $canPost = auth()->check(); @endphp
         <form id="comment-form"
               class="comment-form"
-              action="{{ url('/product/'.$product->id.'/comments') }}"
-              method="POST"
+              action="{{ $canPost ? route('comments.store', ['item_id' => $product->id]) : route('login') }}"
+              method="{{ $canPost ? 'POST' : 'GET' }}"
               novalidate>
-          @csrf
+          @if ($canPost)
+            @csrf
+          @endif
 
-          <label for="comment" class="comment-label">商品のコメント</label>
+          <label for="comment-body" class="comment-label">商品のコメント</label>
           <textarea
-            id="comment"
-            name="comment"
+            id="comment-body"
+            name="body"
             maxlength="255"
             required
             placeholder="商品の状態や気になる点などをコメントしましょう（255文字まで）"
-          >{{ old('comment') }}</textarea>
+          >{{ old('body') }}</textarea>
 
-          @error('comment')
-            <p class="form-error" role="alert">{{ $message }}</p>
-          @enderror
+          @if ($canPost)
+            @error('body')
+              <p class="form-error" role="alert">{{ $message }}</p>
+            @enderror
+          @endif
 
-          <button type="submit" class="comment-submit">コメントを送信する</button>
+          <button type="submit" class="comment-submit">
+            コメントを送信する
+          </button>
         </form>
       </section>
-    </div> {{-- /.product-pane --}}
+    </div>{{-- /.product-pane --}}
   </article>
 </main>
 @endsection
