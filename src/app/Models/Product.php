@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 use App\Models\Comment;
 use App\Models\Category;
@@ -74,6 +75,11 @@ class Product extends Model
         return $query->whereIn('id', function ($q) use ($userId) {
             $q->from('favorites')->select('product_id')->where('user_id', $userId);
         });
+    }
+
+    public function sell(): HasOne
+    {
+        return $this->hasOne(\App\Models\Sell::class, 'product_id');
     }
 }
 

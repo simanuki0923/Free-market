@@ -48,7 +48,7 @@
                     @endif
                     <!-- 出品ボタン -->
                     <li class="nav__item">
-                        <a href="/sell" class="nav__item-link nav__item-link-sell">出品</a>
+                        <a href="{{ route('sell.create') }}" class="nav__item-link nav__item-link-sell">出品</a>
                     </li>
                 </ul>
             </nav>

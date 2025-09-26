@@ -2,132 +2,97 @@
 
 @section('css')
   <link rel="stylesheet" href="{{ asset('css/mypage.css') }}">
+  <style>
+    .sold-out-label{position:absolute;top:8px;left:8px;background:#000;color:#fff;padding:2px 6px;font-size:12px;border-radius:4px}
+  </style>
 @endsection
 
 @section('content')
 @php
-  $displayName = $displayName ?? ($user->profile->display_name ?? $user->name ?? 'ユーザー');
-  $iconPath = ($user->profile && $user->profile->icon_image_path)
-      ? asset('storage/'.$user->profile->icon_image_path)
-      : asset('img/sample.jpg');
+  $user = $user ?? auth()->user();
+  $profile = optional($user)->profile;
+  $displayName = $profile->display_name ?? ($user->name ?? 'ユーザー');
+  $iconPath = $profile && $profile->icon_image_path ? asset('storage/'.$profile->icon_image_path) : asset('img/sample.jpg');
+  $active = $page ?? 'sell';
 @endphp
 
 <main class="mypage__main container">
-
-  {{-- プロフィールヘッダー --}}
   <section class="profile-section" aria-label="プロフィール">
-    <figure class="profile-icon" aria-hidden="true">
-      <img src="{{ $iconPath }}" alt="{{ $displayName.' のアイコン' }}">
-    </figure>
-
+    <figure class="profile-icon"><img src="{{ $iconPath }}" alt="{{ $displayName.' のアイコン' }}"></figure>
     <div class="profile-info">
-      <div class="profile-info-content">
-        <p class="user-name">{{ $displayName }}</p>
-      </div>
-      <a href="{{ route('mypage.profile') }}" class="edit-profile-btn">プロフィールを編集</a>
+      <p class="user-name">{{ $displayName }}</p>
+      <a href="{{ route('mypage', ['page'=>'sell']) }}" class="edit-profile-btn">プロフィールを編集</a>
     </div>
   </section>
 
-  {{-- タブ（出品した商品 / 購入した商品） --}}
   <nav class="toggle-links" aria-label="商品切替タブ">
-    <a href="javascript:void(0);" id="toggleListed" class="toggle-link active" role="button" aria-pressed="true">出品した商品</a>
-    <a href="javascript:void(0);" id="togglePurchased" class="toggle-link" role="button" aria-pressed="false">購入した商品</a>
+    <a href="{{ route('mypage', ['page' => 'sell']) }}" class="toggle-link {{ $active==='sell' ? 'active' : '' }}">出品した商品</a>
+    <a href="{{ route('mypage', ['page' => 'buy']) }}"  class="toggle-link {{ $active==='buy'  ? 'active' : '' }}">購入した商品</a>
   </nav>
 
-  {{-- 出品した商品 --}}
-  <section id="listedProducts" class="product-list" role="list">
-    @if ($listedProducts->isNotEmpty())
-      @foreach ($listedProducts as $product)
+  {{-- 出品した商品（sells -> products 詳細へ） --}}
+  @if ($active === 'sell')
+    <section class="product-list" role="list" style="margin-top:16px">
+      @forelse ($mySells as $s)
         @php
-          $thumb = $product->image_url
-            ? (\Illuminate\Support\Str::startsWith($product->image_url, ['http://','https://'])
-                ? $product->image_url
-                : asset('storage/'.$product->image_url))
-            : asset('img/no-image.png');
-        @endphp
-        <article class="product-item" role="listitem">
-          <a href="{{ route('item.show', ['item_id' => $product->id]) }}" class="product-card" aria-label="{{ $product->name }}">
-            <figure class="product-thumb">
-              <img src="{{ $thumb }}" alt="{{ $product->name }}">
-              @if ($product->is_sold)
-                <span class="sold-out-label" aria-label="売り切れ">sold</span>
-              @endif
-            </figure>
-            <div class="product-meta">
-              <p class="product-name">{{ $product->name }}</p>
-            </div>
-          </a>
-        </article>
-      @endforeach
-    @else
-      <p class="empty-note">出品した商品はありません。</p>
-    @endif
-  </section>
-
-  {{-- 購入した商品 --}}
-  <section id="purchasedProducts" class="product-list" role="list" style="display:none;">
-    @if ($purchasedProducts->isNotEmpty())
-      @foreach ($purchasedProducts as $product)
-        @php
-          // コレクション要素が配列/オブジェクトどちらでも動くように
-          $pid   = is_array($product) ? $product['id'] : ($product->id ?? null);
-          $pname = is_array($product) ? ($product['name'] ?? '') : ($product->name ?? '');
-          $pimg  = is_array($product) ? ($product['image_url'] ?? null) : ($product->image_url ?? null);
-          $thumb = $pimg
-            ? (\Illuminate\Support\Str::startsWith($pimg, ['http://','https://']) ? $pimg : asset('storage/'.$pimg))
-            : asset('img/no-image.png');
-
-          $pstatus = is_array($product) ? ($product['purchase_status'] ?? null) : ($product->purchase_status ?? null);
-          $pdate   = is_array($product) ? ($product['purchased_at'] ?? null)   : ($product->purchased_at ?? null);
+          $thumb = method_exists($s, 'getThumbUrlAttribute') ? $s->thumb_url
+                  : ($s->image_path ? (\Illuminate\Support\Str::startsWith($s->image_path, ['http://','https://']) ? $s->image_path : asset('storage/'.$s->image_path)) : asset('img/no-image.png'));
+          $pid = $s->product_id; // ← ここが肝（products.id）
         @endphp
 
         <article class="product-item" role="listitem">
-          <a href="{{ route('item.show', ['item_id' => $pid]) }}" class="product-card" aria-label="{{ $pname }}">
-            <figure class="product-thumb">
-              <img src="{{ $thumb }}" alt="{{ $pname }}">
+          @if ($pid)
+            <a href="{{ route('item.show', ['item_id' => $pid]) }}" class="product-card">
+          @else
+            <div class="product-card" title="商品詳細（products）に未リンクです">
+          @endif
+
+              <figure class="product-thumb" style="position:relative">
+                <img src="{{ $thumb }}" alt="{{ $s->name }}">
+                @if ($s->is_sold) <span class="sold-out-label">sold</span> @endif
+              </figure>
+              <div class="product-meta">
+                <p class="product-name">{{ $s->name }}</p>
+              </div>
+
+          @if ($pid)</a>@else</div>@endif
+        </article>
+      @empty
+        <p class="empty-note">出品した商品はありません。</p>
+      @endforelse
+
+      <div class="pager" style="margin-top:12px">
+        {{ $mySells->withQueryString()->links() }}
+      </div>
+    </section>
+  @endif
+
+  {{-- 購入した商品（purchases 経由） --}}
+  @if ($active === 'buy')
+    <section class="product-list" role="list">
+      @forelse ($purchasedProducts as $p)
+        @php
+          $thumb = $p->image_url ? (\Illuminate\Support\Str::startsWith($p->image_url, ['http://','https://']) ? $p->image_url : asset('storage/'.$p->image_url)) : asset('img/no-image.png');
+        @endphp
+        <article class="product-item" role="listitem">
+          <a href="{{ route('item.show', ['item_id'=>$p->id]) }}" class="product-card">
+            <figure class="product-thumb" style="position:relative">
+              <img src="{{ $thumb }}" alt="{{ $p->name }}">
+              @if ($p->is_sold) <span class="sold-out-label">sold</span> @endif
             </figure>
             <div class="product-meta">
-              <p class="product-name">{{ $pname }}</p>
-              @if($pstatus || $pdate)
-              @endif
+              <p class="product-name">{{ $p->name }}</p>
             </div>
           </a>
         </article>
-      @endforeach
-    @else
-      <p class="empty-note">購入した商品はありません。</p>
-    @endif
-  </section>
+      @empty
+        <p class="empty-note">購入した商品はありません。</p>
+      @endforelse
 
+      <div class="pager" style="margin-top:12px">
+        {{ $purchasedProducts->withQueryString()->links() }}
+      </div>
+    </section>
+  @endif
 </main>
-
-<script>
-  (function () {
-    const $listed     = document.getElementById('listedProducts');
-    const $purchased  = document.getElementById('purchasedProducts');
-    const $btnListed  = document.getElementById('toggleListed');
-    const $btnBought  = document.getElementById('togglePurchased');
-
-    function showListed() {
-      $listed.style.display = 'grid';
-      $purchased.style.display = 'none';
-      $btnListed.classList.add('active');
-      $btnBought.classList.remove('active');
-      $btnListed.setAttribute('aria-pressed','true');
-      $btnBought.setAttribute('aria-pressed','false');
-    }
-    function showPurchased() {
-      $listed.style.display = 'none';
-      $purchased.style.display = 'grid';
-      $btnListed.classList.remove('active');
-      $btnBought.classList.add('active');
-      $btnListed.setAttribute('aria-pressed','false');
-      $btnBought.setAttribute('aria-pressed','true');
-    }
-
-    $btnListed.addEventListener('click', showListed);
-    $btnBought.addEventListener('click', showPurchased);
-    showListed();
-  })();
-</script>
 @endsection

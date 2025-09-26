@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\ItemListController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProfileController;
@@ -16,17 +15,13 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseAddressController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SellController;
 
 /**
  * トップ（タブ切替）
  */
-Route::get('/', function (Request $request) {
-    $tab = strtolower($request->query('tab', 'all'));
-    if ($tab === 'mylist' && Auth::check()) {
-        return app(ItemListController::class)->index($request);
-    }
-    return app(ItemController::class)->index($request);
-})->name('item');
+Route::get('/', [ItemController::class, 'index'])
+    ->name('item');
 
 /** 商品詳細 */
 Route::get('/item/{item_id}', [ProductController::class, 'show'])
@@ -68,4 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
     Route::post('/payment',       [PaymentController::class, 'store'])->name('payment.store');
     Route::get('/payment/done',   [PaymentController::class, 'done'])->name('payment.done');
+
+    /** ★ 出品フロー（今回追加） */
+    Route::get('/sell',  [SellController::class, 'create'])->name('sell.create'); // 出品フォーム表示
+    Route::post('/sell', [SellController::class, 'store'])->name('sell.store');   // 出品登録
 });

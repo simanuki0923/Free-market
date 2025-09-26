@@ -6,24 +6,33 @@
 @endsection
 
 @section('content')
-<main class="product-list" aria-label="おすすめ一覧">
-  <div class="container">
+@php
+  // 表示用（URLのtabをそのまま採用。未指定は 'all'）
+  $activeTab = strtolower(request('tab', 'all'));
 
-    @php
-      // コントローラーから 'all' が渡ってきます（fallbackも用意）
-      $tab = strtolower($tab ?? request('tab','all'));
-    @endphp
+  // データ用（コントローラから渡された $tab を優先：未ログインの mylist は all にフォールバック済み）
+  $dataTab = strtolower($tab ?? 'all');
+@endphp
+
+<main class="product-list" aria-label="{{ $activeTab === 'mylist' ? 'マイリスト' : 'おすすめ一覧' }}">
+  <div class="container">
 
     <nav class="tab-buttons">
       <a href="{{ route('item') }}"
-         class="tab-link {{ $tab === 'all' ? 'active' : '' }}">おすすめ</a>
+         class="tab-link {{ $activeTab === 'all' ? 'active' : '' }}"
+         @if($activeTab === 'all') aria-current="page" @endif>おすすめ</a>
+
       <a href="{{ route('item', ['tab' => 'mylist']) }}"
-         class="tab-link {{ $tab === 'mylist' ? 'active' : '' }}">マイリスト</a>
+         class="tab-link {{ $activeTab === 'mylist' ? 'active' : '' }}"
+         @if($activeTab === 'mylist') aria-current="page" @endif>マイリスト</a>
     </nav>
 
     <section class="product-list__section">
       @if(($products ?? collect())->count() === 0)
-        <p class="product-empty">商品がありません。</p>
+        <p class="product-empty">
+          {{-- 見た目はURLのtabに合わせる／中身はコントローラの取得結果 --}}
+          {{ $activeTab === 'mylist' ? 'マイリストに商品がありません。' : '商品がありません。' }}
+        </p>
       @else
         <ul class="product-list__items">
           @foreach($products as $p)

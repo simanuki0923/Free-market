@@ -15,6 +15,7 @@
   max-width: var(--container);
   margin: 0 auto;
   padding: 24px 16px 64px;
+   object-fit:contain;
 }
 
 /* =========================
@@ -28,16 +29,20 @@
 }
 
 .product-detail__image{
-  /* margin:0 + margin-bottom をまとめる */
-  margin: 0 0 150px;
-  overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
-  min-height:520px;
-  margin-bottom: 200px;
+  width: 450x;               /* 必要に応じて調整。%でもOK */
+  max-width: 100%;
+  aspect-ratio: 1 / 1;        /* 正方形に固定 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
 }
+
+/* 画像をカードいっぱいに見せる（トリミングあり） */
 .product-detail__image img{
-  width:100%; height:100%;
-  object-fit:contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* 全面にフィット。構図を優先してトリミング */
 }
 
 /* ========== 商品名・ブランド・価格（右ペイン上部） ========== */

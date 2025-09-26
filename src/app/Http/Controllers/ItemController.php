@@ -9,28 +9,38 @@ use App\Models\Product;
 class ItemController extends Controller
 {
     /**
-     * おすすめ一覧（未ログインOK）
-     * 要件:
-     *  - ログイン時は「自分の出品」を除外
-     *  - 売却済みは blade 側で "Sold" バッジ表示（$p->is_sold）
+     * トップ一覧
+     * - /?tab=all    : おすすめ（全商品）
+     * - /?tab=mylist : 自分のお気に入り（favorites）
      */
     public function index(Request $request)
     {
         $perPage = 24;
+        $tab = strtolower($request->query('tab', 'all'));
 
-        $query = Product::query()
-            // 必要に応じて ->with([...]) を追加（カテゴリやコメント件数など）
-            ->latest('id');
-
-        // ログイン中のみ「自分の出品」を除外
-        if (Auth::check()) {
-            $query->where('user_id', '!=', Auth::id());
+        // 未ログインで mylist 指定時は all にフォールバック
+        if ($tab === 'mylist' && !Auth::check()) {
+            $tab = 'all';
         }
 
-        $products = $query->paginate($perPage)->appends($request->query());
-
-        // blade のタブ表示用
-        $tab = 'all';
+        if ($tab === 'mylist') {
+            // 自分のお気に入り商品（favorites 経由）
+            $products = Product::query()
+                ->select('products.*')
+                ->join('favorites', 'favorites.product_id', '=', 'products.id')
+                ->where('favorites.user_id', Auth::id())
+                ->orderByDesc('favorites.created_at')
+                ->paginate($perPage)
+                ->appends($request->query());
+        } else {
+            // おすすめ（全商品）— ログイン時は自分の出品を除外
+            $query = Product::query()->latest('id');
+            if (Auth::check()) {
+                $query->where('user_id', '!=', Auth::id());
+            }
+            $products = $query->paginate($perPage)->appends($request->query());
+            $tab = 'all';
+        }
 
         return view('item', compact('products', 'tab'));
     }

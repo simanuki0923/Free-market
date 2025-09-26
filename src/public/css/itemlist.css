@@ -19,7 +19,6 @@
   padding: 12px 0 22px;
   position: relative; /* 疑似要素の基準 */
 }
-
 .tab-buttons::after {
   content: "";
   position: absolute;
@@ -43,26 +42,34 @@
   font-size: 20px;
 }
 .tab-buttons .tab-link:hover { color: #444; }
-.tab-buttons .tab-link.active {
+
+/* ★ アクティブを赤文字（おすすめ／マイリスト共通） */
+.tab-buttons .tab-link.active,
+.tab-buttons .tab-link[aria-current="page"] {
   color: #e60023;
   border: 0 !important;
   box-shadow: none !important;
 }
+/* アクティブ時はホバーで色が変わらないよう固定（任意） */
+.tab-buttons .tab-link.active:hover,
+.tab-buttons .tab-link[aria-current="page"]:hover {
+  color: #e60023;
+}
+
 .tab-buttons .tab-link.active::after { content: none !important; }
 
 /* ====== Product grid ====== */
 .product-list__section { margin-top: 16px; }
 
-/* ★ ここが 4 列設定（260px×4 + gap） */
+/* 4 列設定（260px×4 + gap） */
 .product-list__items{
   list-style: none;
   margin: 0;
   padding: 24px 0 0;
-
   display: grid;
   grid-template-columns: repeat(4, 260px); /* ← 4列固定 */
-  column-gap: 50px;                               /* 縦横の間隔 */
-  justify-content: start;                   /* 左詰め */
+  column-gap: 50px;                        /* 縦横の間隔 */
+  justify-content: start;                  /* 左詰め */
 }
 
 .product-item { margin: 0; }
@@ -82,12 +89,9 @@
   background: #eee;             /* no-image の台座 */
   border-radius: 10px;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-
 }
 .product-thumb img {
   width: 100%;
@@ -101,7 +105,7 @@
   transform: translateY(-1px);
 }
 
-/* Sold バッジ（任意） */
+/* Sold バッジ */
 .sold-out-label{
   position: absolute;
   top: 8px;
@@ -133,5 +137,3 @@
   font-size: 14px;
   text-align: center;
 }
-
-

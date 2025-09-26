@@ -8,12 +8,26 @@
 @section('content')
 <main class="product-detail__main container">
   @php
-    // 画像URL（外部URL/ストレージ/no-image）
-    $src = $product->image_url
-      ? (\Illuminate\Support\Str::startsWith($product->image_url, ['http://','https://'])
-          ? $product->image_url
-          : asset('storage/'.$product->image_url))
-      : asset('img/no-image.png');
+    /*
+     * 画像URLの決定（優先順）
+     * 1) products.image_url
+     * 2) sells.image_path（方式Aで product->sell が1:1で紐づく）
+     * 3) /img/no-image.png
+     * その上で外部URL/ローカルstorageを判定
+     */
+    $src = $product->image_url;
+
+    if (!$src && optional($product->sell)->image_path) {
+        $src = $product->sell->image_path; // ★ 出品時の画像を利用
+    }
+
+    if (!$src) {
+        $src = asset('img/no-image.png');
+    } else {
+        $src = \Illuminate\Support\Str::startsWith($src, ['http://', 'https://'])
+            ? $src
+            : asset('storage/' . ltrim($src, '/'));
+    }
 
     // 件数（withCount を最優先、無ければリレーションでフォールバック）
     $favoritesCount = $product->favorites_count ?? ($product->favoredByUsers()->count() ?? 0);
@@ -24,12 +38,12 @@
   @endphp
 
   <article class="product-detail__container">
-    {{-- 左：画像 --}}
+    {{-- 左：画像（product.css の .product-detail__image img が効く） --}}
     <figure class="product-detail__image">
       <img src="{{ $src }}" alt="{{ $product->name ?? '商品画像' }}">
     </figure>
 
-    {{-- 右：商品名〜コメント送信ボタン（青枠エリアはCSS側で .product-pane に定義想定） --}}
+    {{-- 右ペイン --}}
     <div class="product-pane">
       {{-- 基本情報 --}}
       <section class="product-detail__info">
@@ -78,18 +92,17 @@
         </aside>
 
         {{-- 購入ボタン：/purchase/{item_id} --}}
-<div class="action-right">
-  @if(!$product->is_sold && (!auth()->check() || $product->user_id !== auth()->id()))
-    {{-- ログイン済/未ログインどちらでも購入URLへ（未ログインはloginへリダイレクト→ログイン後に購入画面へ復帰） --}}
-    <a href="{{ route('purchase', ['item_id' => $product->id]) }}" class="purchase-button">
-      購入する
-    </a>
-  @elseif(auth()->check() && $product->user_id === auth()->id())
-    <button class="purchase-button" disabled>自分の商品は購入できません</button>
-  @else
-    <button class="purchase-button" disabled>SOLD</button>
-  @endif
-</div>
+        <div class="action-right">
+          @if(!$product->is_sold && (!auth()->check() || $product->user_id !== auth()->id()))
+            <a href="{{ route('purchase', ['item_id' => $product->id]) }}" class="purchase-button">
+              購入する
+            </a>
+          @elseif(auth()->check() && $product->user_id === auth()->id())
+            <button class="purchase-button" disabled>自分の商品は購入できません</button>
+          @else
+            <button class="purchase-button" disabled>SOLD</button>
+          @endif
+        </div>
 
         {{-- 商品説明 / 商品情報 --}}
         <div class="product-info-item">
