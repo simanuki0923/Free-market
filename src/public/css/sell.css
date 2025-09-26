@@ -1,0 +1,245 @@
+/* =========================
+   Layout / Title
+   ========================= */
+.container { max-width: 700px; margin: 0 auto; padding: 0 16px; }
+
+.sell-title {
+  margin: 24px 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* =========================
+   Form Blocks
+   ========================= */
+.sell-form { background: #fff; padding: 8px 0 48px; }
+
+.sell-fieldset {
+  border: 0;              /* ← legend 下線で区切るため、上ボーダーは使わない */
+  padding: 20px 0;
+  margin: 0;
+}
+
+/* legend 文字の下にだけ下線（長さは .container と同じ 700px） */
+.sell-legend {
+  position: relative;
+  display: block;
+  padding-bottom: 8px;
+  font-size: 20px;
+  color: black;
+}
+.sell-legend::after{
+  content: "";
+  position: absolute;
+  left: 0;               /* 中央寄せにしたい場合は left:50%; transform:translateX(-50%); に変更 */
+  bottom: 0;
+  width: 660px;
+  height: 3px;
+  background: #dfdfdf;
+  border-radius: 2px;
+}
+
+/* =========================
+   Image Uploader
+   ========================= */
+.sell-image-drop {
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  position: relative;
+}
+
+.sell-image-drop input[type=file]{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.sell-image-button{
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #ff6b6b;
+  color: #fff;
+  font-weight: 700;
+}
+.sell-image-button:hover{ opacity: .9; }
+
+.sell-preview{ margin-top: 12px; }
+.sell-preview img{ max-width: 100%; height: auto; border-radius: 6px; }
+
+/* =========================
+   Inputs / Textarea
+   ========================= */
+.sell-label{
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 700;
+  font-size: 22px;
+  color: #333;
+}
+
+.sell-input{
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.sell-textarea{
+  width: 100%;
+  min-height: 160px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.sell-input:focus,
+.sell-textarea:focus{
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255,107,107,.15);
+}
+
+/* Price */
+.sell-input--price{ padding-left: 28px; }
+
+.sell-price{
+  position: relative;
+  max-width: 700px;   /* 入力幅の上限をコンテンツ幅に合わせる */
+}
+
+.sell-price .yen{
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+}
+
+/* Help / Error */
+.sell-help{ margin-top: 6px; color: #6b7280; font-size: 12px; }
+.sell-error{ margin-top: 6px; color: #e11d48; font-size: 12px; }
+
+/* Submit button */
+.sell-submit{
+  display: block;
+  width: 700px;
+  max-width: 100%;
+  margin: 28px auto 0;
+  padding: 12px 16px;
+  background: #ff6b6b;
+  color: #fff;
+  font-weight: 700;
+  border: 0;
+  border-radius: 8px;
+  font-size: 23px;
+}
+.sell-submit:hover{ opacity: .9; }
+
+/* =========================
+   Category Chips (checkbox)
+   ========================= */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-top: 6px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Visually hide real checkbox but keep it accessible */
+.chip input[type="checkbox"]{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Pill look */
+.chip span{
+  display: inline-block;
+  padding: 8px 14px;
+  border: 2px solid #fb2d2d; /* ご指定の赤枠 */
+  border-radius: 9999px;
+  background: #fff;
+  color: #444;
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+  transition: box-shadow .15s, background-color .15s, color .15s, border-color .15s;
+}
+
+/* Hover */
+.chip:hover span{ border-color: #bfc5ce; }
+
+/* Focus */
+.chip input[type="checkbox"]:focus + span{
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(255,107,107,.25);
+  border-color: #ff6b6b;
+}
+
+/* Checked */
+.chip input[type="checkbox"]:checked + span{
+  background: #ff6b6b;
+  color: #fff;
+  border-color: #ff6b6b;
+  box-shadow: 0 2px 0 rgba(0,0,0,.06) inset;
+}
+
+/* =========================
+   Condition Select (gray when open)
+   ========================= */
+/* 閉じている時は白のまま、hover/focus で淡いグレー */
+#condition.sell-input{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+#condition.sell-input:hover{ background: #eef0f3; }
+#condition.sell-input:focus{
+  background: #eef0f3;
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255,107,107,.15);
+}
+
+/* 開いたメニュー側（各 option の背景をダークグレー） */
+#condition.sell-input option{
+  background: #606061;
+  color: #ffffff;
+}
+#condition.sell-input option:disabled{ color: #9ca3af; }
+
+/* =========================
+   (任意) 2ブロック目以降だけ薄い区切り線が欲しい場合
+   ========================= */
+/*
+.sell-fieldset + .sell-fieldset{
+  border-top: 1px solid #f0f2f5;
+  margin-top: 8px;
+}
+*/
+
+/* このクラスが付いた legend は下線を出さない */
+.sell-legend.sell-legend--no-underline::after {
+  display: none;
+}
