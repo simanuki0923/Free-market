@@ -1,3 +1,4 @@
+{{-- resources/views/sell.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -8,59 +9,83 @@
 <main class="sell-form__main container">
   <h1 class="sell-title">商品の出品</h1>
 
+  @if (session('status'))
+    <div class="sell-form__status">{{ session('status') }}</div>
+  @endif
+
   <form class="sell-form" action="{{ route('sell.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
+    {{-- 商品画像（このlegendだけ下線なし） --}}
     <fieldset class="sell-fieldset">
-       <legend class="sell-legend sell-legend--no-underline">商品画像</legend>
+      <legend class="sell-legend sell-legend--no-underline">商品画像</legend>
+
       <div class="sell-image-drop">
         <input id="image" name="image" type="file" accept="image/*">
         <label for="image" class="sell-image-button">画像を選択する</label>
       </div>
+
       <figure class="sell-preview" style="display:none;">
         <img id="imagePreview" alt="画像プレビュー">
       </figure>
+
       @error('image') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
+    {{-- 商品の詳細（カテゴリ + 状態） --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品の詳細</legend>
 
       {{-- カテゴリー（複数選択・チップ風） --}}
-<label class="sell-label">カテゴリー <small>（複数選択可）</small></label>
-@php
-  $oldSelected = collect(old('categories', []))->map(fn($v)=>(string)$v)->all();
-@endphp
+      <label class="sell-label">カテゴリー <small>（複数選択可）</small></label>
+      @php
+        $oldSelected = collect(old('categories', []))->map(fn($v)=>(string)$v)->all();
+        // 念のためコントローラ未使用時のフォールバックも定義
+        $fallbackCats = collect([
+          'ファッション','家電','インテリア','レディース','メンズ','コスメ',
+          '本','ゲーム','スポーツ','キッチン','ハンドメイド','アクセサリー',
+          'おもちゃ','ベビー・キッズ',
+        ])->map(fn($n)=>['val'=>$n,'name'=>$n]);
+        $catsForView = (isset($categoriesList) && count($categoriesList))
+            ? $categoriesList
+            : $fallbackCats;
+      @endphp
 
-<div class="chip-group" role="group" aria-label="カテゴリーを選択">
-  @foreach(($categoriesList ?? collect()) as $cat)
-    <label class="chip">
-      <input
-        type="checkbox"
-        name="categories[]"
-        value="{{ $cat['val'] }}"
-        {{ in_array((string)$cat['val'], $oldSelected, true) ? 'checked' : '' }}
-      >
-      <span>{{ $cat['name'] }}</span>
-    </label>
-  @endforeach
-</div>
-@error('categories') <p class="sell-error">{{ $message }}</p> @enderror
+      <div class="chip-group" role="group" aria-label="カテゴリーを選択">
+        @foreach($catsForView as $cat)
+          @php
+            $val = (string)($cat['val'] ?? $cat->val ?? '');
+            $name = (string)($cat['name'] ?? $cat->name ?? $val);
+          @endphp
+          <label class="chip">
+            <input
+              type="checkbox"
+              name="categories[]"
+              value="{{ $val }}"
+              {{ in_array($val, $oldSelected, true) ? 'checked' : '' }}
+            >
+            <span>{{ $name }}</span>
+          </label>
+        @endforeach
+      </div>
+      @error('categories') <p class="sell-error">{{ $message }}</p> @enderror
 
-
+      {{-- 商品の状態（プルダウン） --}}
       <label class="sell-label" for="condition">商品の状態</label>
       @php
-        $conditionList = ['新品・未使用','未使用に近い','目立った傷や汚れなし','やや傷や汚れあり','傷や汚れあり','全体的に状態が悪い'];
+        $condList = $conditionList
+          ?? ['新品・未使用','未使用に近い','目立った傷や汚れなし','やや傷や汚れあり','傷や汚れあり','全体的に状態が悪い'];
       @endphp
       <select id="condition" name="condition" class="sell-input">
-        <option value="" disabled {{ old('condition') ? '' : 'selected' }}></option>
-        @foreach($conditionList as $cond)
+        <option value="" disabled {{ old('condition') ? '' : 'selected' }}>選択してください</option>
+        @foreach($condList as $cond)
           <option value="{{ $cond }}" {{ old('condition') === $cond ? 'selected' : '' }}>{{ $cond }}</option>
         @endforeach
       </select>
       @error('condition') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
+    {{-- 商品名・ブランド・説明 --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品名と説明</legend>
 
@@ -77,26 +102,29 @@
       @error('description') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
+    {{-- 価格 --}}
     <fieldset class="sell-fieldset">
+      <legend class="sell-legend">販売価格</legend>
+
       <label class="sell-label" for="price">販売価格</label>
       <div class="sell-price">
-        <span class="yen">¥</span>
+        <span class="yen" aria-hidden="true">¥</span>
         <input id="price" name="price" type="number" class="sell-input sell-input--price"
                inputmode="numeric" pattern="[0-9]*" min="1" step="1" value="{{ old('price') }}" placeholder="0">
       </div>
+      <p class="sell-help">半角数字で入力してください（例：1200）</p>
       @error('price') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
-    <form action="{{ route('sell.store') }}" method="POST" enctype="multipart/form-data">
-    @csrf
+    {{-- 送信 --}}
     <button type="submit" class="sell-submit">出品する</button>
-</form>
-
   </form>
 </main>
 
+{{-- JS：画像プレビュー＆数値入力ガード --}}
 <script>
 (function () {
+  // 画像プレビュー
   const input = document.getElementById('image');
   const box   = document.querySelector('.sell-preview');
   const img   = document.getElementById('imagePreview');
@@ -105,15 +133,23 @@
       const [file] = e.target.files || [];
       if (file) {
         const url = URL.createObjectURL(file);
-        img.src = url; box.style.display = 'block';
+        img.src = url;
+        box.style.display = 'block';
         img.onload = () => URL.revokeObjectURL(url);
-      } else { box.style.display = 'none'; img.removeAttribute('src'); }
+      } else {
+        box.style.display = 'none';
+        img.removeAttribute('src');
+      }
     });
   }
+
+  // e/E/+/-. の入力禁止
   const price = document.getElementById('price');
-  if (price) price.addEventListener('keydown', (e) => {
-    if (['e','E','+','-','.'].includes(e.key)) e.preventDefault();
-  });
+  if (price) {
+    price.addEventListener('keydown', (e) => {
+      if (['e','E','+','-','.'].includes(e.key)) e.preventDefault();
+    });
+  }
 })();
 </script>
 @endsection

@@ -57,15 +57,9 @@
         </label>
 
         <label class="form__group">
-            <span class="form__label">住所1（都道府県市区町村）</span>
+            <span class="form__label">住所</span>
             <input type="text" name="address_pref_city" value="{{ old('address_pref_city', $profile->address_pref_city ?? '') }}">
             @error('address_pref_city') <p class="error">{{ $message }}</p> @enderror
-        </label>
-
-        <label class="form__group">
-            <span class="form__label">住所2（番地）</span>
-            <input type="text" name="address_street" value="{{ old('address_street', $profile->address_street ?? '') }}">
-            @error('address_street') <p class="error">{{ $message }}</p> @enderror
         </label>
 
         <label class="form__group">

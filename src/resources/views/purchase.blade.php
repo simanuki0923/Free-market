@@ -1,4 +1,3 @@
-{{-- resources/views/purchase.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -84,7 +83,7 @@
       <article class="card">
         <header class="card__header card__header--with-action">
           <h2 class="card__title">配送先</h2>
-          <a class="link" href="{{ route('purchase.address.edit') }}">変更する</a>
+          <a class="btn" href="{{ route('purchase.address.edit', ['item_id' => $product->id]) }}">変更する</a>
         </header>
         <div class="card__section">
           <div class="address">
@@ -95,9 +94,6 @@
               <div class="address__row"><span class="muted">電話</span> {{ $phone }}</div>
             @endif
           </div>
-          @if (!$addressDisp || $addressDisp === '')
-            <p class="form-help">配送先が未登録です。「変更する」から住所を登録してください。</p>
-          @endif
         </div>
       </article>
     </section>

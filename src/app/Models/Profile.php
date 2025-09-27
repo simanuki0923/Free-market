@@ -12,8 +12,7 @@ class Profile extends Model
         'display_name',
         'icon_image_path',
         'postal_code',
-        'address_pref_city',
-        'address_street',
+        'address',
         'building_name',
     ];
 

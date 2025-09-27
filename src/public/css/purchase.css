@@ -27,6 +27,7 @@ body{ color:var(--black); background:#f5f5f5; }
   display: grid;
   grid-template-columns: 1fr 320px;  /* 左：可変 / 右：固定 */
   gap: 28px;
+  align-items: start;
 }
 
 /* =========================
@@ -46,6 +47,7 @@ body{ color:var(--black); background:#f5f5f5; }
   display:flex;
   align-items:center;
   justify-content:space-between;
+  gap:12px;
 }
 .card__title{
   margin:0;
@@ -76,10 +78,18 @@ body{ color:var(--black); background:#f5f5f5; }
 .purchase-item__thumb img{
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:cover;          /* 画像を正方形サムネに収める */
 }
-.purchase-item__info{ display:flex; flex-direction:column; gap:6px; }
-.purchase-item__name{ margin:0; font-size:16px; font-weight:700; }
+.purchase-item__info{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.purchase-item__name{
+  margin:0;
+  font-size:16px;
+  font-weight:700;
+  white-space:nowrap;        /* 長い商品名の省略 */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
 .purchase-item__price{ margin:0; font-size:16px; }
 
 /* 支払い方法フォーム */
@@ -99,8 +109,14 @@ body{ color:var(--black); background:#f5f5f5; }
   background:#fff;
 }
 
+.form-select option{
+  background:#838384;      /* ← 候補リストの背景 */
+  color:#111827;
+}
+
 /* 配送先 */
 .address{ display:flex; flex-direction:column; gap:8px; font-size:14px; }
+.address__row{ line-height:1.6; }
 .address__row .muted{
   display:inline-block;
   min-width:72px;
@@ -108,12 +124,31 @@ body{ color:var(--black); background:#f5f5f5; }
   font-size:12px;
   margin-right:8px;
 }
-.link{
-  color:#2563eb;
+
+/* 「変更する」リンクボタン */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  height:32px;
+  padding:0 12px;
+  color:blue;
+  font-size:16px;
   text-decoration:none;
-  font-size:12px;
+  cursor:pointer;
+  transition:background-color .15s ease, border-color .15s ease, transform .02s ease;
 }
-.link:hover{ text-decoration:underline; }
+.btn:hover{
+  background:#f9fafb;
+  border-color:#d1d5db;
+}
+.btn:active{
+  transform:translateY(1px);
+}
+.card__header--with-action .btn{
+  margin-left:auto;
+}
 
 /* =========================
    右カラム：サマリ
@@ -160,9 +195,14 @@ body{ color:var(--black); background:#f5f5f5; }
 .flash.success{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
 .flash.error{ background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
 
-/* =========================
-   細かな整形
-   ========================= */
+/* 補助テキスト */
+.form-help{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* 細かな整形 */
 .purchase__left > .card + .card{ margin-top:16px; }
 
 /* =========================
@@ -172,5 +212,4 @@ body{ color:var(--black); background:#f5f5f5; }
   .purchase__grid{
     grid-template-columns: 1fr;
   }
-  .summary{ position:static; }
 }

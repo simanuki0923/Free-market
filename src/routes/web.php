@@ -56,8 +56,11 @@ Route::middleware('auth')->group(function () {
         ->name('purchase');
 
     // 配送先編集
-    Route::get('/purchase/address/edit', [PurchaseAddressController::class, 'edit'])->name('purchase.address.edit');
-    Route::patch('/purchase/address',     [PurchaseAddressController::class, 'update'])->name('purchase.address.update');
+    Route::get('/purchase/address/{item_id}', [PurchaseAddressController::class, 'edit'])
+        ->whereNumber('item_id')
+        ->name('purchase.address.edit');
+    Route::patch('/purchase/address',     [PurchaseAddressController::class, 'update'])
+        ->name('purchase.address.update');
 
     // 決済（Stripe 想定）
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payment.create');

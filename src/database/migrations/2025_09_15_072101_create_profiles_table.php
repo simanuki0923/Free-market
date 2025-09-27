@@ -18,8 +18,7 @@ return new class extends Migration {
             $table->string('display_name', 255)->nullable();
             $table->string('icon_image_path', 2048)->nullable();
             $table->string('postal_code', 16)->nullable()->index();
-            $table->string('address_pref_city', 255)->nullable();
-            $table->string('address_street', 255)->nullable();
+            $table->string('address', 255)->nullable();
             $table->string('building_name', 255)->nullable();
             $table->timestamps();
         });

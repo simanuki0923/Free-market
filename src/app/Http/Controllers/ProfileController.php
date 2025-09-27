@@ -34,8 +34,7 @@ class ProfileController extends Controller
             'display_name'       => ['required','string','max:255'],
             'icon'               => ['nullable','image','mimes:jpg,jpeg,png,webp,gif','max:4096'],
             'postal_code'        => ['nullable','string','max:16'],
-            'address_pref_city'  => ['nullable','string','max:255'],
-            'address_street'     => ['nullable','string','max:255'],
+            'address'            => ['nullable','string','max:255'],
             'building_name'      => ['nullable','string','max:255'],
         ]);
 
@@ -52,8 +51,7 @@ class ProfileController extends Controller
         // 値を更新
         $profile->display_name       = $validated['display_name'];
         $profile->postal_code        = $validated['postal_code']        ?? null;
-        $profile->address_pref_city  = $validated['address_pref_city']  ?? null;
-        $profile->address_street     = $validated['address_street']     ?? null;
+        $profile->address  = $validated['address']  ?? null;
         $profile->building_name      = $validated['building_name']      ?? null;
 
         if ($request->hasFile('icon')) {
