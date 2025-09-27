@@ -1,65 +1,64 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Profile;
 
 class PurchaseAddressController extends Controller
 {
     /**
      * 住所編集フォーム表示
-     * GET /purchase/address/edit
+     * GET /purchase/address/edit?item_id=123
      */
     public function edit(Request $request)
     {
-        $user = Auth::user();
-        abort_unless($user, 403);
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
 
-        $profile = Profile::firstOrNew(['user_id' => $user->id]);
+        $profile = Profile::firstOrCreate(['user_id' => Auth::id()]);
+        $itemId  = (int) $request->query('item_id', 0);
 
-        // 直前に見ていた商品IDをセッションに保存しておけば、更新後に戻せる
-        // （PurchaseController@show で session(['last_purchase_item_id' => $product->id]) を入れておくのがオススメ）
-        $lastItemId = session('last_purchase_item_id');
-
-        return view('purchase_address_edit', [
-            'profile'   => $profile,
-            'lastItemId'=> $lastItemId,
-        ]);
+        return view('address', compact('profile', 'itemId'));
     }
 
     /**
-     * 住所更新
+     * 住所更新（PATCH）→ 購入画面へ遷移
      * PATCH /purchase/address
      */
     public function update(Request $request)
     {
-        $user = Auth::user();
-        abort_unless($user, 403);
-
-        $data = $request->validate([
-            'display_name' => ['nullable', 'string', 'max:255'],
-            'zip_code'     => ['nullable', 'string', 'max:16'],
-            'prefecture'   => ['nullable', 'string', 'max:64'],
-            'city'         => ['nullable', 'string', 'max:128'],
-            'address_line1'=> ['nullable', 'string', 'max:255'],
-            'address_line2'=> ['nullable', 'string', 'max:255'],
-            'phone'        => ['nullable', 'string', 'max:32'],
-        ]);
-
-        $profile = Profile::firstOrNew(['user_id' => $user->id]);
-        $profile->fill($data);
-        $profile->user_id = $user->id;
-        $profile->save();
-
-        // 直前に開いていた購入ページへ戻す（無ければトップ）
-        $itemId = session('last_purchase_item_id');
-        if ($itemId) {
-            return redirect()->route('purchase', ['item_id' => $itemId])
-                ->with('status', '配送先を更新しました。');
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        return redirect()->route('item')->with('status', '配送先を更新しました。');
+        $validated = $request->validate([
+            'postal_code'   => ['nullable','string','max:20'],
+            'address'       => ['required','string','max:255'],
+            'building_name' => ['nullable','string','max:255'],
+            'item_id'       => ['nullable','integer'],
+        ]);
+
+        $profile = Profile::firstOrCreate(['user_id' => Auth::id()]);
+
+        // 指定の3項目のみ更新（telは除外）
+        $profile->fill([
+            'postal_code'   => $validated['postal_code']   ?? $profile->postal_code,
+            'address'       => $validated['address']       ?? $profile->address,
+            'building_name' => $validated['building_name'] ?? $profile->building_name,
+        ])->save();
+
+        $itemId = $validated['item_id'] ?? null;
+
+        if ($itemId) {
+            return redirect()
+                ->route('purchase.show', ['item_id' => (int) $itemId])
+                ->with('success', '住所を更新しました。');
+        }
+
+        return redirect()->route('item')->with('success', '住所を更新しました。');
     }
 }
