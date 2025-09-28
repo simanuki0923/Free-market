@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 
-class FavoriteController extends Controller
+class FavoriteControllzer extends Controller
 {
     /**
      * お気に入りのトグル（追加/削除）

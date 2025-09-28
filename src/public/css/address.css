@@ -11,27 +11,16 @@
   --brand-hover:#ff5a5a;
   --error:#e11d48;      /* バリデーション・エラー */
   --success:#059669;    /* 成功メッセージ */
-  --container: 720px;
+  --container: 1350px;
 
 }
 
-* { box-sizing: border-box; }
-
-html, body {
-  height: 100%;
-}
-
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "YuGothic", "Meiryo", sans-serif;
-  color: var(--text);
-}
 
 /* =========================
    レイアウト
    ========================= */
 .container{
-  max-width: var(--container);
+  max-width: 720px;
   margin: 0 auto;
   padding: 32px 16px 64px;
 }
