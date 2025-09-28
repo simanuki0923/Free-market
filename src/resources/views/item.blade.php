@@ -32,11 +32,6 @@
     <section class="product-list__section">
       {{-- ▼ 未ログイン × マイリストタブ：商品は非表示、案内のみ --}}
       @if ($activeTab === 'mylist' && !$isLoggedIn)
-        <div class="product-empty" role="status" style="padding:16px; border:1px solid #e5e7eb; border-radius:8px;">
-          マイリストの表示にはログインが必要です。
-          <a href="{{ route('login') }}" class="btn btn-primary" style="margin-left:8px;">ログイン</a>
-        </div>
-
       {{-- ▼ 通常描画（おすすめ or ログイン済みのマイリスト） --}}
       @else
         @php
