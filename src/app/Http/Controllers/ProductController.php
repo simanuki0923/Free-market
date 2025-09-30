@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Http\Requests\CommentRequest;
 
 class ProductController extends Controller
 {
-    
+
     public function show(int $item_id)
     {
         $product = Product::query()
@@ -50,29 +51,22 @@ class ProductController extends Controller
         ]);
     }
 
-    public function storeComment(Request $request, int $item_id): RedirectResponse
+    public function storeComment(CommentRequest $request, int $item_id): RedirectResponse
     {
-        // バリデーション（255文字制限などは要件に合わせて調整）
-        $validated = $request->validate(
-            ['body' => ['required', 'string', 'max:255']],
-            [
-                'body.required' => 'コメントを入力してください。',
-                'body.max'      => 'コメントは255文字以内で入力してください。',
-            ]
-        );
+        $validated = $request->validated(); // ['body' => '...']
 
-        // 対象商品が存在するか確認
         $product = Product::findOrFail($item_id);
 
-        // 保存
         $product->comments()->create([
-            'user_id'   => $request->user()->id,
-            'body'      => $validated['body'],
+            'user_id' => $request->user()->id,
+            'body'    => $validated['body'],
         ]);
 
-        // 元の詳細画面に戻る（withCount で件数が更新される）
         return back()->with('status', 'コメントを投稿しました。');
     }
+
+    // ...（他は現状のまま）...
+
 
     /**
      * ログインユーザーが「お気に入り済み」かを判定
@@ -93,5 +87,5 @@ class ProductController extends Controller
             ->exists();
     }
 
-    
+
 }

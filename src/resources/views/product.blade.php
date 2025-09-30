@@ -184,7 +184,6 @@
             name="body"
             maxlength="255"
             required
-            placeholder="商品の状態や気になる点などをコメントしましょう（255文字まで）"
           >{{ old('body') }}</textarea>
 
           @if ($canPost)
