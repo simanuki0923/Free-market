@@ -2,115 +2,138 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sell extends Model
 {
     use HasFactory;
 
-    protected $table = 'sells';
-
-    /** 表示用ラベル（1..6） */
-    public const CONDITION_LABELS = [
-        1 => '新品・未使用',
-        2 => '未使用に近い',
-        3 => '目立った傷や汚れなし',
-        4 => 'やや傷や汚れあり',
-        5 => '傷や汚れあり',
-        6 => '全体的に状態が悪い',
-    ];
-
     /**
-     * 入力→数値 正規化用の別名マップ（フォームのゆらぎ対策）
-     * キーは受け取りうる文字列、値は保存する数値
+     * スキーマ想定：
+     * - id, user_id, product_id, price, is_sold, image_path など
+     * - （存在する場合のみ）category_id / name / brand / description / condition
+     *   → プロジェクトの実マイグレーションに合わせてOK
      */
-    public const CONDITION_MAP = [
-        // 正式ラベル
-        '新品・未使用'         => 1,
-        '未使用に近い'         => 2,
-        '目立った傷や汚れなし' => 3,
-        'やや傷や汚れあり'     => 4,
-        '傷や汚れあり'         => 5,
-        '全体的に状態が悪い'   => 6,
-
-        // よくある略称/別名
-        '新品'                 => 1,
-        '未使用'               => 1,
-        '未使用品'             => 1,
-
-        // 数値文字列も許容
-        '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6,
-    ];
-
     protected $fillable = [
-        'user_id', 'product_id', 'name', 'brand', 'price',
-        'image_path', 'condition', 'description', 'is_sold',
+        'user_id', 'product_id',
+        'category_id', // ※無いテーブルなら削除してOK
+        'name',        // ※同上（productへ正規化されていれば未使用）
+        'brand',       // ※同上
+        'price',
+        'image_path',
+        'condition',   // ※同上
+        'description', // ※同上
+        'is_sold',
     ];
 
     protected $casts = [
-        'price'     => 'integer',
-        'is_sold'   => 'boolean',
-        'condition' => 'integer',
+        'price'   => 'integer',
+        'is_sold' => 'boolean',
     ];
 
-    /** リレーション */
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    /* ===============================
+     |  Relations
+     |===============================*/
 
-    public function product(): BelongsTo { return $this->belongsTo(Product::class, 'product_id'); }
-
-    public function categories(): BelongsToMany
+    /** 出品者 */
+    public function user(): BelongsTo
     {
-        // pivot: category_sell(sell_id, category_id)
-        return $this->belongsToMany(Category::class, 'category_sell', 'sell_id', 'category_id')
-                    ->withTimestamps();
+        return $this->belongsTo(User::class);
     }
 
-    /** サムネイルURL（storage/外部URL/no-image対応） */
+    /** 元の商品 */
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * カテゴリ（Sell 直下に category_id がある場合のみ）
+     * 通常は product.category を辿る方が自然です。
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * 購入レコード（1件だけ拾いたいとき）
+     * - 「1出品=1購入」を想定する画面用のショートカット
+     * - 実DBは複数許容なので、厳密には latestPurchase を使うのが安全
+     */
+    public function purchase(): HasOne
+    {
+        return $this->hasOne(Purchase::class);
+    }
+
+    /** 購入レコード（複数想定・集計等に使用） */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
+    /**
+     * 直近の購入（first sold などの画面用）
+     * ※ Laravel 9+ の latestOfMany/oldestOfMany を使用
+     */
+    public function latestPurchase(): HasOne
+    {
+        return $this->hasOne(Purchase::class)->latestOfMany('purchased_at');
+    }
+
+    /* ===============================
+     |  Scopes
+     |===============================*/
+
+    /** ユーザーで絞り込み（出品者） */
+    public function scopeByUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /** 販売中 */
+    public function scopeAvailable($query)
+    {
+        return $query->where('is_sold', false);
+    }
+
+    /** 売り切れ */
+    public function scopeSold($query)
+    {
+        return $query->where('is_sold', true);
+    }
+
+    /* ===============================
+     |  Accessors (UIヘルパ)
+     |===============================*/
+
+    /**
+     * サムネイルURL（外部URL / storage / no-image）
+     * - Sell.image_path を優先
+     * - 無ければ product 側の image_url / image_path をフォールバック
+     */
     public function getThumbUrlAttribute(): string
     {
-        if (!$this->image_path) return asset('img/no-image.png');
-        return Str::startsWith($this->image_path, ['http://','https://'])
-            ? $this->image_path
-            : asset('storage/'.$this->image_path);
-    }
+        // 1) Sell 側の image_path
+        $path = $this->image_path;
 
-    /** 保存前に状態を数値へ正規化（コントローラ側での変換が不要に） */
-    public function setConditionAttribute($value): void
-    {
-        $this->attributes['condition'] = self::normalizeCondition($value);
-    }
-
-    /** 数値→ラベル（$sell->condition_label で取得） */
-    public function getConditionLabelAttribute(): ?string
-    {
-        $c = $this->condition;
-        return $c ? (self::CONDITION_LABELS[$c] ?? null) : null;
-    }
-
-    /** 文字列/数値どちらでも受け取り、1..6 の数値へ正規化 */
-    public static function normalizeCondition(null|string|int $value): ?int
-    {
-        if ($value === null || $value === '') return null;
-
-        // 数値/数値文字列なら範囲チェック
-        if (is_numeric($value)) {
-            $n = (int)$value;
-            return ($n >= 1 && $n <= 6) ? $n : null;
+        // 2) 無ければ Product 側の画像を拝借
+        if (!$path && $this->relationLoaded('product') && $this->product) {
+            $path = $this->product->image_url ?? $this->product->image_path ?? null;
         }
 
-        // 文字列マップ照合（全角・前後空白対策）
-        $key = trim((string)$value);
-        if (array_key_exists($key, self::CONDITION_MAP)) {
-            return self::CONDITION_MAP[$key];
+        if (!empty($path)) {
+            // http(s) ならそのまま、相対なら storage パスへ
+            if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+                return $path;
+            }
+            return asset('storage/' . ltrim($path, '/'));
         }
 
-        return null; // 不明値は null（バリデーションで弾くことを推奨）
+        return asset('img/no-image.png');
     }
-
-    /** ログインユーザー絞り込み */
-    public function scopeByUser($q, int $userId) { return $q->where('user_id', $userId); }
 }

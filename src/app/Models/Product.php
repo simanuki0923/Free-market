@@ -2,84 +2,60 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-
-use App\Models\Comment;
-use App\Models\Category;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'name',
-        'brand',
-        'price',
-        'image_url',
-        'is_sold',
-        'condition',
-        'description',
+        'user_id','category_id','name','brand','price','image_path',
+        'condition','description','is_sold',
     ];
 
     protected $casts = [
-        'is_sold' => 'boolean',
         'price'   => 'integer',
+        'is_sold' => 'boolean',
     ];
 
+    /** 作成者 */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function favoredByUsers(): BelongsToMany
+    /** カテゴリ */
+    public function category(): BelongsTo
     {
-        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+        return $this->belongsTo(Category::class);
     }
 
-    public function favoredBy()
-    {
-        return $this->belongsToMany(User::class, 'favorites')
-                ->withTimestamps();
-    }
-
+    /** コメント（product_id 外部キー） */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function categories(): BelongsToMany
+    /** お気に入り（favorites テーブル直参照） */
+    public function favorites(): HasMany
     {
-        return $this->belongsToMany(Category::class)->withTimestamps();
+        return $this->hasMany(Favorite::class);
     }
 
-    // ログインユーザー自身の出品を除外するための補助スコープ
-    public function scopeExcludeOwner(Builder $query, ?int $userId): Builder
+    /** この商品をお気に入りに入れたユーザー（pivot: favorites） */
+    public function favoredByUsers(): BelongsToMany
     {
-        if ($userId) {
-            $query->where('user_id', '!=', $userId);
-        }
-        return $query;
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
-    // 指定ユーザーの「お気に入り」商品のみに絞るスコープ
-    public function scopeOnlyFavoritesOf(Builder $query, int $userId): Builder
-    {
-        return $query->whereIn('id', function ($q) use ($userId) {
-            $q->from('favorites')->select('product_id')->where('user_id', $userId);
-        });
-    }
-
+    /** 1:1で対応する出品 */
     public function sell(): HasOne
     {
-        return $this->hasOne(\App\Models\Sell::class, 'product_id');
+        return $this->hasOne(Sell::class);
     }
 }
-

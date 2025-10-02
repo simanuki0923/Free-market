@@ -2,43 +2,36 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Purchase extends Model
 {
-    use HasFactory;
-
-    // ★ マイグレーションの列名に合わせる
     protected $fillable = [
-        'user_id',
-        'product_id',
-        'price',                 // マイグレーションに合わせる（decimalでもintegerでもOK）
-        'payment_method',        // 'credit_card' 等
-        'status',                // 'paid' など
-        'stripe_session_id',     // 使わなければ未使用のままでOK
-        'shipping_recipient',
-        'shipping_postal_code',
-        'shipping_prefecture',
-        'shipping_city',
-        'shipping_address_line1',
-        'shipping_address_line2',
-        'shipping_phone',
-        'purchase_date',         // 使う場合
+        'user_id',      // 購入者
+        'sell_id',      // 出品
+        'amount',       // 購入金額（見積もり）
+        'purchased_at',
     ];
 
-    protected $casts = [
-        'purchase_date' => 'datetime',  // ← キャスト対象も修正
-    ];
-
-    public function user(): BelongsTo
+    public function payment()
     {
-        return $this->belongsTo(User::class);
+        // 1:1 の想定なら hasOne
+        return $this->hasOne(Payment::class);
     }
 
-    public function product(): BelongsTo
+    // もし分割払い等で複数支払いを許容するなら hasMany にする
+    // public function payments() { return $this->hasMany(Payment::class); }
+
+    public function sell()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Sell::class);
+    }
+
+    public function buyer()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -2,87 +2,50 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-
-// リレーション型
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name','email','password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password','remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function profile(): HasOne
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-        ];
+        return $this->hasOne(Profile::class);
     }
 
-    // -------------------------
-    // Relations
-    // -------------------------
-
-    public function profile()
+    public function sells(): HasMany
     {
-        return $this->hasOne(\App\Models\Profile::class);
+        return $this->hasMany(Sell::class);
     }
 
-    public function products(): HasMany
+    public function purchases(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Purchase::class);
     }
 
-    /**
-     * 中間テーブル favorites をそのまま扱う（必要なら保持）
-     * Favorite モデルがある場合に利用
-     */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /**
-     * お気に入りの商品一覧（マイリスト表示用）
-     * 中間テーブル：favorites（user_id, product_id）
-     */
-    public function favoritedProducts()
+    public function comments(): HasMany
     {
-        // 中間テーブル名やカラム名が異なる場合は第2〜第4引数を合わせる
-        return $this->belongsToMany(Product::class, 'favorites') //, 'user_id', 'product_id'
-                    ->withTimestamps();
+        return $this->hasMany(Comment::class);
     }
 }
-

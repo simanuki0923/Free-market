@@ -1,29 +1,24 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    // 必要なカラムだけを fillable に
-    protected $fillable = ['name', 'slug']; // slugを使わないなら ['name'] にしてOK
+    use HasFactory;
 
-    /** products との多対多 */
-    public function products(): BelongsToMany
+    protected $fillable = ['name','slug'];
+
+    public function products(): HasMany
     {
-        // 既定ピボット: category_product (category_id, product_id)
-        return $this->belongsToMany(Product::class)->withTimestamps();
+        return $this->hasMany(Product::class);
     }
 
-    /**
-     * （任意）sells との多対多
-     * ※ 本当に 'category_sell' ピボットがある場合のみ使う。無ければこのメソッドは削除してください。
-     */
-    public function sells(): BelongsToMany
+    public function sells(): HasMany
     {
-        return $this->belongsToMany(Sell::class, 'category_sell')->withTimestamps();
+        return $this->hasMany(Sell::class);
     }
 }
