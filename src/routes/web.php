@@ -10,6 +10,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\CommentController;
 
 // ★ 追加
 use App\Http\Controllers\PurchaseController;
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
         ->name('product.favorite.toggle');
 
     /** コメント投稿 */
-    Route::post('/item/{item_id}/comments', [ProductController::class, 'storeComment'])
+    Route::post('/item/{item_id}/comments', [CommentController::class, 'storeComment'])
         ->whereNumber('item_id')
         ->name('comments.store');
 
