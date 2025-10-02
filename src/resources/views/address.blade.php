@@ -31,51 +31,51 @@
     {{-- 確実に item_id を渡す --}}
     <input type="hidden" name="item_id" value="{{ $item_id }}">
 
-    {{-- 郵便番号（profiles.postcode） --}}
+    {{-- 郵便番号（profiles.postal_code） --}}
     <div class="form-row">
-      <label for="postcode">郵便番号</label>
+      <label for="postal_code">郵便番号</label>
       <input
         type="text"
-        id="postcode"
-        name="postcode"
+        id="postal_code"
+        name="postal_code"
         inputmode="numeric"
         pattern="\d{3}-?\d{4}"
         autocomplete="postal-code"
-        value="{{ old('postcode', $profile->postcode ?? '') }}"
-        aria-describedby="postcode_help"
+        value="{{ old('postal_code', $profile->postal_code ?? '') }}"
+        aria-describedby="postal_code_help"
       >
-      @error('postcode')
+      @error('postal_code')
         <p class="error-message">{{ $message }}</p>
       @enderror
     </div>
 
-    {{-- 住所（必須）profiles.address --}}
+    {{-- 住所1（必須）profiles.address1 --}}
     <div class="form-row">
-      <label for="address">住所 <span class="required" aria-label="必須"></span></label>
+      <label for="address1">住所 <span class="required" aria-label="必須"></span></label>
       <input
         type="text"
-        id="address"
-        name="address"
+        id="address1"
+        name="address1"
         required
         autocomplete="street-address"
-        value="{{ old('address', $profile->address ?? '') }}"
+        value="{{ old('address1', $profile->address1 ?? '') }}"
       >
-      @error('address')
+      @error('address1')
         <p class="error-message">{{ $message }}</p>
       @enderror
     </div>
 
-    {{-- 建物名（任意）profiles.building_name --}}
+    {{-- 住所2（任意：建物名など）profiles.address2 --}}
     <div class="form-row">
-      <label for="building_name">建物名</label>
+      <label for="address2">建物名</label>
       <input
         type="text"
-        id="building_name"
-        name="building_name"
+        id="address2"
+        name="address2"
         autocomplete="address-line2"
-        value="{{ old('building_name', $profile->building_name ?? '') }}"
+        value="{{ old('address2', $profile->address2 ?? '') }}"
       >
-      @error('building_name')
+      @error('address2')
         <p class="error-message">{{ $message }}</p>
       @enderror
     </div>
