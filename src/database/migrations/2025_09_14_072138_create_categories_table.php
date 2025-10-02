@@ -6,17 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        Schema::create('users', function (Blueprint $t) {
+        Schema::create('categories', function (Blueprint $t) {
             $t->id();
             $t->string('name');
-            $t->string('email')->unique();
-            $t->timestamp('email_verified_at')->nullable();
-            $t->string('password');
-            $t->rememberToken();
+            $t->string('slug')->unique();
             $t->timestamps();
+
+            $t->index('name');
         });
     }
-    public function down(): void {
-        Schema::dropIfExists('users');
-    }
+    public function down(): void { Schema::dropIfExists('categories'); }
 };
