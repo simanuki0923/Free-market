@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
-use Illuminate\Pagination\LengthAwarePaginator; // ← 追加
-use Illuminate\Support\Collection;              // ← 追加
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ItemController extends Controller
 {
@@ -18,48 +17,55 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $perPage = 24;
-        $tab = strtolower($request->query('tab', 'all'));
-        $page = (int) $request->query('page', 1);
 
-        $canSeeMylist = Auth::check();
+        // 1) タブ値を正規化（未知の値は all にフォールバック）
+        $rawTab = strtolower((string)$request->query('tab', 'all'));
+        $tab = in_array($rawTab, ['all', 'mylist'], true) ? $rawTab : 'all';
+
+        $page = (int) $request->query('page', 1);
+        $isLoggedIn = Auth::check();
 
         if ($tab === 'mylist') {
-            if (!$canSeeMylist) {
-                // 未ログイン時：空のページネータを返し、tab は mylist のまま
+            if (!$isLoggedIn) {
+                // 未ログイン：空のページネータを返す（tab は mylist のまま）
                 $products = new LengthAwarePaginator(
-                    collect(),     // 空コレクション
-                    0,             // トータル0件
+                    collect(), // 空
+                    0,         // トータル0件
                     $perPage,
                     $page,
                     [
                         'path'  => url()->current(),
-                        'query' => $request->query(),
+                        'query' => array_merge($request->query(), ['tab' => 'mylist']),
                     ]
                 );
+                $products->setPageName('page');
             } else {
-                // 自分のお気に入り商品（favorites 経由）
+                // ログイン済：お気に入り一覧（新しい順）
                 $products = Product::query()
                     ->select('products.*')
                     ->join('favorites', 'favorites.product_id', '=', 'products.id')
                     ->where('favorites.user_id', Auth::id())
                     ->orderByDesc('favorites.created_at')
                     ->paginate($perPage)
-                    ->appends($request->query());
+                    ->appends(array_merge($request->query(), ['tab' => 'mylist']));
             }
         } else {
-            // おすすめ（全商品）— ログイン時は自分の出品を除外
+            // おすすめ：全商品（ログイン中は自分の出品を除外）
             $query = Product::query()->latest('id');
-            if (Auth::check()) {
+            if ($isLoggedIn) {
                 $query->where('user_id', '!=', Auth::id());
             }
-            $products = $query->paginate($perPage)->appends($request->query());
-            $tab = 'all';
+
+            $products = $query
+                ->paginate($perPage)
+                ->appends(array_merge($request->query(), ['tab' => 'all']));
+            $tab = 'all'; // 念のため固定
         }
 
         return view('item', [
             'products'     => $products,
-            'tab'          => $tab,
-            'canSeeMylist' => $canSeeMylist, // ← Blade で分岐に使う
+            'tab'          => $tab,        // ← これを Blade の表示状態に使う
+            'isLoggedIn'   => $isLoggedIn, // ← Blade 分岐用
         ]);
     }
 }

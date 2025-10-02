@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\Profile;
-use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -15,16 +16,15 @@ class PurchaseController extends Controller
             return redirect()->route('login');
         }
 
-        $product = Product::findOrFail($item_id);
+        $product = Product::with('sell')->findOrFail($item_id);
 
         // 自分の商品 or 売切れは一覧へ
-        if ($product->user_id === Auth::id() || $product->is_sold) {
+        if ($product->user_id === Auth::id() || $product->is_sold || optional($product->sell)->is_sold) {
             return redirect()->route('item')->with('error', '購入できない商品です。');
         }
 
         $profile = Profile::where('user_id', Auth::id())->first();
-        // 右側サマリ初期表示用（画面で変更可能）
-        $payment = (object)['payment_method' => 'convenience_store'];
+        $payment = (object)['payment_method' => 'convenience_store']; // 初期表示用
 
         return view('purchase', compact('product', 'profile', 'payment'));
     }
