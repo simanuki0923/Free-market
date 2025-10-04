@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\ProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Profile;
@@ -31,26 +32,11 @@ class ProfileController extends Controller
     }
 
     /** プロフィール更新（PATCH /profile） */
-    public function update(Request $request): RedirectResponse
+    public function update(ProfileRequest $request): RedirectResponse
     {
         $user = Auth::user();
+        $validated = $request->validated();
         abort_if(!$user, 403);
-
-        // 旧フォーム名（address/building_name）にも対応
-        $validated = $request->validate([
-            'display_name'  => ['required', 'string', 'max:255'],
-            'icon'          => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
-            'postal_code'   => ['nullable', 'string', 'max:16'],
-
-            // 新フォーム推奨：address1/address2
-            'address1'      => ['nullable', 'string', 'max:255'],
-            'address2'      => ['nullable', 'string', 'max:255'],
-            'phone'         => ['nullable', 'string', 'max:50'],
-
-            // 互換（旧フォーム名）
-            'address'       => ['nullable', 'string', 'max:255'],
-            'building_name' => ['nullable', 'string', 'max:255'],
-        ]);
 
         // プロフィールが無ければ作成
         $profile = $user->profile()->firstOrCreate(['user_id' => $user->id]);

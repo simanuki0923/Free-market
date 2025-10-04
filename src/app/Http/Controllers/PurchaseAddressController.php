@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
 use App\Models\Product;
 use Illuminate\Support\Arr;
+use App\Http\Requests\AddressRequest;
 
 class PurchaseAddressController extends Controller
 {
@@ -15,39 +16,30 @@ class PurchaseAddressController extends Controller
         $this->middleware('auth');
     }
 
-   // app/Http/Controllers/PurchaseAddressController.php
-public function edit(Request $request)
-{
-    // ?item_id= / /purchase/address/{item_id} のどちらでも受ける
-    $itemId = (int) ($request->query('item_id') ?? $request->route('item_id'));
+    /** 住所編集フォーム表示 */
+    public function edit(Request $request)
+    {
+        // ?item_id= でも /purchase/address/{item_id} でも受ける
+        $itemId = (int) ($request->query('item_id') ?? $request->route('item_id'));
 
-    if ($itemId <= 0) {
-        // 戻り先がなければ一覧などに飛ばす（任意の安全策）
-        return redirect()->route('item')->with('error', '商品が指定されていません。');
+        if ($itemId <= 0) {
+            return redirect()->route('item')->with('error', '商品が指定されていません。');
+        }
+
+        // プロフィールが無ければ空で作成
+        $profile = Profile::firstOrCreate(['user_id' => Auth::id()]);
+
+        return view('address', [
+            'profile' => $profile,
+            'item_id' => $itemId, // ← hidden で埋め込む
+        ]);
     }
 
-    $profile = Profile::firstOrCreate(['user_id' => Auth::id()]);
-
-    return view('address', [
-        'profile' => $profile,
-        'item_id' => $itemId,   // ← フォーム hidden に埋め込む
-    ]);
-}
-
-
     /** 住所更新 → 購入画面へ戻る */
-    public function update(Request $request)
+    public function update(AddressRequest $request)
     {
-        // item_id を最初に拾っておく（エラー時の戻り先に使える）
-        $itemId = (int) $request->input('item_id');
-
-        $validated = $request->validate([
-            'postal_code' => ['nullable','string','max:20'],
-            'address1'    => ['required','string','max:255'], // ← 住所は必須にしておくと親切
-            'address2'    => ['nullable','string','max:255'],
-            'phone'       => ['nullable','string','max:50'],
-            'item_id'     => ['bail','required','integer','exists:products,id'],
-        ]);
+        // バリデーション済みデータ
+        $validated = $request->validated();
 
         $profile = Profile::firstOrCreate(['user_id' => Auth::id()]);
 
