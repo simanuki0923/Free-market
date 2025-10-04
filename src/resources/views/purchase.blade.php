@@ -22,6 +22,9 @@
   $addr2       = optional($profile)->address2 ?? '';
   $phone       = optional($profile)->phone ?? '';
   $addressDisp = trim($addr1 . ' ' . $addr2);
+
+  // 支払い方法の初期値：未選択スタート（空文字）
+  $initialPayment = old('payment_method') ?? (optional($payment)->payment_method ?? '');
 @endphp
 
 <main class="purchase__main container">
@@ -63,9 +66,9 @@
 
             <label for="payment_method" class="form-label">支払い方法を選択</label>
             <select id="payment_method" name="payment_method" class="form-select" required>
-              <option value="" disabled {{ empty(optional($payment)->payment_method) ? 'selected' : '' }}>選択してください</option>
-              <option value="convenience_store" {{ (optional($payment)->payment_method ?? '') === 'convenience_store' ? 'selected' : '' }}>コンビニ払い</option>
-              <option value="credit_card"       {{ (optional($payment)->payment_method ?? '') === 'credit_card' ? 'selected' : '' }}>クレジットカード</option>
+              <option value="" disabled {{ $initialPayment === '' ? 'selected' : '' }}>選択してください</option>
+              <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ払い</option>
+              <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>クレジットカード</option>
             </select>
           </form>
         </div>
@@ -104,8 +107,8 @@
           <span>支払い方法</span>
           <span id="summary-payment">
             @php
-              $pm = optional($payment)->payment_method;
-              $pmText = $pm === 'credit_card' ? 'クレジットカード' : ($pm === 'convenience_store' ? 'コンビニ払い' : '未選択');
+              $pmText = $initialPayment === 'credit_card' ? 'クレジットカード'
+                       : ($initialPayment === 'convenience_store' ? 'コンビニ払い' : '未選択');
             @endphp
             {{ $pmText }}
           </span>
@@ -130,13 +133,20 @@
     var select  = document.getElementById('payment_method');
     var summary = document.getElementById('summary-payment');
     if (!select || !summary) return;
+
     var label = function (v) {
       if (v === 'credit_card') return 'クレジットカード';
       if (v === 'convenience_store') return 'コンビニ払い';
       return '未選択';
     };
+
+    // 初期表示：現在のvalue（空なら未選択）に合わせて右側も表示
     summary.textContent = label(select.value);
-    select.addEventListener('change', function(){ summary.textContent = label(this.value); });
+
+    // 変更時に同期
+    select.addEventListener('change', function () {
+      summary.textContent = label(this.value);
+    });
   })();
 </script>
 @endpush

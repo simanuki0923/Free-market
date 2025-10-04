@@ -112,7 +112,6 @@
         <input id="price" name="price" type="number" class="sell-input sell-input--price"
                inputmode="numeric" pattern="[0-9]*" min="1" step="1" value="{{ old('price') }}" placeholder="0">
       </div>
-      <p class="sell-help">半角数字で入力してください（例：1200）</p>
       @error('price') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 

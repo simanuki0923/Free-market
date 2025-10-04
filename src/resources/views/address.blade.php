@@ -29,17 +29,19 @@
     @method('PATCH')
 
     {{-- 確実に item_id を渡す --}}
-    <input type="hidden" name="item_id" value="{{ $item_id }}">
+    <input type="hidden" name="item_id" value="{{ old('item_id', $item_id) }}">
 
     {{-- 郵便番号（profiles.postal_code） --}}
     <div class="form-row">
-      <label for="postal_code">郵便番号</label>
+      <label for="postal_code">郵便番号 <span class="required" aria-label="必須"></span></label>
       <input
         type="text"
         id="postal_code"
         name="postal_code"
+        required
         inputmode="numeric"
-        pattern="\d{3}-?\d{4}"
+        pattern="\d{3}-\d{4}"
+        maxlength="8"
         autocomplete="postal-code"
         value="{{ old('postal_code', $profile->postal_code ?? '') }}"
         aria-describedby="postal_code_help"

@@ -43,10 +43,6 @@
     <section class="product-list__section">
       {{-- 未ログイン × マイリストタブ：商品は出さず案内のみ --}}
       @if ($activeTab === 'mylist' && !$isLoggedIn)
-        <div class="product-empty notice">
-          <p>マイリストを表示するにはログインしてください。</p>
-          <p><a class="btn" href="{{ route('login') }}">ログインする</a></p>
-        </div>
       @else
         @php
           $count = ($products ?? collect())->count();
