@@ -13,8 +13,11 @@
   --success:#059669;    /* 成功メッセージ */
   --container: 1350px;
 
+  /* 参照されているトークンのデフォルト（未定義対策） */
+  --radius: 12px;
+  --shadow: 0 8px 20px rgba(0,0,0,.06);
+  --shadow-light: 0 2px 8px rgba(0,0,0,.04);
 }
-
 
 /* =========================
    レイアウト
@@ -84,7 +87,6 @@
   font-weight: 700;
 }
 
-
 input[type="text"]{
   width: 100%;
   height: 40px;
@@ -97,7 +99,6 @@ input[type="text"]{
   outline: none;
   transition: box-shadow .15s ease, border-color .15s ease;
 }
-
 
 input:focus{
   border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
@@ -156,16 +157,15 @@ input:focus{
   transform: translateY(1px);
 }
 
-/* =========================
-   レスポンシブ
-   ========================= */
-@media (max-width: 640px){
-  .edit-address__main{
-    padding: 28px 18px 32px;
-    margin-top: 28px;
-    border-radius: 12px;
-  }
-  .btn-primary{
-    width: 100%;
-  }
+/* =========================================================
+   ① PC帯 1400–1540px：元CSSから“見た目の変更なし”
+   （将来の調整時に誤って崩さないための明示オーバーライド）
+   ========================================================= */
+@media (min-width:1400px) and (max-width:1540px){
+  .container{ max-width: 720px; padding: 32px 16px 64px; }
+  .edit-address__main{ margin-top:56px; padding:40px 56px 48px; border-radius:var(--radius); }
+  .edit-address__main h1{ font-size: clamp(30px, 2.4vw, 24px); }
+  .form-row label{ font-size:20px; }
+  .btn{ font-size:20px; padding:12px 20px; }
+  .btn-primary{ width: min(800px, 100%); }
 }

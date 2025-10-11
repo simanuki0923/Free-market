@@ -168,21 +168,10 @@ body {
   margin-bottom: 12px;
 }
 
-/* レスポンシブ */
-@media (max-width: 560px) {
-  .profile-section {
-    grid-template-columns: 1fr;
-    padding: 24px 18px 28px;
-  }
-  .profile-icon {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    margin: 0 auto 6px;
-  }
-  .profile-info {
-    grid-column: 1 / -1;
-  }
-  .profile-section::before {
-    margin-bottom: 12px;
-  }
+/* ----------------------------------------------------
+   1400–1540px：見た目はベース（＝変更なし）
+   ※要件通り「元CSSと変わらない」ことを明示するための空ブレークポイント
+---------------------------------------------------- */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  /* オーバーライド無し（ベースのまま維持） */
 }

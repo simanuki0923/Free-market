@@ -20,7 +20,7 @@
   margin: 0;
 }
 
-/* legend 文字の下にだけ下線（長さは .container と同じ 700px） */
+/* legend 文字の下にだけ下線（PCは .container と同じ見た目の長さに） */
 .sell-legend {
   position: relative;
   display: block;
@@ -31,9 +31,9 @@
 .sell-legend::after{
   content: "";
   position: absolute;
-  left: 0;               /* 中央寄せにしたい場合は left:50%; transform:translateX(-50%); に変更 */
+  left: 0;
   bottom: 0;
-  width: 660px;
+  width: 660px;            /* ← 基本は従来どおり */
   height: 3px;
   background: #dfdfdf;
   border-radius: 2px;
@@ -208,7 +208,6 @@
 /* =========================
    Condition Select (gray when open)
    ========================= */
-/* 閉じている時は白のまま、hover/focus で淡いグレー */
 #condition.sell-input{
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -242,4 +241,15 @@
 /* このクラスが付いた legend は下線を出さない */
 .sell-legend.sell-legend--no-underline::after {
   display: none;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+/* 1400–1540px：見た目は“元CSSと同じ”になるよう、実質ノー変更 */
+@media (min-width: 1400px) and (max-width: 1540px){
+  /* 明示しておくが値は据え置き（見た目は変わりません） */
+  .container { max-width: 700px; }
+  .sell-legend::after { width: 660px; }
 }

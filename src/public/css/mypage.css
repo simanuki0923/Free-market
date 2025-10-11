@@ -1,5 +1,5 @@
 /* =========================
-   MyPage 基本レイアウト
+   MyPage 基本レイアウト（元CSS）
    ========================= */
 .mypage__main {
   background: #fff;
@@ -135,15 +135,11 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #eee;             /* no-image の台座 */
-  border-radius: 10px;
   overflow: hidden;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-
 }
 .product-thumb img {
   width: 100%;
@@ -177,34 +173,47 @@ span.sold-out-label {
   -webkit-box-orient: vertical;
 }
 
-/* ホバー効果（PC） */
-@media (hover:hover) and (pointer:fine) {
-  .product-card:hover .product-thumb {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+/* =========================================================
+   ▼ 1400–1540px：見た目を“固定”して揺れを防ぐ（元CSSと同じ）
+   ========================================================= */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  /* レイアウトは現状維持（4列・余白も同じ） */
+  .mypage__main.container {
+    max-width: 1350px;
+    padding: 0 16px;
   }
-}
-
-/* 空メッセージ */
-.empty-note {
-  grid-column: 1 / -1;
-  color: #6b7280;
-  padding: 16px 0 8px;
-  font-size: 14px;
-}
-
-/* =========================
-   レスポンシブ
-   ========================= */
-@media (max-width: 1024px) {
-  .product-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } /* タブレット：3列 */
-}
-@media (max-width: 640px) {
   .profile-section {
-    grid-template-columns: 72px 1fr;
-    gap: 12px;
+    grid-template-columns: 96px 1fr;
+    gap: 20px;
+    padding: 24px 0 12px;
   }
-  .profile-icon { width: 72px; height: 72px; }
-  .user-name { font-size: 18px; }
-  .product-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* モバイル：2列 */
+  .user-name {
+    font-size: 40px;
+    margin-left: 50px;
+  }
+  .edit-profile-btn {
+    padding: 16px 42px;
+    font-size: 20px;
+    transform: translateX(-10%);
+  }
+  .toggle-links::after {
+    width: 100vw;  /* 画面幅いっぱいの下線を維持 */
+    height: 5px;
+  }
+  .toggle-link {
+    font-size: 20px;
+    padding-left: 50px;
+  }
+  .product-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4列固定 */
+    column-gap: 50px;
+  }
+  .product-name {
+    font-size: 20px;
+    margin-left: 35px;
+  }
+  span.sold-out-label {
+    font-size: 20px;
+    padding: 4px 8px;
+  }
 }

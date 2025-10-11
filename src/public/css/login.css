@@ -31,7 +31,6 @@ main {
 .login__content {
   width: min(420px, 100%);
   background: #fff;
-  
   padding: 28px 28px 20px;
   box-shadow: 0 1px 2px rgba(0,0,0,.02);
 }
@@ -52,9 +51,7 @@ main {
 }
 
 /* ラベル＋入力1セット */
-.form__group {
-  display: block;
-}
+.form__group { display: block; }
 
 /* ラベル（行左端に小さく） */
 .form__label--item {
@@ -117,7 +114,29 @@ main {
 }
 .register__button-submit:hover { text-decoration: underline; }
 
-/* ========== 小さめ画面での余白調整 ========== */
-@media (max-width: 360px) {
-  .login__content { padding: 24px 18px 16px; }
+/* =========================================================
+   ① 1400px～1540px（元CSSと“同じ見た目”を保証する固定指定）
+   ※ 値はベースと同一。意図せぬ継承や拡張の影響を避けるため明示。
+   ========================================================= */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  header { background: #111; padding: 8px 16px; }
+  header img { height: 28px; }
+
+  main { padding: 48px 16px; }
+
+  .login__content {
+    width: min(420px, 100%);
+    padding: 28px 28px 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.02);
+  }
+
+  .login-form__heading { font-size: 20px; margin: 0 0 20px; }
+
+  .form { gap: 18px; }
+  .form__label--item { font-size: 12px; margin-bottom: 6px; }
+  .form input[type="email"],
+  .form input[type="password"] { font-size: 14px; padding: 10px 2px; }
+
+  .form__button-submit { height: 44px; font-size: 14px; }
+  .register__button-submit { font-size: 12px; }
 }

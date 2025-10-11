@@ -16,14 +16,13 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
   line-height: 1.6;
+  color: var(--text);
 }
 
 /* Header (黒帯に白ロゴ) */
@@ -59,13 +58,8 @@ main {
 }
 
 /* フォーム */
-.form {
-  margin-top: 12px;
-}
-.form__group {
-  display: block;
-  margin: 14px 0;
-}
+.form { margin-top: 12px; }
+.form__group { display: block; margin: 14px 0; }
 .form__label--item {
   display: inline-block;
   margin-bottom: 8px;
@@ -119,26 +113,17 @@ main {
   cursor: pointer;
   transition: transform .03s ease, filter .15s ease;
 }
-.form__button-submit:hover {
-  filter: brightness(1.05);
-}
-.form__button-submit:active {
-  transform: translateY(1px);
-}
+.form__button-submit:hover { filter: brightness(1.05); }
+.form__button-submit:active { transform: translateY(1px); }
 
 /* ログイン導線（ボタン下の青リンク・中央寄せ） */
-.login__link {
-  margin-top: 14px;
-  text-align: center;
-}
+.login__link { margin-top: 14px; text-align: center; }
 .login__button-submit {
   color: var(--link);
   font-size: 13px;
   text-decoration: none;
 }
-.login__button-submit:hover {
-  text-decoration: underline;
-}
+.login__button-submit:hover { text-decoration: underline; }
 
 /* フラッシュメッセージ（任意） */
 .flash__message {
@@ -151,13 +136,10 @@ main {
   color: #3a3a3a;
 }
 
-/* レスポンシブ微調整 */
-@media (max-width: 420px) {
-  .register__content {
-    padding: 22px 16px 26px;
-    border-radius: 4px;
-  }
-  .register-form__heading {
-    font-size: 20px;
-  }
+/* =========================
+   1400–1540px：元CSSを変えない
+   ========================= */
+@media (min-width: 1400px) and (max-width: 1540px){
+  /* 保全用：あえて上書きしない（=見た目は基準スタイルのまま） */
+  /* 何も記述しないことで“変えない”ことを担保 */
 }

@@ -15,23 +15,23 @@
   max-width: var(--container);
   margin: 0 auto;
   padding: 24px 16px 64px;
-   object-fit:contain;
+  object-fit: contain;
 }
 
 /* =========================
-   2カラムレイアウト
+   2カラムレイアウト（デフォルト：PC想定）
    ========================= */
 .product-detail__container{
-  display:grid;
+  display: grid;
   grid-template-columns: 520px 1fr;
-  gap:80px;
+  gap: 80px;
   margin-left: 150px;
 }
 
 .product-detail__image{
-  width: 450x;               /* 必要に応じて調整。%でもOK */
+  width: 450px;              /* 450x → 450px */
   max-width: 100%;
-  aspect-ratio: 1 / 1;        /* 正方形に固定 */
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +42,7 @@
 .product-detail__image img{
   width: 100%;
   height: 100%;
-  object-fit: cover;          /* 全面にフィット。構図を優先してトリミング */
+  object-fit: cover;
 }
 
 /* ========== 商品名・ブランド・価格（右ペイン上部） ========== */
@@ -73,10 +73,8 @@
   color: var(--muted);
 }
 
-/* ========== 商品説明 / 商品情報 見出しと本文 ========== */
-.product-info-item{
-  margin: 20px 0 24px;
-}
+/* ========== 商品説明 / 商品情報 ========== */
+.product-info-item{ margin: 20px 0 24px; }
 .product-info-item > strong{
   display: block;
   font-size: 25px;
@@ -84,30 +82,23 @@
   color: #111827;
   margin: 0 0 10px;
 }
-
-/* 商品説明テキスト（段落） */
 .product-info-item .description{
   font-size: 15px;
   line-height: 1.8;
   color: #111827;
   margin: 0 0 16px;
-  white-space: pre-wrap; /* 改行保持（必要なら） */
+  white-space: pre-wrap;
 }
-
-/* 商品情報の行（カテゴリー/状態） */
 .product-info-item .category,
 .product-info-item .condition{
   font-size: 15px;
   color: #111827;
   margin: 6px 0;
 }
-
-/* 「カテゴリー：」「商品の状態：」の“：”以降だけ強くしすぎないよう軽めに */
 .product-info-item .category b,
 .product-info-item .condition b{
   font-weight: 600;
 }
-
 
 /* =========================
    いいね／コメント（PNGアイコン）
@@ -116,25 +107,17 @@
   display:flex; align-items:flex-start; gap:20px;
   margin:6px 0 16px;
 }
-
-/* アイコン下に数値、共通化 */
 .favorite-button,
 .comment-counter{
   display:inline-flex; flex-direction:column; align-items:center;
   gap:6px; padding:6px 10px; line-height:1; color:#6b7280;
 }
-
 .iconstar,
 .iconcomment{
   width:23px; height:23px; display:block;
   object-fit:contain; image-rendering:auto;
 }
-
-.action-count{
-  display:block; font-size:13px; line-height:1; transform:none;
-}
-
-/* ☆ボタンの背景枠は常に無し（元の :hover / .favorited の背景指定もここで吸収） */
+.action-count{ display:block; font-size:13px; line-height:1; transform:none; }
 .favorite-button{
   background: transparent; border: 0; box-shadow:none;
   -webkit-appearance: none; appearance: none;
@@ -146,7 +129,7 @@
 .iconstar{ background: transparent; }
 
 /* =========================
-   ボタン（共通ベース → 個別上書き）
+   ボタン
    ========================= */
 .buy-button,
 .comment-submit,
@@ -154,12 +137,8 @@
   display:inline-block; border:0; border-radius:6px;
   font-weight:700; cursor:pointer;
 }
-
-/* 個別差分 */
 .buy-form{ margin:8px 0 20px; }
-.buy-button{
-  width:220px; height:36px; background:var(--btn); color:#fff;
-}
+.buy-button{ width:220px; height:36px; background:var(--btn); color:#fff; }
 .buy-button:hover{ opacity:.9; }
 
 .comment-submit{
@@ -175,7 +154,7 @@
   letter-spacing:.02em; margin:2px 0 20px; text-align:center;
   transition:background .15s, transform .02s;
 }
-.purchase-button:hover{ background:#b02a2a; } /* var(--accent-dark) 未定義だったので実値に統一 */
+.purchase-button:hover{ background:#b02a2a; }
 .purchase-button:active{ transform:translateY(1px); }
 .purchase-button--disabled{ opacity:.55; cursor:not-allowed; filter:grayscale(.2); }
 
@@ -184,13 +163,10 @@
    ========================= */
 .product-section{ margin:20px 0 24px; }
 .section-title{ font-size:14px; font-weight:700; margin:0 0 10px; color:#111827; }
-
 .desc-list{ margin:0 0 8px; }
 .desc-list dt{ display:inline-block; width:58px; color:var(--muted); font-size:12px; }
 .desc-list dd{ display:inline; margin:0 0 0 6px; font-size:13px; }
-
 .product-desc{ font-size:13px; line-height:1.8; color:#111827; }
-
 .kv{ display:flex; align-items:center; gap:10px; margin:6px 0; }
 .kv__key{ font-size:12px; color:var(--muted); }
 .tag{
@@ -203,7 +179,6 @@
    ========================= */
 .comment-list{ list-style:none; padding:0; margin:0 0 10px; }
 .comment-item{ padding:6px 0; margin:0; border:none; background:none; }
-
 .comment-user{ display:flex; align-items:center; gap:8px; margin:0 0 4px; }
 .comment-user__icon{ width:25px; height:25px; border-radius:50%; object-fit:cover; background:#d7d7d7; }
 .comment-user__meta{ display:flex; align-items:center; gap:8px; }
@@ -213,21 +188,17 @@
 .comment-body{
   display: block;
   width: 410px;         /* ← .comment-submit と同じ */
-  max-width: 100%;      /* 画面が狭い時は縮む */
-  margin: 0 0 6px;
+  max-width: 100%;
+  margin: 0 6px 6px 0;
   padding: 10px 12px;
-  border: 1px solid #e5e7eb;   /* 枠色を指定 */
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  background: transparent;
+  background: #e5e7eb;
   box-sizing: border-box;
   font-size: 13px;
   line-height: 1.5;
-  color: #333;
-  background-color: #e5e7eb;
 }
 .comment-empty{ color:#666; font-size:13px; margin:4px 0 10px; }
-
-/* 入力 */
 .comment-label{ display:block; font-size:20px; font-weight:700; color:#222; margin:10px 0 6px; }
 .comment-form{ display:grid; gap:8px; max-width:520px; }
 .comment-form textarea{
@@ -237,12 +208,21 @@
 }
 .form-error{ color:#d33; font-size:12px; margin:4px 0 0; }
 
-/* =========================
-   レスポンシブ
-   ========================= */
-@media (max-width: 980px){
-  .product-detail__container{ grid-template-columns: 1fr; }
-  .product-detail__image{ min-height:360px; }
-  /* 幅指定がある送信系ボタンだけフル幅化 */
-  .buy-button, .comment-submit{ width:100%; }
+/* =========================================================
+   ① 1400–1540px：元CSSを維持するための固定（数値を明示）
+   ========================================================= */
+@media (min-width: 1400px) and (max-width: 1540px){
+  .product-detail__container{
+    display: grid;
+    grid-template-columns: 520px 1fr;
+    gap: 80px;
+    margin-left: 150px;
+  }
+  .product-detail__image{ width: 450px; }
+  .product-title{ font-size: 35px; }
+  .price{ font-size: 30px; }
+  .price small{ font-size: 20px; }
+  .comment-body{ width: 410px; }
+  .comment-submit{ width: 410px; }
+  .purchase-button{ min-width: 410px; }
 }

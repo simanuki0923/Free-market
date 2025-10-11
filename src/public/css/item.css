@@ -1,48 +1,52 @@
+/* =========================
+   item.css（レスポンシブ対応版）
+   ========================= */
+
+/* ========== ベース ========== */
 .product-list {
   background: #fff;
   padding: 16px 0 64px;
 }
+
 .product-list .container {
-  max-width: 1350px;
+  max-width: 1350px;            /* PC 1400-1540px でも中央で安定 */
   margin: 0 auto;
   padding: 0 16px;
 }
 
 /* ====== Tabs ====== */
+.tab-buttons {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  border-bottom: none;
+  padding: 12px 0 22px;
+  position: relative;
+}
+
+/* 下線（PC は画面幅いっぱい、SP ははみ出し防止でコンテナ幅に） */
+.tab-buttons::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100vw;                 /* PC: 画面幅いっぱい */
+  height: 5px;
+  background: grey;
+  pointer-events: none;
+}
 
 .tab-buttons .tab-link {
   display: inline-block;
   padding: 12px 0 12px 50px;
   color: #777;
-  text-decoration: none;         /* 下線なし */
+  text-decoration: none;
   border: 0;
   box-shadow: none;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 30px;
 }
-.tab-buttons {
-  display: flex;
-  gap: 20px;
-  align-items: flex-end;
-  /* もとの下線は消す */
-  border-bottom: none;
-  /* 下に線の高さ分の余白を足す */
-  padding: 12px 0 22px;
-  position: relative; /* 疑似要素の基準 */
-}
-
-.tab-buttons::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;                 /* 線の位置 */
-  transform: translateX(-50%);
-  width: 100vw;              /* 画面幅いっぱい */
-  height: 5px;               /* 線の太さ */
-  background: grey;          /* 線の色 */
-  pointer-events: none;      /* クリックに干渉しない */
-}
-
 .tab-buttons .tab-link:hover { color: #444; }
 .tab-buttons .tab-link.active {
   color: #e60023;
@@ -54,16 +58,17 @@
 /* ====== Product grid ====== */
 .product-list__section { margin-top: 16px; }
 
-/* ★ ここが 4 列設定（260px×4 + gap） */
-.product-list__items{
+/* グリッドは minmax で可変化。PC 帯は 4 列を保持 */
+.product-list__items {
   list-style: none;
   margin: 0;
   padding: 24px 0 0;
 
   display: grid;
-  grid-template-columns: repeat(4, 260px); /* ← 4列固定 */
-  column-gap: 50px;                                /* 縦横の間隔 */
-  justify-content: start;                   /* 左詰め */
+  grid-template-columns: repeat(4, minmax(260px, 1fr)); /* PC 安定: 4 列 */
+  column-gap: 40px;
+  row-gap: 32px;
+  justify-content: center; /* 余白が出る環境でも中央寄せで崩れ防止 */
 }
 
 .product-item { margin: 0; }
@@ -80,15 +85,13 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #eee;             /* no-image の台座 */
+  background: #eee;
   border-radius: 10px;
   overflow: hidden;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-
 }
 .product-thumb img {
   width: 100%;
@@ -97,37 +100,42 @@
 }
 
 /* Hover（控えめ） */
-.product-card:hover .product-thumb{
+.product-card:hover .product-thumb {
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   transform: translateY(-1px);
 }
 
 /* Sold バッジ（任意） */
-.sold-out-label{
+.sold-out-label {
   position: absolute;
   top: 8px;
   left: 8px;
   padding: 6px 10px;
-  font-size: 20px;
+  font-size: 25px;
   line-height: 1;
   color: #fff;
   background: #e60023;
   border-radius: 6px;
 }
 
-/* 商品名（サムネと左端を揃える） */
-.product-meta{ width: 220px; text-align: left; }
-.product-name{
-  margin: 0 0 12px 36px;
-  font-size: 20px;
+/* 商品メタ情報：固定幅をやめ可変にして折り返しに強くする */
+.product-meta {
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+.product-name {
+  margin: 0 0 8px 0;         /* 左マージン固定を撤廃して可変に */
+  font-size: 18px;           /* 20px → 18px（可読性と改行のバランス） */
   color: #333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transform: translateX(40px);
 }
 
 /* 空状態 */
-.product-empty{
+.product-empty {
   grid-column: 1 / -1;
   color: #888;
   padding: 24px 0;
@@ -135,4 +143,30 @@
   text-align: center;
 }
 
-
+/* =========================
+   1400–1540px：元CSSと同じ見え方を“明示的に”固定
+   ========================= */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  .product-list .container {
+    max-width: 1350px;   /* 中央固定（既存どおり） */
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .product-list__items{
+    grid-template-columns: repeat(4, minmax(260px, 1fr)); /* 4列維持 */
+    column-gap: 40px;
+    row-gap: 32px;
+    justify-content: center;
+  }
+  .tab-buttons::after{
+    width: 100vw;  /* 画面幅いっぱいの下線（既存どおり） */
+  }
+  .product-name{
+    font-size: 23px;
+    transform: translateX(5%); /* 既存仕様を維持 */
+  }
+  .sold-out-label { font-size: 25px; }
+  .product-thumb {
+  transform: translateX(-10%);
+  }
+}

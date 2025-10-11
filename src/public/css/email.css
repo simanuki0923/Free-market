@@ -1,5 +1,5 @@
 /* =========================
-   Verify Email Screen
+   Verify Email Screen（完成形）
    ========================= */
 :root{
   --header:#0b0b0b;         /* 黒帯 */
@@ -8,12 +8,15 @@
   --primary:#1d4ed8;        /* リンクの青 */
   --radius:14px;
   --shadow:0 8px 30px rgba(0,0,0,.12);
+
+  /* 既存で未定義だったトークンのデフォルト */
+  --bg-page:#f6f7f8;
+  --bg-card:#ffffff;
+  --border:#e5e7eb;
 }
 
-*{box-sizing:border-box}
-html,body{
-  height:100%;
-}
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
 body{
   margin:0;
   color:var(--text);
@@ -60,6 +63,7 @@ main{
   justify-content:center;
   text-align:center;
   padding:48px 20px;
+  box-shadow:var(--shadow);
 }
 
 /* ----- 文言 ----- */
@@ -91,13 +95,11 @@ main{
   box-shadow:0 1px 0 rgba(0,0,0,.05);
   transition:transform .02s ease, box-shadow .15s ease, background .2s ease;
 }
-.verify__button:hover{ background:#f3f4f6 }
-.verify__button:active{ transform:translateY(1px); box-shadow:none }
+.verify__button:hover{ background:#f3f4f6; }
+.verify__button:active{ transform:translateY(1px); box-shadow:none; }
 
 /* ----- 下部の青い再送リンク ----- */
-.verify__resend{
-  margin-top:18px;
-}
+.verify__resend{ margin-top:18px; }
 .verify__resend button.verify__resend-link{
   appearance:none;
   background:none;
@@ -113,8 +115,22 @@ main{
   text-decoration:underline;
 }
 
-/* ----- 小さめ画面の余白調整 ----- */
-@media (max-width:480px){
-  .verify__content{ padding:36px 16px }
-  header img{ height:22px }
+/* ======================================
+   ① 1400px～1540px：元CSSと同じ見た目を固定
+   （数値を“再指定”するだけで挙動は変えない）
+   ====================================== */
+@media (min-width:1400px) and (max-width:1540px){
+  header a{ min-height:56px; padding:8px 16px; }
+  header img{ height:24px; }
+
+  main{ padding:28px 16px; }
+  .verify__content{
+    width:clamp(320px, 70vw, 920px);
+    min-height:320px;
+    padding:48px 20px;
+  }
+  .verify__status{ font-size:14px; }
+  .verify__lead{ font-size:14px; }
+  .verify__button{ padding:10px 20px; }
+  .verify__resend button.verify__resend-link{ font-size:12px; }
 }

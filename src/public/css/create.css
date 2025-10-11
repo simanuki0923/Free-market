@@ -61,15 +61,11 @@
 /* ====== Stripe Elements の状態スタイル（任意だが推奨） ====== */
 .StripeElement {
   width: 100%;
-  background: transparent;    /* 親の .form-control が背景を持つ */
+  background: transparent; /* 親の .form-control が背景を持つ */
 }
-.StripeElement--focus {
-  /* フォーカスは親の :focus-within が担当 */
-}
-.StripeElement--invalid {
-  /* エラー時の縁色を明示 */
-  /* 親 .form-control に適用されないため、内側の見た目調整だけ */
-}
+.StripeElement--focus { /* フォーカスは親の :focus-within が担当 */ }
+.StripeElement--invalid { /* 内側の見た目調整のみ（例：色など） */ }
+
 #card-errors {
   color: #dc3545;
   font-size: 0.9rem;
@@ -107,24 +103,14 @@
   border-color: #545b62;
 }
 
-/* ====== Mobile ====== */
-@media (max-width: 768px) {
-  .container { padding: 10px; }
-  .card { border-radius: 5px; }
-  .card-header { font-size: 1rem; padding: 8px; }
-  .card-body { padding: 15px; }
-
-  .form-control {
-    padding: 8px 10px;
-    font-size: 0.95rem;
-    border-radius: 4px;
-    min-height: 42px;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    border-radius: 4px;
-  }
+/* =======================================================
+   1400–1540px：元CSSから“見た目が変わらない”設定
+   ※ 値はベースと同一（= 実質変更なし）
+   ======================================================= */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+  .card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; background: #fff; }
+  .card-header { font-size: 1.25rem; padding: 10px; }
+  .form-control { min-height: 44px; }
+  /* 他のプロパティもベース通り（= 見た目は変わりません） */
 }
