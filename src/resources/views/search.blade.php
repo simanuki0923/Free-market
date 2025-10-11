@@ -34,11 +34,11 @@
 
     {{-- タブ（CSSの .tab-buttons / .tab-link に合わせて構造を固定） --}}
     <nav class="tab-buttons" aria-label="表示切替タブ">
-      <a href="{{ route('item', ['tab' => 'all']) }}"
+      <a href="{{ route('item', array_merge(request()->query(), ['tab' => 'all'])) }}"
          class="tab-link {{ $activeTab === 'all' ? 'active' : '' }}"
          @if($activeTab === 'all') aria-current="page" @endif>おすすめ</a>
 
-      <a href="{{ route('item', ['tab' => 'mylist']) }}"
+      <a href="{{ route('item', array_merge(request()->query(), ['tab' => 'mylist'])) }}"
          class="tab-link {{ $activeTab === 'mylist' ? 'active' : '' }}"
          @if($activeTab === 'mylist') aria-current="page" @endif>マイリスト</a>
     </nav>

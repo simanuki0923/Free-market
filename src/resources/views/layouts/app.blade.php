@@ -20,7 +20,7 @@
 
             <!-- 検索フォーム -->
             <form action="{{ route('search') }}" method="GET" class="header__search">
-                <input type="text" name="search" placeholder="何をお探しですか？" value="{{ request('search') }}">
+                <input type="text" name="search" placeholder="何をお探しですか？" value="{{ request('search', request('q')) }}">
             </form>
 
             <!-- ナビゲーション -->

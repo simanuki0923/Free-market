@@ -2,11 +2,13 @@
 
 namespace App\Actions\Fortify;
 
-use Illuminate\Http\Request;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
-// app/Actions/Fortify/LoginResponse.php
-class LoginResponse implements \Laravel\Fortify\Contracts\LoginResponse {
-    public function toResponse($request) { return redirect()->route('item'); }
+class LoginResponse implements LoginResponseContract
+{
+    public function toResponse($request)
+    {
+        // ログイン成功後の遷移先（必要なら変更可）
+        return redirect()->route('item');
+    }
 }
-

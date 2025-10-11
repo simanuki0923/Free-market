@@ -26,14 +26,14 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * エラーメッセージ
+     * エラーメッセージ（★ テスト期待に合わせて文言を統一）
      */
     public function messages(): array
     {
         return [
-            'email.required'    => 'メールアドレス必須',
+            'email.required'    => 'メールアドレスを入力してください',
             'email.email'       => 'メールアドレスが正しくありません。',
-            'password.required' => 'パスワード必須',
+            'password.required' => 'パスワードを入力してください',
         ];
     }
 
