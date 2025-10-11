@@ -15,4 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withProviders([
+        App\Providers\AppServiceProvider::class,
+        App\Providers\EventServiceProvider::class,    // ★ 追加：Registered -> Verify通知
+        App\Providers\FortifyServiceProvider::class,  // ★ 追加：登録後のリダイレクト差し替え
+        // App\Providers\AuthServiceProvider::class,  // 使っていれば
+        // App\Providers\RouteServiceProvider::class, // 使っていれば
+    ])
+    ->create();

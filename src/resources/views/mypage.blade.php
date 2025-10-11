@@ -106,10 +106,6 @@
             </figure>
             <div class="product-meta">
               <p class="product-name">{{ $p->name }}</p>
-              <p class="product-meta__sub">
-                購入金額: ¥{{ number_format((int)($p->purchased_amount ?? 0)) }}
-                / 購入日: {{ \Carbon\Carbon::parse($p->purchased_at)->format('Y-m-d') }}
-              </p>
             </div>
           </a>
         </article>
