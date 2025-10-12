@@ -103,7 +103,7 @@
 /* Hover（控えめ） */
 .product-card:hover .product-thumb {
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  transform: translateY(-1px);
+  transform: translateX(-10%);
 }
 
 /* Sold バッジ（任意） */

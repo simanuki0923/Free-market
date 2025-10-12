@@ -5,8 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Product;
 use App\Models\User;
-// Category を使うならコメントアウト解除
-// use App\Models\Category;
+use App\Models\Category;
 
 class ProductFactory extends Factory
 {
@@ -15,66 +14,100 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'     => User::factory(),                          // 出品者
-            'category_id' => null,                                     // ← マイグレが nullable なので既定は null
-            'name'        => $this->faker->words(3, true),
+            'user_id'     => User::factory(),
+            'category_id' => null, // 単一カテゴリ(belongsTo)は必要時に付与
+            'name'        => $this->faker->unique()->words(3, true),
             'brand'       => $this->faker->optional()->randomElement([
                 'Apple','Sony','Canon','Panasonic','Nintendo','ASUS','Other'
-            ]),                                                       // ← brand は nullable
-            'price'       => $this->faker->numberBetween(1000, 50000), // ← unsignedInteger を満たす
-            'image_path'  => null,                                     // ← カラム名を image_path に統一
+            ]),
+            'price'       => $this->faker->numberBetween(1000, 50000),
+            'image_path'  => null,
             'condition'   => $this->faker->optional()->randomElement([
-                'new', 'like-new', 'used'
-            ]),                                                       // ← varchar(50) 範囲内
+                '新品', '未使用に近い', '目立った傷や汚れなし', 'やや傷や汚れあり', '全体的に状態が悪い'
+            ]),
             'description' => $this->faker->optional()->sentence(12),
-            'is_sold'     => false,                                    // 既定は未売
+            'is_sold'     => false,
         ];
     }
 
-    /**
-     * 売却済み（Sold）にする state
-     */
+    /* ---------------------------
+       よく使う state ヘルパ
+       --------------------------- */
+
+    /** 売却済みにする */
     public function sold(): static
     {
         return $this->state(fn () => ['is_sold' => true]);
     }
 
-    /**
-     * 画像あり（例：ストレージに置いたダミー画像パス）
-     */
+    /** ダミー画像パスを入れる */
     public function withImage(): static
     {
-        return $this->state(fn () => [
-            // 例: storage:link 済みで public/storage/products/sample.jpg を想定
-            'image_path' => 'products/sample.jpg',
-        ]);
+        return $this->state(fn () => ['image_path' => 'products/sample.jpg']);
     }
 
-    /**
-     * 特定ユーザーの出品として作成
-     */
+    /** 特定ユーザーの出品として作成 */
     public function byUser(User $user): static
     {
         return $this->state(fn () => ['user_id' => $user->id]);
     }
 
-    /**
-     * カテゴリ紐付け（Category を使う場合）
-     */
-    public function withCategory(/* ?Category $category = null */): static
+    /** 単一カテゴリ（belongsTo）を同時作成して紐付け */
+    public function withSingleCategory(?string $name = null): static
     {
-        // Category モデルを使う場合は上部 use と下記コメントを外す
-        // return $this->state(fn () => [
-        //     'category_id' => $category?->id ?? Category::factory(),
-        // ]);
-
-        // Category をまだ作っていない場合はダミーIDや null を返す（ここでは null のまま）
-        return $this->state(fn () => ['category_id' => null]);
+        return $this->state(function () use ($name) {
+            // Factory をそのまま返すと id が自動で入る（belongsTo）
+            return [
+                'category_id' => $name
+                    ? Category::factory()->create(['name' => $name])->id
+                    : Category::factory(),
+            ];
+        });
     }
 
     /**
-     * 価格帯のショートカット（任意）
+     * 多対多カテゴリ（belongsToMany）を名前配列で付与
+     * 例) ->withCategories(['メンズ','シューズ'])
      */
+    public function withCategories(array $names): static
+    {
+        // ✔ Laravel の afterCreating は $model だけを受け取る形にしておく（第2引数を使わない）
+        return $this->afterCreating(function (Product $product) use ($names) {
+            if (!method_exists($product, 'categories')) {
+                return;
+            }
+            $ids = [];
+            foreach ($names as $name) {
+                if ($name instanceof Category) {
+                    $ids[] = $name->id;
+                } elseif (is_string($name) && $name !== '') {
+                    $ids[] = Category::factory()->create(['name' => $name])->id;
+                }
+            }
+            if ($ids) {
+                $product->categories()->attach($ids);
+            }
+        });
+    }
+
+    /**
+     * 多対多カテゴリ（belongsToMany）をダミー n 件付与
+     * 例) ->withCategoryCount(2)
+     */
+    public function withCategoryCount(int $count): static
+    {
+        return $this->afterCreating(function (Product $product) use ($count) {
+            if (!method_exists($product, 'categories') || $count <= 0) {
+                return;
+            }
+            $ids = Category::factory()->count($count)->create()->pluck('id')->all();
+            if ($ids) {
+                $product->categories()->attach($ids);
+            }
+        });
+    }
+
+    /** 価格帯ショートカット */
     public function cheap(): static
     {
         return $this->state(fn () => ['price' => $this->faker->numberBetween(500, 1999)]);
