@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->timestamp('purchased_at')->useCurrent();
             $table->timestamps();
             $table->unique(['user_id','sell_id']);
-            $table->index('purchased_at');
         });
     }
     public function down(): void { Schema::dropIfExists('purchases'); }

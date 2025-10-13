@@ -19,9 +19,6 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->boolean('is_sold')->default(false);
             $table->timestamps();
-            $table->index(['user_id','category_id']);
-            $table->index('price');
-            $table->index('is_sold');
         });
     }
     public function down(): void { Schema::dropIfExists('sells'); }

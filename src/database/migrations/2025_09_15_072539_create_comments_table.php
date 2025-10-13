@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('body', 255);
             $table->timestamps();
-            $table->index(['product_id', 'created_at']);
         });
     }
     public function down(): void { Schema::dropIfExists('comments'); }

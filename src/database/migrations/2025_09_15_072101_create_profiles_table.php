@@ -17,11 +17,8 @@ return new class extends Migration
             $table->string('postal_code', 16)->nullable();
             $table->string('address1')->nullable();
             $table->string('address2')->nullable();
-            $table->string('phone', 50)->nullable();
             $table->string('icon_image_path')->nullable();
             $table->timestamps();
-            $table->index('postal_code');
-            $table->index('phone');
         });
     }
 
