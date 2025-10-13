@@ -16,7 +16,6 @@ class ProfileController extends Controller
             'postal_code' => '',
             'address1'    => '',
             'address2'    => '',
-            'phone'       => '',
             'icon_image_path' => null,
         ]);
 
@@ -35,7 +34,6 @@ class ProfileController extends Controller
             'address_pref_city' => ['nullable', 'string'],
             'address2'          => ['nullable', 'string'],
             'building_name'     => ['nullable', 'string'],
-            'phone'             => ['nullable', 'string', 'max:30'],
             'icon'              => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:5120'],
         ]);
 
@@ -68,7 +66,6 @@ class ProfileController extends Controller
         $profile->postal_code = $validated['postal_code'] ?? $profile->postal_code;
         $profile->address1    = $address1 ?? $profile->address1;
         $profile->address2    = $address2 ?? $profile->address2;
-        $profile->phone       = $validated['phone'] ?? $profile->phone;
 
         if ($request->hasFile('icon')) {
             $oldPath = $profile->icon_image_path;
