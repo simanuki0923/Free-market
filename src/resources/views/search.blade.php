@@ -1,8 +1,6 @@
-{{-- resources/views/search.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
-  {{-- あなたが貼ってくれたCSS（上のスニペット）を public/css/search.css に保存しておく --}}
   <link rel="stylesheet" href="{{ asset('css/search.css') }}">
 @endsection
 
@@ -10,10 +8,8 @@
 @php
   use Illuminate\Support\Str;
 
-  // コントローラから $tab が来ていればそれを優先。無ければクエリ param。
   $activeTab = strtolower($tab ?? request('tab', 'all'));
 
-  // 画像パスを表示URLに解決（image_url or image_path → http/https or /storage/...）
   $resolveImage = function ($model) {
       $raw = $model->image_url ?? $model->image_path ?? null;
       if (!$raw) return asset('img/no-image.png');
@@ -22,7 +18,6 @@
           : asset('storage/'.ltrim($raw, '/'));
   };
 
-  // Paginator 判定（安全に links() を呼ぶため）
   $isPaginator = function ($v) {
       return $v instanceof \Illuminate\Contracts\Pagination\Paginator
           || $v instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -32,7 +27,6 @@
 <main class="product-list" aria-label="{{ $activeTab === 'mylist' ? 'マイリスト' : 'おすすめ' }}">
   <div class="container">
 
-    {{-- タブ（CSSの .tab-buttons / .tab-link に合わせて構造を固定） --}}
     <nav class="tab-buttons" aria-label="表示切替タブ">
       <a href="{{ route('item', array_merge(request()->query(), ['tab' => 'all'])) }}"
          class="tab-link {{ $activeTab === 'all' ? 'active' : '' }}"
@@ -73,7 +67,6 @@
           @endforeach
         </ul>
 
-        {{-- ページネーション（クエリを引き継ぐ / CSSは標準のままでOK） --}}
         @if ($isPaginator($products) && $products->hasPages())
           <div class="pagination" style="margin-top:24px">
             {{ $products->appends(request()->query())->links() }}

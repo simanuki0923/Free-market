@@ -16,7 +16,6 @@ class ProfileEditViewTest extends TestCase
     #[Test]
     public function guest_cannot_access_edit_and_is_redirected_to_login(): void
     {
-        // ルートは /mypage/profile（name: mypage.profile）
         $response = $this->get(route('mypage.profile'));
         $response->assertRedirect(route('login'));
     }
@@ -34,22 +33,17 @@ class ProfileEditViewTest extends TestCase
             'icon_image_path' => 'profile_icons/dummy.png',
         ]);
 
-        // ビューが参照するダミー画像を配置
         Storage::disk('public')->put($profile->icon_image_path, 'dummy');
 
         $this->actingAs($user);
 
-        // /mypage/profile
         $response = $this->get(route('mypage.profile'))->assertOk();
 
-        // アイコン（storage 配下の公開URL想定）
         $response->assertSee('storage/'.$profile->icon_image_path, false);
 
-        // 表示名（old 無し → $user->name）
         $response->assertSee('name="display_name"', false)
                  ->assertSee('value="山田太郎"', false);
 
-        // 郵便番号・住所・建物名の初期値
         $response->assertSee('name="postal_code"', false)
                  ->assertSee('value="123-4567"', false);
 
@@ -70,7 +64,6 @@ class ProfileEditViewTest extends TestCase
 
         $response = $this->get(route('mypage.profile'))->assertOk();
 
-        // デフォルト画像（ビュー側のパスに合わせて調整）
         $response->assertSee('/img/sample.jpg', false);
     }
 
@@ -82,26 +75,18 @@ class ProfileEditViewTest extends TestCase
 
         $this->actingAs($user);
 
-        // 想定：display_name max:20 を超過させてエラー
         $tooLongName = str_repeat('あ', 21);
 
-        // 更新先は /profile（name: profile.update, PATCH）
         $response = $this->from(route('mypage.profile'))->post(route('profile.update'), [
             '_method'            => 'PATCH',
             'display_name'       => $tooLongName,
             'postal_code'        => '123-4567',
             'address_pref_city'  => '東京都千代田区',
-            // building_name は任意
         ]);
 
-        // バリデーション失敗 → 編集画面に戻る
         $response->assertStatus(302)->assertRedirect(route('mypage.profile'));
-
-        // 戻った画面で old() が優先される
         $follow = $this->get(route('mypage.profile'))->assertOk();
         $follow->assertSee('value="'.$tooLongName.'"', false);
-
-        // エラー表示（実装のクラス名/要素に合わせて調整可）
         $follow->assertSee('error', false);
     }
 }

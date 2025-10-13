@@ -12,12 +12,10 @@ class CategoryFactory extends Factory
 
     public function definition(): array
     {
-        // 一意な名前と必須の slug を同時に生成
         $name = $this->faker->unique()->randomElement([
             '家電','メンズ','レディース','シューズ','家具','ゲーム','本','おもちゃ','スポーツ'
         ]);
 
-        // SQLite 等で一意制約衝突を避けるために乱数サフィックスを付与
         $slug = Str::slug($name).'-'.Str::random(6);
 
         return [

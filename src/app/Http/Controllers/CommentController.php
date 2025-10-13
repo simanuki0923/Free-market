@@ -15,19 +15,16 @@ class CommentController extends Controller
         $this->middleware('auth')->only(['store', 'storeComment']);
     }
 
-    /** 標準: /item/{item_id}/comments に POST（既存の store も残す） */
     public function store(Request $request, int $item_id): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         return $this->storeCore($request, $item_id);
     }
 
-    /** 互換: ルート/フォームが storeComment を呼んでも動くように */
     public function storeComment(Request $request, int $item_id): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         return $this->storeCore($request, $item_id);
     }
 
-    /** 実処理 */
     private function storeCore(Request $request, int $item_id)
     {
         $request->validate([

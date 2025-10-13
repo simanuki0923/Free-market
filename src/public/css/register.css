@@ -1,4 +1,3 @@
-/* ========== Register page ========== */
 :root {
   --bg: #f2f2f2;
   --card-bg: #ffffff;
@@ -25,9 +24,8 @@ body {
   color: var(--text);
 }
 
-/* Header (黒帯に白ロゴ) */
 header {
-  background: #111;          /* 黒帯 */
+  background: #111;
   padding: 8px 16px;
 }
 header a {
@@ -35,21 +33,19 @@ header a {
   line-height: 0;
 }
 header img {
-  height: 28px;              /* スクショ相当のサイズ感 */
+  height: 28px;
   display: block;
 }
 
-/* カードレイアウト */
 main {
   padding: 24px 16px 48px;
 }
 .register__content {
-  max-width: 560px;      /* スクショの横幅感に調整 */
+  max-width: 560px;
   margin: 24px auto 0;
   padding: 28px 28px 32px;
 }
 
-/* 見出し（中央・やや太め） */
 .register-form__heading {
   margin: 0 0 16px;
   font-size: 22px;
@@ -57,7 +53,6 @@ main {
   text-align: center;
 }
 
-/* フォーム */
 .form { margin-top: 12px; }
 .form__group { display: block; margin: 14px 0; }
 .form__label--item {
@@ -67,7 +62,6 @@ main {
   color: var(--muted);
 }
 
-/* 入力欄 */
 .form__group input[type="text"],
 .form__group input[type="email"],
 .form__group input[type="password"] {
@@ -88,7 +82,6 @@ main {
   box-shadow: 0 0 0 3px rgba(0,0,0,.04);
 }
 
-/* エラー表示（入力下に赤文字） */
 .form__error {
   display: block;
   margin-top: 6px;
@@ -97,7 +90,6 @@ main {
   line-height: 1.4;
 }
 
-/* 送信ボタン（赤・横いっぱい） */
 .form__button-submit {
   display: block;
   width: 100%;
@@ -116,7 +108,6 @@ main {
 .form__button-submit:hover { filter: brightness(1.05); }
 .form__button-submit:active { transform: translateY(1px); }
 
-/* ログイン導線（ボタン下の青リンク・中央寄せ） */
 .login__link { margin-top: 14px; text-align: center; }
 .login__button-submit {
   color: var(--link);
@@ -125,7 +116,6 @@ main {
 }
 .login__button-submit:hover { text-decoration: underline; }
 
-/* フラッシュメッセージ（任意） */
 .flash__message {
   margin: 0 0 12px;
   padding: 10px 12px;
@@ -134,12 +124,4 @@ main {
   border-radius: 6px;
   font-size: 13px;
   color: #3a3a3a;
-}
-
-/* =========================
-   1400–1540px：元CSSを変えない
-   ========================= */
-@media (min-width: 1400px) and (max-width: 1540px){
-  /* 保全用：あえて上書きしない（=見た目は基準スタイルのまま） */
-  /* 何も記述しないことで“変えない”ことを担保 */
 }

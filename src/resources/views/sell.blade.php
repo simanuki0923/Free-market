@@ -1,4 +1,3 @@
-{{-- resources/views/sell.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -16,7 +15,6 @@
   <form class="sell-form" action="{{ route('sell.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
-    {{-- 商品画像（このlegendだけ下線なし） --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend sell-legend--no-underline">商品画像</legend>
 
@@ -32,11 +30,9 @@
       @error('image') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
-    {{-- 商品の詳細（カテゴリ + 状態） --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品の詳細</legend>
 
-      {{-- カテゴリー（複数選択・チップ風） --}}
       <label class="sell-label">カテゴリー <small>（複数選択可）</small></label>
       @php
         $oldSelected = collect(old('categories', []))->map(fn($v)=>(string)$v)->all();
@@ -70,7 +66,6 @@
       </div>
       @error('categories') <p class="sell-error">{{ $message }}</p> @enderror
 
-      {{-- 商品の状態（プルダウン） --}}
       <label class="sell-label" for="condition">商品の状態</label>
       @php
         $condList = $conditionList
@@ -85,7 +80,6 @@
       @error('condition') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
-    {{-- 商品名・ブランド・説明 --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品名と説明</legend>
 
@@ -102,7 +96,6 @@
       @error('description') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
-    {{-- 価格 --}}
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">販売価格</legend>
 
@@ -115,15 +108,12 @@
       @error('price') <p class="sell-error">{{ $message }}</p> @enderror
     </fieldset>
 
-    {{-- 送信 --}}
     <button type="submit" class="sell-submit">出品する</button>
   </form>
 </main>
 
-{{-- JS：画像プレビュー＆数値入力ガード --}}
 <script>
 (function () {
-  // 画像プレビュー
   const input = document.getElementById('image');
   const box   = document.querySelector('.sell-preview');
   const img   = document.getElementById('imagePreview');
@@ -142,7 +132,6 @@
     });
   }
 
-  // e/E/+/-. の入力禁止
   const price = document.getElementById('price');
   if (price) {
     price.addEventListener('keydown', (e) => {

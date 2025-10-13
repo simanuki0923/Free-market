@@ -1,4 +1,3 @@
-{{-- resources/views/item.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -29,7 +28,6 @@
 <main class="product-list" aria-label="{{ $activeTab === 'mylist' ? 'マイリスト' : 'おすすめ一覧' }}">
   <div class="container">
 
-    {{-- タブナビ --}}
     <nav class="tab-buttons" role="tablist" aria-label="一覧切替タブ">
       <a href="{{ route('item') }}"
          class="tab-link {{ $activeTab === 'all' ? 'active' : '' }}"
@@ -41,7 +39,6 @@
     </nav>
 
     <section class="product-list__section">
-      {{-- 未ログイン × マイリストタブ：商品は出さず案内のみ --}}
       @if ($activeTab === 'mylist' && !$isLoggedIn)
       @else
         @php

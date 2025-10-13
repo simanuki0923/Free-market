@@ -1,10 +1,9 @@
-/* ===== Base (そのまま使用) ===== */
 .container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;          /* 画面中央配置 */
+    height: 100vh;
     text-align: center;
 }
 
@@ -25,16 +24,10 @@ h1 {
     border: 2px solid blue;
     border-radius: 5px;
     text-decoration: none;
-    line-height: 1;         /* ボタンの高さ安定化 */
+    line-height: 1;
 }
 
 .btn:hover {
     background-color: darkblue;
     border-color: darkblue;
-}
-
-/* ===== 1400px〜1540px：元CSSと同じ（変更なし） =====
-   ※ この範囲ではベースのまま適用されます。明示的に何も上書きしません。 */
-@media (min-width: 1400px) and (max-width: 1540px) {
-  /* 変更なし（ベースがそのまま効く） */
 }

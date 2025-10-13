@@ -19,7 +19,6 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        // RegisterRequest のルール／メッセージ／属性名を再利用
         $req = new RegisterRequest();
 
         Validator::make(

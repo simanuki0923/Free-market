@@ -8,7 +8,6 @@ class CommentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // 認可はルート側の auth ミドルウェアで担保する想定
         return true;
     }
 

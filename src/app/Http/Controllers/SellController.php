@@ -15,13 +15,11 @@ class SellController extends Controller
         $this->middleware('auth');
     }
 
-    /** 出品フォーム表示 */
     public function create()
     {
-        return view('sell'); // 既存の sell.blade.php を想定
+        return view('sell');
     }
 
-    /** 出品登録 */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,7 +30,6 @@ class SellController extends Controller
             'condition'   => ['nullable','string','max:50'],
             'description' => ['nullable','string','max:10000'],
             'category_id' => ['nullable','integer','exists:categories,id'],
-            // 既存UIがカテゴリ複数の場合でも今回は単一化済み
         ]);
 
         $imagePath = $request->hasFile('image')
@@ -40,7 +37,6 @@ class SellController extends Controller
             : null;
 
         DB::transaction(function () use ($validated, $imagePath) {
-            // 1) ベース商品（Product）を作る/同名があれば再利用してもOK
             $product = Product::create([
                 'user_id'     => Auth::id(),
                 'category_id' => $validated['category_id'] ?? null,
@@ -53,7 +49,6 @@ class SellController extends Controller
                 'is_sold'     => false,
             ]);
 
-            // 2) 出品（Sell）を作る（Product と 1:1）
             Sell::create([
                 'user_id'     => Auth::id(),
                 'product_id'  => $product->id,

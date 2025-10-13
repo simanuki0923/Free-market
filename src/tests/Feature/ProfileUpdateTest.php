@@ -30,14 +30,9 @@ class ProfileUpdateTest extends TestCase
             '_method'           => 'PATCH',
             'display_name'      => '新しい名前',
             'postal_code'       => '123-4567',
-
-            // バリデーションが address 必須のため必ず送る
-            // 取り込み実装の差異に強くするため、address1/address_pref_city も同値で送る
             'address'           => '東京都新宿区',
             'address1'          => '東京都新宿区',
             'address_pref_city' => '東京都新宿区',
-
-            // building_name と address2 も同値（どちらを吸収しても可）
             'building_name'     => 'サンプルビル101',
             'address2'          => 'サンプルビル101',
         ];
@@ -62,7 +57,7 @@ class ProfileUpdateTest extends TestCase
     {
         $user = User::factory()->create([
             'name'              => '元の名前',
-            'email_verified_at' => now(), // 認証済み
+            'email_verified_at' => now(),
         ]);
 
         $this->assertNull($user->profile);
@@ -72,8 +67,6 @@ class ProfileUpdateTest extends TestCase
             '_method'           => 'PATCH',
             'display_name'      => '初回設定後の名前',
             'postal_code'       => '987-6543',
-
-            // address 必須を満たす & 吸収を確実化
             'address'           => '東京都渋谷区',
             'address1'          => '東京都渋谷区',
             'address_pref_city' => '東京都渋谷区',
@@ -82,7 +75,7 @@ class ProfileUpdateTest extends TestCase
         $response = $this->from(route('mypage.profile'))
                          ->post(route('profile.update'), $payload);
 
-        $response->assertRedirect('/'); // トップページ
+        $response->assertRedirect('/');
         $response->assertSessionHas('status', 'プロフィールを更新しました。');
 
         $user->refresh();
@@ -102,12 +95,10 @@ class ProfileUpdateTest extends TestCase
             'icon_image_path' => 'profile_icons/old.png',
         ]);
 
-        // 旧ファイルを存在させておく
         Storage::disk('public')->put($profile->icon_image_path, 'OLD');
 
         $this->actingAs($user);
 
-        // GD不要の create() を使用（image/png として扱われる）
         $newIcon = UploadedFile::fake()->create('newicon.png', 10, 'image/png');
 
         $payload = [
@@ -142,8 +133,7 @@ class ProfileUpdateTest extends TestCase
 
         $response = $this->from(route('mypage.profile'))->post(route('profile.update'), [
             '_method'      => 'PATCH',
-            'display_name' => $tooLong, // 長すぎる想定
-            // postal_code / address を送らず失敗させる（FormRequest 準拠）
+            'display_name' => $tooLong,
         ]);
 
         $response->assertStatus(302)->assertRedirect(route('mypage.profile'));

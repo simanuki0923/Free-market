@@ -28,7 +28,6 @@ class FortifyServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // ★ レスポンス差し替え（既存のままでOK）
         $this->app->singleton(RegisterResponseContract::class, RegisterResponse::class);
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
         $this->app->singleton(VerifyEmailResponseContract::class, VerifyEmailResponse::class);
@@ -36,23 +35,17 @@ class FortifyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // --- Fortify アクション ---
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
-
-        // --- View 紐づけ ---
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register'));
         Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
         Fortify::resetPasswordView(fn ($request) => view('auth.reset-password', ['request' => $request]));
         Fortify::verifyEmailView(fn () => view('auth.verify-email'));
-
-        // --- ログイン時のバリデーション＋認証 ---
         Fortify::authenticateUsing(function (Request $request) {
-            // LoginRequest の前処理/ルール/メッセージを適用
             app(LoginRequest::class)
                 ->setContainer(app())
                 ->setRedirector(app('redirect'))
@@ -65,22 +58,14 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::where('email', $email)->first();
 
             if ($user && Hash::check($password, $user->password)) {
-                // （必要なら）メール認証の強制チェック
-                // if (! $user->hasVerifiedEmail()) {
-                //     throw ValidationException::withMessages([
-                //         'auth' => 'メール認証がまだ完了していません',
-                //     ]);
-                // }
-                return $user; // 成功
+                return $user;
             }
 
-            // ★ 失敗：必ず 'auth' キーでテスト期待文言を投げる（←ここが決め手）
             throw ValidationException::withMessages([
                 'auth' => 'ログイン情報が登録されていません',
             ]);
         });
 
-        // --- レート制限 ---
         RateLimiter::for('login', function (Request $request) {
             $key = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
             return Limit::perMinute(5)->by($key);

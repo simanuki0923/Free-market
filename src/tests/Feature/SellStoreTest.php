@@ -18,29 +18,20 @@ class SellStoreTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * GD不要・確実に読み取れる実ファイルを作って返す。
-     * $minBytes によって任意サイズ(例: 6MB)のPNGっぽいファイルを生成可能。
-     */
     private function makePngUpload(string $name = 'photo.png', int $minBytes = 0): UploadedFile
     {
-        // 1x1 PNG (有効ヘッダ) のバイナリ
         $png1x1 = base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII='
         );
 
-        // tempnam で消えない一時ファイルを作る
         $path = tempnam(sys_get_temp_dir(), 't_png_');
         file_put_contents($path, $png1x1);
-
-        // 必要ならサイズを水増し（PNG末尾にヌル埋めしても getimagesize は通る）
         $current = filesize($path);
         if ($minBytes > $current) {
             $pad = str_repeat("\0", $minBytes - $current);
             file_put_contents($path, $pad, FILE_APPEND);
         }
 
-        // 第5引数 true: テスト用扱い
         return new UploadedFile($path, $name, 'image/png', null, true);
     }
 
@@ -57,8 +48,6 @@ class SellStoreTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
         Storage::fake('public');
-
-        // categories があれば1件作る（slug が NOT NULL の可能性に対応）
         $categoryId = null;
         if (Schema::hasTable('categories')) {
             $data = [
@@ -72,7 +61,7 @@ class SellStoreTest extends TestCase
             $categoryId = DB::table('categories')->insertGetId($data);
         }
 
-        $image = $this->makePngUpload('photo.png'); // GD不要
+        $image = $this->makePngUpload('photo.png');
 
         $payload = [
             'category_id' => $categoryId,
@@ -182,8 +171,6 @@ class SellStoreTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
         Storage::fake('public');
-
-        // 画像でないファイル → image ルールに引っかかる
         $notImagePath = tempnam(sys_get_temp_dir(), 'txt_');
         file_put_contents($notImagePath, 'not image');
         $notImage = new UploadedFile($notImagePath, 'not-image.txt', 'text/plain', null, true);
@@ -196,8 +183,6 @@ class SellStoreTest extends TestCase
             ]);
         $response->assertRedirect(route('sell.create'));
         $response->assertSessionHasErrors(['image']);
-
-        // 5MB超過の「有効PNG」
         $bigImage = $this->makePngUpload('big.png', 6 * 1024 * 1024);
 
         $response = $this->from(route('sell.create'))

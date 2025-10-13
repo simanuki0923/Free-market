@@ -10,13 +10,9 @@ class LoginRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // ログイン前の画面なので true でOK
         return true;
     }
 
-    /**
-     * バリデーションルール
-     */
     public function rules(): array
     {
         return [
@@ -25,9 +21,6 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * エラーメッセージ（★ テスト期待に合わせて文言を統一）
-     */
     public function messages(): array
     {
         return [
@@ -37,9 +30,6 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * 表示名（任意）
-     */
     public function attributes(): array
     {
         return [
@@ -48,9 +38,6 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * 前処理（任意）：前後の空白除去・小文字化など
-     */
     protected function prepareForValidation(): void
     {
         $email = $this->input('email');

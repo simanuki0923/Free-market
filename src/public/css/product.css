@@ -1,6 +1,3 @@
-/* =========================
-   基本トークン
-   ========================= */
 :root{
   --container: 1350px;
   --line: #e5e7eb;
@@ -10,7 +7,6 @@
   --btn:#ff6b6b;
 }
 
-/* 共通レイアウト */
 .container{
   max-width: var(--container);
   margin: 0 auto;
@@ -18,9 +14,6 @@
   object-fit: contain;
 }
 
-/* =========================
-   2カラムレイアウト（デフォルト：PC想定）
-   ========================= */
 .product-detail__container{
   display: grid;
   grid-template-columns: 520px 1fr;
@@ -29,7 +22,7 @@
 }
 
 .product-detail__image{
-  width: 450px;              /* 450x → 450px */
+  width: 450px;
   max-width: 100%;
   aspect-ratio: 1 / 1;
   display: flex;
@@ -38,14 +31,12 @@
   background: #fff;
 }
 
-/* 画像をカードいっぱいに見せる（トリミングあり） */
 .product-detail__image img{
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* ========== 商品名・ブランド・価格（右ペイン上部） ========== */
 .product-title{
   font-size: 35px;
   font-weight: 700;
@@ -59,7 +50,6 @@
   margin: 0 0 8px;
 }
 
-/* 価格行：¥ と数値をきれいに並べる */
 .price{
   display: flex;
   align-items: baseline;
@@ -73,7 +63,6 @@
   color: var(--muted);
 }
 
-/* ========== 商品説明 / 商品情報 ========== */
 .product-info-item{ margin: 20px 0 24px; }
 .product-info-item > strong{
   display: block;
@@ -100,9 +89,6 @@
   font-weight: 600;
 }
 
-/* =========================
-   いいね／コメント（PNGアイコン）
-   ========================= */
 .action-buttons{
   display:flex; align-items:flex-start; gap:20px;
   margin:6px 0 16px;
@@ -128,9 +114,6 @@
 .favorite-button:focus-visible{ outline:2px solid #94a3b8; outline-offset:2px; }
 .iconstar{ background: transparent; }
 
-/* =========================
-   ボタン
-   ========================= */
 .buy-button,
 .comment-submit,
 .purchase-button{
@@ -158,9 +141,6 @@
 .purchase-button:active{ transform:translateY(1px); }
 .purchase-button--disabled{ opacity:.55; cursor:not-allowed; filter:grayscale(.2); }
 
-/* =========================
-   セクション
-   ========================= */
 .product-section{ margin:20px 0 24px; }
 .section-title{ font-size:14px; font-weight:700; margin:0 0 10px; color:#111827; }
 .desc-list{ margin:0 0 8px; }
@@ -174,9 +154,6 @@
   border:1px solid var(--line); background:#f8fafc;
 }
 
-/* =========================
-   コメント
-   ========================= */
 .comment-list{ list-style:none; padding:0; margin:0 0 10px; }
 .comment-item{ padding:6px 0; margin:0; border:none; background:none; }
 .comment-user{ display:flex; align-items:center; gap:8px; margin:0 0 4px; }
@@ -187,7 +164,7 @@
 
 .comment-body{
   display: block;
-  width: 410px;         /* ← .comment-submit と同じ */
+  width: 410px;
   max-width: 100%;
   margin: 0 6px 6px 0;
   padding: 10px 12px;
@@ -208,9 +185,6 @@
 }
 .form-error{ color:#d33; font-size:12px; margin:4px 0 0; }
 
-/* =========================================================
-   ① 1400–1540px：元CSSを維持するための固定（数値を明示）
-   ========================================================= */
 @media (min-width: 1400px) and (max-width: 1540px){
   .product-detail__container{
     display: grid;

@@ -8,26 +8,21 @@ class AddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // 認可はミドルウェア(auth)で担保
+        return true;
     }
 
     public function rules(): array
     {
         return [
-            // 郵便番号：必須・8文字(例: 123-4567)・半角数字+ハイフン固定
             'postal_code' => [
                 'required',
                 'string',
                 'size:8',
                 'regex:/^\d{3}-\d{4}$/',
             ],
-            // 住所(= address1)：必須
             'address1' => ['required','string','max:255'],
-            // 任意
             'address2' => ['nullable','string','max:255'],
             'phone'     => ['nullable','string','max:50'],
-
-            // 画面遷移に必要（hidden）
             'item_id'   => ['bail','required','integer','exists:products,id'],
         ];
     }

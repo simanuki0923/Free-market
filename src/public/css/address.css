@@ -1,27 +1,20 @@
-/* =========================
-   基本スタイル
-   ========================= */
 :root{
-  --bg:#111;            /* 背景（ヘッダー相当の黒） */
-  --card:#fff;          /* カード白 */
-  --text:#0b0b0b;       /* 本文テキスト */
-  --muted:#6b7280;      /* 補助テキスト */
-  --line:#e5e7eb;       /* 線・枠 */
-  --brand:#ff6b6b;      /* 更新ボタン（赤） */
+  --bg:#111;
+  --card:#fff;
+  --text:#0b0b0b;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --brand:#ff6b6b;
   --brand-hover:#ff5a5a;
-  --error:#e11d48;      /* バリデーション・エラー */
-  --success:#059669;    /* 成功メッセージ */
+  --error:#e11d48;
+  --success:#059669;
   --container: 1350px;
 
-  /* 参照されているトークンのデフォルト（未定義対策） */
   --radius: 12px;
   --shadow: 0 8px 20px rgba(0,0,0,.06);
   --shadow-light: 0 2px 8px rgba(0,0,0,.04);
 }
 
-/* =========================
-   レイアウト
-   ========================= */
 .container{
   max-width: 720px;
   margin: 0 auto;
@@ -29,7 +22,6 @@
 }
 
 .edit-address__main{
-  /* 中央の白カード */
   background: var(--card);
   margin-top: 56px;
   border-radius: var(--radius);
@@ -37,7 +29,6 @@
   padding: 40px 56px 48px;
 }
 
-/* タイトル */
 .edit-address__main h1{
   text-align: center;
   font-size: clamp(30px, 2.4vw, 24px);
@@ -45,9 +36,6 @@
   letter-spacing: .02em;
 }
 
-/* =========================
-   フラッシュ
-   ========================= */
 .flash{
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -67,9 +55,6 @@
   color: var(--text);
 }
 
-/* =========================
-   フォーム
-   ========================= */
 .address-form{
   width: min(560px, 100%);
   margin: 0 auto;
@@ -111,16 +96,12 @@ input:focus{
   color: var(--muted);
 }
 
-/* エラーメッセージ */
 .error-message{
   margin: 6px 0 0;
   font-size: 12px;
   color: var(--error);
 }
 
-/* =========================
-   ボタン
-   ========================= */
 .form-actions{
   margin-top: 28px;
   display: flex;
@@ -147,7 +128,7 @@ input:focus{
 .btn-primary{
   background: var(--brand);
   color: #fff;
-  width: min(800px, 100%);    /* スクショの横長ボタン感 */
+  width: min(800px, 100%);
 }
 .btn-primary:hover{
   background: var(--brand-hover);
@@ -157,10 +138,6 @@ input:focus{
   transform: translateY(1px);
 }
 
-/* =========================================================
-   ① PC帯 1400–1540px：元CSSから“見た目の変更なし”
-   （将来の調整時に誤って崩さないための明示オーバーライド）
-   ========================================================= */
 @media (min-width:1400px) and (max-width:1540px){
   .container{ max-width: 720px; padding: 32px 16px 64px; }
   .edit-address__main{ margin-top:56px; padding:40px 56px 48px; border-radius:var(--radius); }

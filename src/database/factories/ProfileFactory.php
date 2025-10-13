@@ -14,8 +14,7 @@ class ProfileFactory extends Factory
     {
         return [
             'user_id'         => User::factory(),
-            'icon_image_path' => null,                      // 画像未設定時は blade 側のフォールバック想定
-            // 他に項目があればここに追加（display_name, postal_code など）
+            'icon_image_path' => null,
         ];
     }
 }

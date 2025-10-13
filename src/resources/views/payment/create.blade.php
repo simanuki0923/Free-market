@@ -48,7 +48,6 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-  // 公開鍵
   const stripe = Stripe("{{ config('services.stripe.key') }}");
   const elements = stripe.elements();
 
@@ -64,7 +63,6 @@
   const btn   = document.getElementById('pay-btn');
   const errEl = document.getElementById('card-errors');
 
-  // サーバが作って渡した client_secret
   const clientSecret = "{{ $clientSecret }}";
 
   form.addEventListener('submit', async (e) => {
@@ -72,7 +70,6 @@
     btn.disabled = true;
     errEl.textContent = '';
 
-    // 3DS を含む支払い確定（ここで必要なら本人認証が走る）
     const {paymentIntent, error} = await stripe.confirmCardPayment(clientSecret, {
       payment_method: { card: cardNumber }
     });
@@ -84,7 +81,6 @@
     }
 
     if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // サーバに保存してもらうため、payment_intent_id を付与して submit
       document.getElementById('payment_intent_id').value = paymentIntent.id;
       form.submit();
     } else {

@@ -1,6 +1,3 @@
-/* =========================
-   Header layout (3カラム固定)
-   ========================= */
 :root{
   --container: 2300px;
   --border: #e5e7eb;
@@ -22,15 +19,13 @@
   column-gap:16px;
 }
 
-/* 左：ロゴ */
 .header__logo{ justify-self:start; }
 .header__logo img{ height:26px; display:block; }
 
-/* 中央：検索 */
 .header__search{
   justify-self:center;
   width:100%;
-  max-width:520px;   /* ← 基準値（1400–1540pxもこのまま） */
+  max-width:520px;
   min-width:0;
 }
 .header__search input[type="text"]{
@@ -44,7 +39,6 @@
 }
 .header__search input::placeholder{ color:var(--muted); }
 
-/* 右：ナビ */
 .header__nav{ justify-self:end; }
 .nav__list{
   display:flex;
@@ -73,11 +67,7 @@
 }
 .nav__item-link-sell:hover{ filter:brightness(0.92); }
 
-/* =========================================
-   1400–1540px：元CSSと同じ（上書きなし）
-   ========================================= */
 @media (min-width:1400px) and (max-width:1540px){
-  /* 明示的に“変わらない”ことを示すだけ（実質ベースと同じ） */
   .header__search{ max-width:520px; }
   .nav__item-link,
   .nav__item-button{ font-size:16px; }

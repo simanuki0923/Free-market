@@ -23,37 +23,31 @@ class Product extends Model
         'is_sold' => 'boolean',
     ];
 
-    /** 作成者 */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /** カテゴリ */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    /** コメント（product_id 外部キー） */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    /** お気に入り（favorites テーブル直参照） */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /** この商品をお気に入りに入れたユーザー（pivot: favorites） */
     public function favoredByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
-    /** 1:1で対応する出品 */
     public function sell(): HasOne
     {
         return $this->hasOne(Sell::class);

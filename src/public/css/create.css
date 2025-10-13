@@ -1,11 +1,9 @@
-/* ====== Layout ====== */
 .container {
   max-width: 500px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* ====== Card ====== */
 .card {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border-radius: 10px;
@@ -22,7 +20,6 @@
   border-top-right-radius: 10px;
 }
 
-/* ※ 入力ブロック防止：前面レイヤ & クリック可を保証 */
 .card-body {
   padding: 20px;
   position: relative;
@@ -30,8 +27,6 @@
   pointer-events: auto;
 }
 
-/* ====== Inputs (Stripe Elements コンテナを含む) ====== */
-/* Stripe が iframe を埋め込む div を “入力欄” として扱う */
 .form-control {
   margin-bottom: 15px;
   padding: 10px 12px;
@@ -41,8 +36,6 @@
   border: 1px solid #ced4da;
   width: 100%;
   background: #fff;
-
-  /* 入力できない問題対策：高さ・レイヤ・クリック可を担保 */
   min-height: 44px;
   position: relative;
   z-index: 2;
@@ -51,17 +44,15 @@
   box-sizing: border-box;
 }
 
-/* フォーカス時の見やすさ */
 .form-control:focus-within {
   border-color: #80bdff;
   box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
   outline: 0;
 }
 
-/* ====== Stripe Elements の状態スタイル（任意だが推奨） ====== */
 .StripeElement {
   width: 100%;
-  background: transparent; /* 親の .form-control が背景を持つ */
+  background: transparent;
 }
 .StripeElement--focus { /* フォーカスは親の :focus-within が担当 */ }
 .StripeElement--invalid { /* 内側の見た目調整のみ（例：色など） */ }
@@ -70,10 +61,9 @@
   color: #dc3545;
   font-size: 0.9rem;
   margin-top: 4px;
-  min-height: 1.2em; /* レイアウトのガタつき防止 */
+  min-height: 1.2em;
 }
 
-/* ====== Buttons ====== */
 .btn-primary,
 .btn-secondary {
   background-color: #007bff;
@@ -103,14 +93,9 @@
   border-color: #545b62;
 }
 
-/* =======================================================
-   1400–1540px：元CSSから“見た目が変わらない”設定
-   ※ 値はベースと同一（= 実質変更なし）
-   ======================================================= */
 @media (min-width: 1400px) and (max-width: 1540px) {
   .container { max-width: 500px; margin: 0 auto; padding: 20px; }
   .card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; background: #fff; }
   .card-header { font-size: 1.25rem; padding: 10px; }
   .form-control { min-height: 44px; }
-  /* 他のプロパティもベース通り（= 見た目は変わりません） */
 }

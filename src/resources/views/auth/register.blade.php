@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>COACHTECH｜会員登録</title>
+    <title>COACHTECH</title>
     <link rel="stylesheet" href="{{ asset('css/sanitize.css') }}">
     <link rel="stylesheet" href="{{ asset('css/register.css') }}">
 </head>
@@ -18,20 +18,8 @@
 
 <main>
     <section class="register__content">
-        <h2 class="register-form__heading">会員登録</h2>
+        <h1 class="register-form__heading">会員登録</h1>
 
-        {{-- バリデーションメッセージについて
-             想定文言：
-             ・お名前を入力してください
-             ・メールアドレスを入力してください
-             ・メールアドレスはメール形式で入力してください
-             ・パスワードを入力してください
-             ・パスワードは8文字以上で入力してください
-             ・パスワードと一致しません
-             ※上記はコントローラ/フォームリクエスト側でメッセージを設定してください。
-        --}}
-
-        {{-- フラッシュメッセージ（任意） --}}
         @if (session('status'))
             <div class="flash__message" role="status">{{ session('status') }}</div>
         @endif
@@ -39,7 +27,6 @@
         <form class="form" action="{{ route('register') }}" method="post" novalidate>
             @csrf
 
-            {{-- ユーザー名 --}}
             <label class="form__group">
                 <span class="form__label--item">ユーザー名</span>
                 <input
@@ -58,7 +45,6 @@
                 @endif
             </label>
 
-            {{-- メールアドレス --}}
             <label class="form__group">
                 <span class="form__label--item">メールアドレス</span>
                 <input
@@ -77,7 +63,6 @@
                 @endif
             </label>
 
-            {{-- パスワード --}}
             <label class="form__group">
                 <span class="form__label--item">パスワード</span>
                 <input
@@ -96,7 +81,6 @@
                 @endif
             </label>
 
-            {{-- 確認用パスワード --}}
             <label class="form__group">
                 <span class="form__label--item">確認用パスワード</span>
                 <input
@@ -122,10 +106,7 @@
             <a class="login__button-submit" href="{{ route('login') }}">ログインはこちら</a>
         </p>
 
-        {{-- 参考：
-             ・登録直後はコントローラ側でプロフィール設定画面へリダイレクトしてください。
-             ・メール認証を導入している場合は、認証用画面へリダイレクトしてください。
-        --}}
+        {{-- 参考：登録直後の遷移は環境に合わせて実装 --}}
     </section>
 </main>
 </body>

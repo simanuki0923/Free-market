@@ -6,7 +6,6 @@
 
 @section('content')
 @php
-  // 画像URL（absolute / storage / no-image）— product優先、なければ sell から
   $path = $product->image_path ?? optional($product->sell)->image_path;
   $src = $path
       ? (\Illuminate\Support\Str::startsWith($path, ['http://','https://'])
@@ -14,7 +13,6 @@
           : asset('storage/' . ltrim($path, '/')))
       : asset('img/no-image.png');
 
-  // 配送先の初期表示（profiles: postal_code/address1/address2/phone）
   $user        = auth()->user();
   $recipient   = $user?->name ?? 'お名前未設定';
   $postal      = optional($profile)->postal_code ?? '';
@@ -23,7 +21,6 @@
   $phone       = optional($profile)->phone ?? '';
   $addressDisp = trim($addr1 . ' ' . $addr2);
 
-  // 支払い方法の初期値：未選択スタート（空文字）
   $initialPayment = old('payment_method') ?? (optional($payment)->payment_method ?? '');
 @endphp
 
@@ -36,9 +33,7 @@
   @endif
 
   <div class="purchase__grid">
-    {{-- 左カラム：商品と入力 --}}
     <section class="purchase__left">
-      {{-- 商品概要 --}}
       <article class="purchase-item card">
         <header class="card__header">
           <h1 class="card__title">商品購入</h1>
@@ -54,14 +49,12 @@
         </div>
       </article>
 
-      {{-- 支払い方法 --}}
       <article class="card">
         <header class="card__header">
           <h2 class="card__title">支払い方法</h2>
         </header>
         <div class="card__section">
           <form id="payment-form" action="{{ route('payment.create') }}" method="GET" class="purchase-form">
-            {{-- 右の「購入する」ボタンから submit します --}}
             <input type="hidden" name="item_id" value="{{ $product->id }}">
 
             <label for="payment_method" class="form-label">支払い方法を選択</label>
@@ -74,7 +67,6 @@
         </div>
       </article>
 
-      {{-- 配送先 --}}
       <article class="card">
         <header class="card__header card__header--with-action">
           <h2 class="card__title">配送先</h2>
@@ -93,7 +85,6 @@
       </article>
     </section>
 
-    {{-- 右カラム：サマリと購入ボタン --}}
     <aside class="purchase__right">
       <div class="summary card">
         <header class="card__header">
@@ -114,7 +105,6 @@
           </span>
         </div>
         <div class="card__section">
-          {{-- 右側の購入ボタンで左フォームを submit --}}
           <button type="submit" form="payment-form" class="purchase-button--primary" {{ $product->is_sold ? 'disabled' : '' }}>
             購入する
           </button>
@@ -140,10 +130,8 @@
       return '未選択';
     };
 
-    // 初期表示：現在のvalue（空なら未選択）に合わせて右側も表示
     summary.textContent = label(select.value);
 
-    // 変更時に同期
     select.addEventListener('change', function () {
       summary.textContent = label(this.value);
     });

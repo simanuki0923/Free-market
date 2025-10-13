@@ -23,7 +23,6 @@ class PurchaseFlowTest extends TestCase
     {
         parent::setUp();
 
-        // 購入者 + 配送先
         $this->buyer = User::factory()->create();
         Profile::factory()->create([
             'user_id'     => $this->buyer->id,
@@ -33,7 +32,6 @@ class PurchaseFlowTest extends TestCase
             'phone'       => '03-1234-5678',
         ]);
 
-        // 出品者 + 商品
         $this->seller  = User::factory()->create();
         $this->product = Product::factory()->create([
             'user_id' => $this->seller->id,
@@ -43,7 +41,6 @@ class PurchaseFlowTest extends TestCase
         ]);
     }
 
-    /** 1) 決済フローへ進める（= 2xx/3xx） */
     public function test_user_can_proceed_to_payment_create_from_purchase_page(): void
     {
         if (!Route::has('payment.create')) {
@@ -52,7 +49,6 @@ class PurchaseFlowTest extends TestCase
 
         $this->actingAs($this->buyer);
 
-        // 購入画面（候補ルート）
         if (Route::has('purchase.show')) {
             $res = $this->get(route('purchase.show', ['item_id' => $this->product->id]));
         } elseif (Route::has('purchase')) {
@@ -66,7 +62,6 @@ class PurchaseFlowTest extends TestCase
             ->assertSee('購入する')
             ->assertSee('支払い方法');
 
-        // GET /payment/create（testing では 302 /payment/done へ）
         $goPay = $this->get(route('payment.create', [
             'item_id'        => $this->product->id,
             'payment_method' => 'credit_card',
@@ -78,12 +73,10 @@ class PurchaseFlowTest extends TestCase
         );
     }
 
-    /** 2) 一覧で "Sold" 表示（厳密一致 or バッジクラス） */
     public function test_purchased_item_is_shown_as_Sold_in_list(): void
     {
         $this->actingAs($this->buyer);
 
-        // 決済で is_sold が立たない環境では代替で true
         $completed = false;
         if (Route::has('payment.create')) {
             $this->get(route('payment.create', [
@@ -113,10 +106,6 @@ class PurchaseFlowTest extends TestCase
         );
     }
 
-    /**
-     * 3) プロフィール「購入一覧」に追加
-     * - purchases は決済側が作成する想定。未接続なら SKIP。
-     */
     public function test_purchased_item_is_listed_in_profile_purchases(): void
     {
         $this->actingAs($this->buyer);
@@ -131,7 +120,6 @@ class PurchaseFlowTest extends TestCase
             $this->product->update(['is_sold' => true]);
         }
 
-        // 画面候補
         $profileRoutes = ['profile.purchases', 'mypage.purchases', 'profile.show', 'mypage'];
         foreach ($profileRoutes as $name) {
             if (Route::has($name)) {
@@ -144,7 +132,6 @@ class PurchaseFlowTest extends TestCase
             }
         }
 
-        // DB 側（未接続なら SKIP）
         if (\Schema::hasTable('purchases')) {
             $count = DB::table('purchases')->where('user_id', $this->buyer->id)->count();
             if ($count === 0) {
@@ -155,7 +142,6 @@ class PurchaseFlowTest extends TestCase
             return;
         }
 
-        // 最終保証
         $this->assertTrue((bool)$this->product->fresh()->is_sold, '購入後に is_sold=true であること');
     }
 }

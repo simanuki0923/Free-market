@@ -27,27 +27,19 @@ class PurchaseAddressTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    // item_id 不在は edit では URL 生成時に落ちるため、update 側で検証する
     #[Test]
     public function update_without_item_id_redirects_to_item_with_error_flash(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        // item_id を渡さず PATCH → コントローラのガードで item へリダイレクト想定
         $response = $this->patch(route('purchase.address.update'), [
-            // 'item_id' => (missing)
             'postal_code' => '100-0001',
             'address1'    => '東京都千代田区千代田1-1',
         ]);
 
-        // リダイレクト先
         $response->assertRedirect(route('item'));
-
-        // バリデーション/withErrors() 由来のエラーバッグがあること
         $response->assertSessionHasErrors();
-
-        // 画面には描画されていないため、セッションのエラーバッグ内容を直接確認
         $errors = session('errors');
         $this->assertNotNull($errors, 'errors バッグが存在しません');
         $this->assertContains(
@@ -82,12 +74,8 @@ class PurchaseAddressTest extends TestCase
         $response = $this->get(route('purchase.address.edit', ['item_id' => $product->id]));
         $response->assertStatus(200);
         $response->assertSee('住所の変更');
-
-        // hidden item_id
         $response->assertSee('name="item_id"', false);
         $response->assertSee('value="'.$product->id.'"', false);
-
-        // 既存値の初期表示
         $response->assertSee('value="100-0001"', false);
         $response->assertSee('value="東京都千代田区千代田1-1"', false);
         $response->assertSee('value="皇居前ハイツ101"', false);
@@ -107,7 +95,6 @@ class PurchaseAddressTest extends TestCase
 
         $this->actingAs($user);
 
-        // postal_code と address1 の欠落
         $response = $this->from(route('purchase.address.edit', ['item_id' => $product->id]))
             ->patch(route('purchase.address.update'), [
                 'item_id'  => $product->id,
@@ -117,7 +104,6 @@ class PurchaseAddressTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHasErrors(['postal_code', 'address1']);
 
-        // postal_code の形式不正（例：ハイフン無し）
         $response = $this->from(route('purchase.address.edit', ['item_id' => $product->id]))
             ->patch(route('purchase.address.update'), [
                 'item_id'     => $product->id,

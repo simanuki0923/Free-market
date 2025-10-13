@@ -1,4 +1,3 @@
-{{-- resources/views/mypage.blade.php --}}
 @extends('layouts.app')
 
 @section('css')
@@ -10,23 +9,18 @@
 
 @section('content')
 @php
-  // ユーザー / プロフィール
   $user    = $user ?? auth()->user();
   $profile = optional($user)->profile;
 
-  // 表示名（display_name が無ければ user->name）
   $displayName = optional($profile)->display_name ?? ($user->name ?? 'ユーザー');
 
-  // アイコン
   $iconPath = !empty(optional($profile)->icon_image_path)
       ? asset('storage/'.ltrim($profile->icon_image_path, '/'))
       : asset('img/sample.jpg');
 
-  // タブ（?page=sell|buy 以外は sell）
   $active = in_array(($page ?? request()->query('page', 'sell')), ['sell','buy'], true)
             ? ($page ?? 'sell') : 'sell';
 
-  // 画像URL解決（absolute / storage / no-image）
   $resolveImage = function ($path) {
       if (!$path) return asset('img/no-image.png');
       return \Illuminate\Support\Str::startsWith($path, ['http://','https://'])
@@ -42,7 +36,6 @@
     </figure>
     <div class="profile-info">
       <p class="user-name">{{ $displayName }}</p>
-      {{-- ルート名は環境に合わせて --}}
       <a href="{{ route('mypage.profile') }}" class="edit-profile-btn">プロフィールを編集</a>
     </div>
   </section>
@@ -52,7 +45,6 @@
     <a href="{{ route('mypage', ['page' => 'buy'])  }}" class="toggle-link {{ $active==='buy'  ? 'active' : '' }}">購入した商品</a>
   </nav>
 
-  {{-- 出品した商品（sells -> products 詳細へ） --}}
   @if ($active === 'sell')
     <section class="product-list" role="list" style="margin-top:16px">
       @forelse ($mySells ?? [] as $s)
@@ -83,13 +75,12 @@
 
       @if (isset($mySells) && $mySells instanceof \Illuminate\Contracts\Pagination\Paginator && $mySells->hasPages())
         <div class="pager" style="margin-top:12px">
-          {{ $mySells->links() }} {{-- p1（Controllerで appends 済み） --}}
+          {{ $mySells->links() }}
         </div>
       @endif
     </section>
   @endif
 
-  {{-- 購入した商品（purchases → sells → products） --}}
   @if ($active === 'buy')
     <section class="product-list" role="list" style="margin-top:16px">
       @forelse ($purchasedProducts ?? [] as $p)
@@ -115,7 +106,7 @@
 
       @if (isset($purchasedProducts) && $purchasedProducts instanceof \Illuminate\Contracts\Pagination\Paginator && $purchasedProducts->hasPages())
         <div class="pager" style="margin-top:12px">
-          {{ $purchasedProducts->links() }} {{-- p2（Controllerで appends 済み） --}}
+          {{ $purchasedProducts->links() }}
         </div>
       @endif
     </section>

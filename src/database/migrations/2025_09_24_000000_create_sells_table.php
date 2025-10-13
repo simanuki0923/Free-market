@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('sells', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // 出品者
-            $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete(); // product と1:1紐付け可
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('brand')->nullable();

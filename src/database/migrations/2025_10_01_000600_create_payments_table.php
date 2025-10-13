@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('purchase_id')->constrained()->cascadeOnDelete();
             $table->enum('payment_method', ['convenience_store','credit_card','bank_transfer'])->index();
-            $table->string('provider_txn_id')->nullable(); // Stripe等の取引ID
+            $table->string('provider_txn_id')->nullable();
             $table->unsignedInteger('paid_amount');
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

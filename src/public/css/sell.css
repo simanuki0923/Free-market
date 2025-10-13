@@ -1,6 +1,3 @@
-/* =========================
-   Layout / Title
-   ========================= */
 .container { max-width: 700px; margin: 0 auto; padding: 0 16px; }
 
 .sell-title {
@@ -9,18 +6,14 @@
   text-align: center;
 }
 
-/* =========================
-   Form Blocks
-   ========================= */
 .sell-form { background: #fff; padding: 8px 0 48px; }
 
 .sell-fieldset {
-  border: 0;              /* ← legend 下線で区切るため、上ボーダーは使わない */
+  border: 0;
   padding: 20px 0;
   margin: 0;
 }
 
-/* legend 文字の下にだけ下線（PCは .container と同じ見た目の長さに） */
 .sell-legend {
   position: relative;
   display: block;
@@ -33,15 +26,12 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 660px;            /* ← 基本は従来どおり */
+  width: 660px;
   height: 3px;
   background: #dfdfdf;
   border-radius: 2px;
 }
 
-/* =========================
-   Image Uploader
-   ========================= */
 .sell-image-drop {
   border: 1px dashed #cbd5e1;
   border-radius: 8px;
@@ -73,9 +63,6 @@
 .sell-preview{ margin-top: 12px; }
 .sell-preview img{ max-width: 100%; height: auto; border-radius: 6px; }
 
-/* =========================
-   Inputs / Textarea
-   ========================= */
 .sell-label{
   display: block;
   margin: 14px 0 6px;
@@ -111,12 +98,11 @@
   box-shadow: 0 0 0 3px rgba(255,107,107,.15);
 }
 
-/* Price */
 .sell-input--price{ padding-left: 28px; }
 
 .sell-price{
   position: relative;
-  max-width: 700px;   /* 入力幅の上限をコンテンツ幅に合わせる */
+  max-width: 700px;
 }
 
 .sell-price .yen{
@@ -127,11 +113,9 @@
   font-weight: 700;
 }
 
-/* Help / Error */
 .sell-help{ margin-top: 6px; color: #6b7280; font-size: 12px; }
 .sell-error{ margin-top: 6px; color: #e11d48; font-size: 12px; }
 
-/* Submit button */
 .sell-submit{
   display: block;
   width: 700px;
@@ -147,9 +131,6 @@
 }
 .sell-submit:hover{ opacity: .9; }
 
-/* =========================
-   Category Chips (checkbox)
-   ========================= */
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -163,7 +144,6 @@
   align-items: center;
 }
 
-/* Visually hide real checkbox but keep it accessible */
 .chip input[type="checkbox"]{
   position: absolute;
   inset: 0;
@@ -173,11 +153,10 @@
   cursor: pointer;
 }
 
-/* Pill look */
 .chip span{
   display: inline-block;
   padding: 8px 14px;
-  border: 2px solid #fb2d2d; /* ご指定の赤枠 */
+  border: 2px solid #fb2d2d;
   border-radius: 9999px;
   background: #fff;
   color: #444;
@@ -187,17 +166,14 @@
   transition: box-shadow .15s, background-color .15s, color .15s, border-color .15s;
 }
 
-/* Hover */
 .chip:hover span{ border-color: #bfc5ce; }
 
-/* Focus */
 .chip input[type="checkbox"]:focus + span{
   outline: 0;
   box-shadow: 0 0 0 3px rgba(255,107,107,.25);
   border-color: #ff6b6b;
 }
 
-/* Checked */
 .chip input[type="checkbox"]:checked + span{
   background: #ff6b6b;
   color: #fff;
@@ -205,9 +181,6 @@
   box-shadow: 0 2px 0 rgba(0,0,0,.06) inset;
 }
 
-/* =========================
-   Condition Select (gray when open)
-   ========================= */
 #condition.sell-input{
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -221,35 +194,17 @@
   box-shadow: 0 0 0 3px rgba(255,107,107,.15);
 }
 
-/* 開いたメニュー側（各 option の背景をダークグレー） */
 #condition.sell-input option{
   background: #606061;
   color: #ffffff;
 }
 #condition.sell-input option:disabled{ color: #9ca3af; }
 
-/* =========================
-   (任意) 2ブロック目以降だけ薄い区切り線が欲しい場合
-   ========================= */
-/*
-.sell-fieldset + .sell-fieldset{
-  border-top: 1px solid #f0f2f5;
-  margin-top: 8px;
-}
-*/
-
-/* このクラスが付いた legend は下線を出さない */
 .sell-legend.sell-legend--no-underline::after {
   display: none;
 }
 
-/* =========================================================
-   Responsive
-   ========================================================= */
-
-/* 1400–1540px：見た目は“元CSSと同じ”になるよう、実質ノー変更 */
 @media (min-width: 1400px) and (max-width: 1540px){
-  /* 明示しておくが値は据え置き（見た目は変わりません） */
   .container { max-width: 700px; }
   .sell-legend::after { width: 660px; }
 }

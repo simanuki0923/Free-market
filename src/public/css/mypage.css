@@ -1,21 +1,14 @@
-/* =========================
-   MyPage 基本レイアウト（元CSS）
-   ========================= */
 .mypage__main {
   background: #fff;
   padding: 24px 0 64px;
 }
 
-/* 任意：全体幅をそろえる（既存 .container があれば不要） */
 .mypage__main.container {
   max-width: 1350px;
   margin: 0 auto;
   padding: 0 16px;
 }
 
-/* =========================
-   プロフィールヘッダー
-   ========================= */
 .profile-section {
   display: grid;
   grid-template-columns: 96px 1fr;
@@ -29,7 +22,7 @@
   height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  background: #e5e7eb; /* 画像が無い時の台座 */
+  background: #e5e7eb;
   margin: 0;
 }
 .profile-icon img {
@@ -57,7 +50,6 @@
   margin-left: 50px;
 }
 
-/* 「プロフィールを編集」ボタン：白地に赤枠 */
 .edit-profile-btn {
   display: inline-block;
   padding: 16px 42px;
@@ -74,32 +66,27 @@
   filter: brightness(0.98);
 }
 
-/* =========================
-   タブ（下部グレーラインは残す）
-   ========================= */
 .toggle-links {
   display: flex;
   gap: 24px;
   align-items: flex-end;
   padding: 10px 0;
-  /* border-bottom: 5px solid gray;  ← コンテナ幅に制限されるため無効化 */
   margin-bottom: 20px;
-  position: relative;             /* ← 疑似要素の基準にする */
+  position: relative;
 }
 
 .toggle-links::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -20px;                  /* margin-bottom と合わせて線の下端を揃える */
+  bottom: -20px;
   transform: translateX(-50%);
-  width: 100vw;                   /* 画面幅いっぱい */
-  height: 5px;                    /* 線の太さ */
-  background: gray;               /* グレー線 */
-  pointer-events: none;           /* クリックを邪魔しない */
+  width: 100vw;
+  height: 5px;
+  background: gray;
+  pointer-events: none;
 }
 
-/* 既存のタブリンク */
 .toggle-link {
   display: inline-block;
   padding: 12px 0 12px 50px;
@@ -111,26 +98,21 @@
 .toggle-link:hover { color: #374151; }
 .toggle-link.active { color: #e60023; }
 
-/* =========================
-   商品一覧（カード）
-   ========================= */
 .product-list {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)); /* PC: 4列 */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   column-gap: 50px;
   margin-top: 16px;
 }
 
 .product-item { list-style: none; }
 
-/* カード全体 */
 .product-card {
   display: block;
   color: inherit;
   text-decoration: none;
 }
 
-/* サムネは正方形を維持 */
 .product-thumb {
   position: relative;
   width: 100%;
@@ -147,7 +129,6 @@
   object-fit: cover;
 }
 
-/* sold out ラベル */
 span.sold-out-label {
   position: absolute;
   left: 8px;
@@ -160,7 +141,6 @@ span.sold-out-label {
   border-radius: 9999px;
 }
 
-/* 商品名 */
 .product-meta { padding: 8px 2px 0; }
 .product-name {
   margin: 0 0 12px 35px;
@@ -169,15 +149,11 @@ span.sold-out-label {
   line-height: 1.4;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;     /* 2行で省略 */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-/* =========================================================
-   ▼ 1400–1540px：見た目を“固定”して揺れを防ぐ（元CSSと同じ）
-   ========================================================= */
 @media (min-width: 1400px) and (max-width: 1540px) {
-  /* レイアウトは現状維持（4列・余白も同じ） */
   .mypage__main.container {
     max-width: 1350px;
     padding: 0 16px;
@@ -197,7 +173,7 @@ span.sold-out-label {
     transform: translateX(-10%);
   }
   .toggle-links::after {
-    width: 100vw;  /* 画面幅いっぱいの下線を維持 */
+    width: 100vw;
     height: 5px;
   }
   .toggle-link {
@@ -205,7 +181,7 @@ span.sold-out-label {
     padding-left: 50px;
   }
   .product-list {
-    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4列固定 */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: 50px;
   }
   .product-name {

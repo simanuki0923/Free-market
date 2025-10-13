@@ -15,7 +15,7 @@ class ProductFactory extends Factory
     {
         return [
             'user_id'     => User::factory(),
-            'category_id' => null, // 単一カテゴリ(belongsTo)は必要時に付与
+            'category_id' => null,
             'name'        => $this->faker->unique()->words(3, true),
             'brand'       => $this->faker->optional()->randomElement([
                 'Apple','Sony','Canon','Panasonic','Nintendo','ASUS','Other'
@@ -30,33 +30,24 @@ class ProductFactory extends Factory
         ];
     }
 
-    /* ---------------------------
-       よく使う state ヘルパ
-       --------------------------- */
-
-    /** 売却済みにする */
     public function sold(): static
     {
         return $this->state(fn () => ['is_sold' => true]);
     }
 
-    /** ダミー画像パスを入れる */
     public function withImage(): static
     {
         return $this->state(fn () => ['image_path' => 'products/sample.jpg']);
     }
 
-    /** 特定ユーザーの出品として作成 */
     public function byUser(User $user): static
     {
         return $this->state(fn () => ['user_id' => $user->id]);
     }
 
-    /** 単一カテゴリ（belongsTo）を同時作成して紐付け */
     public function withSingleCategory(?string $name = null): static
     {
         return $this->state(function () use ($name) {
-            // Factory をそのまま返すと id が自動で入る（belongsTo）
             return [
                 'category_id' => $name
                     ? Category::factory()->create(['name' => $name])->id
@@ -65,13 +56,8 @@ class ProductFactory extends Factory
         });
     }
 
-    /**
-     * 多対多カテゴリ（belongsToMany）を名前配列で付与
-     * 例) ->withCategories(['メンズ','シューズ'])
-     */
     public function withCategories(array $names): static
     {
-        // ✔ Laravel の afterCreating は $model だけを受け取る形にしておく（第2引数を使わない）
         return $this->afterCreating(function (Product $product) use ($names) {
             if (!method_exists($product, 'categories')) {
                 return;
@@ -90,10 +76,6 @@ class ProductFactory extends Factory
         });
     }
 
-    /**
-     * 多対多カテゴリ（belongsToMany）をダミー n 件付与
-     * 例) ->withCategoryCount(2)
-     */
     public function withCategoryCount(int $count): static
     {
         return $this->afterCreating(function (Product $product) use ($count) {
@@ -107,7 +89,6 @@ class ProductFactory extends Factory
         });
     }
 
-    /** 価格帯ショートカット */
     public function cheap(): static
     {
         return $this->state(fn () => ['price' => $this->faker->numberBetween(500, 1999)]);

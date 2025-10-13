@@ -10,20 +10,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Purchase extends Model
 {
     protected $fillable = [
-        'user_id',      // 購入者
-        'sell_id',      // 出品
-        'amount',       // 購入金額（見積もり）
+        'user_id',
+        'sell_id',
+        'amount',
         'purchased_at',
     ];
 
     public function payment()
     {
-        // 1:1 の想定なら hasOne
         return $this->hasOne(Payment::class);
     }
-
-    // もし分割払い等で複数支払いを許容するなら hasMany にする
-    // public function payments() { return $this->hasMany(Payment::class); }
 
     public function sell()
     {

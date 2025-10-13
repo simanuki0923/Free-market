@@ -105,13 +105,10 @@ class RegisterTest extends TestCase
 
         $response = $this->post(route('register'), $payload);
 
-        // 登録されたか（DBが小文字正規化でもパス）
         $this->assertDatabaseHas('users', ['email' => strtolower($payload['email'])]);
 
-        // 認証状態になっている（Fortify規定では登録後にログイン状態）
         $this->assertAuthenticated();
 
-        // メール確認画面へ誘導される
         $response->assertRedirect(route('verification.notice'));
     }
 }

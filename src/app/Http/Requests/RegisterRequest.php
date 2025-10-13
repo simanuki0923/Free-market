@@ -10,7 +10,6 @@ class RegisterRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // ゲストが使う想定なので true
         return true;
     }
 
@@ -20,7 +19,6 @@ class RegisterRequest extends FormRequest
             'name'                  => ['required', 'string', 'max:20'],
             'email'                 => ['required', 'string', 'email:filter', 'max:255', 'unique:users,email'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
-            // confirmed を使うと password_confirmation と一致チェックが入る
             'password_confirmation' => ['required', 'string', 'min:8'],
         ];
     }

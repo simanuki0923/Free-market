@@ -22,7 +22,6 @@ class PaymentController extends Controller
     {
         $this->middleware('auth');
 
-        // 本番/開発のみ Stripe 初期化（testing は未設定でもOK）
         if (!App::environment('testing')) {
             $secret = config('services.stripe.secret') ?? env('STRIPE_SECRET_KEY');
             if ($secret) {
@@ -31,11 +30,6 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * GET /payment/create
-     * - testing: 依存を最小に **DB直書き**で即確定 → /payment/done に 302
-     * - prod/dev: PaymentIntent を発行してカード入力画面へ
-     */
     public function create(Request $request)
     {
         $productId = $request->input('productId') ?? $request->input('item_id');
@@ -44,25 +38,20 @@ class PaymentController extends Controller
         /** @var Product $product */
         $product = Product::query()->findOrFail((int)$productId);
 
-        // 自分の出品 or SOLD は購入不可
         if ($product->user_id === Auth::id() || $product->is_sold) {
             return redirect()->route('item')->with('error', '購入できない商品です。');
         }
 
-        /* ======================= testing は安全ショートカット ======================= */
         if (App::environment('testing')) {
             try {
                 DB::transaction(function () use ($product) {
 
-                    // 行ロックして最新を取得
                     $p = DB::table('products')->lockForUpdate()->where('id', $product->id)->first();
                     if (!$p) abort(404);
                     if (!empty($p->is_sold)) {
-                        // 冪等：すでに SOLD なら何もしない
                         return;
                     }
 
-                    // sells を解決：なければ **name を含めて作成（NOT NULL対応）**
                     $sellId = null;
                     if (Schema::hasTable('sells')) {
                         $sellId = DB::table('sells')->where('product_id', $p->id)->value('id');
@@ -71,7 +60,7 @@ class PaymentController extends Controller
                                 'user_id'     => $p->user_id,
                                 'product_id'  => $p->id,
                                 'category_id' => $p->category_id ?? null,
-                                'name'        => $p->name,               // ★ 必須（NOT NULL）
+                                'name'        => $p->name,
                                 'brand'       => $p->brand ?? null,
                                 'price'       => (int)$p->price,
                                 'image_path'  => $p->image_path ?? null,
@@ -84,7 +73,6 @@ class PaymentController extends Controller
                         }
                     }
 
-                    // purchases を記録（テーブルがあり sell_id 解決時のみ）
                     if ($sellId && Schema::hasTable('purchases')) {
                         $exists = DB::table('purchases')
                             ->where('user_id', Auth::id())
@@ -103,13 +91,11 @@ class PaymentController extends Controller
                         }
                     }
 
-                    // 商品を SOLD に
                     DB::table('products')->where('id', $p->id)->update([
                         'is_sold'    => true,
                         'updated_at' => now(),
                     ]);
 
-                    // 売上側も SOLD 同期（あれば）
                     if ($sellId) {
                         DB::table('sells')->where('id', $sellId)->update([
                             'is_sold'    => true,
@@ -122,13 +108,10 @@ class PaymentController extends Controller
 
             } catch (\Throwable $e) {
                 Log::warning('Test payment finalize failed: '.$e->getMessage());
-                // 例外は 500 にせず、一覧へ戻す（テストを落とさない）
                 return redirect()->route('item')->with('error', 'テスト決済処理に失敗しました。');
             }
         }
-        /* ======================= testing ここまで ======================= */
 
-        // 本番/開発：Stripe で PaymentIntent を発行し、カード入力画面を出す
         try {
             $publicKey = config('services.stripe.public') ?? env('STRIPE_PUBLIC_KEY');
             $secret    = config('services.stripe.secret') ?? env('STRIPE_SECRET_KEY');
@@ -140,7 +123,7 @@ class PaymentController extends Controller
             Stripe::setApiKey($secret);
 
             $intent = PaymentIntent::create([
-                'amount'   => (int) $product->price * 100, // 円→最小単位
+                'amount'   => (int) $product->price * 100,
                 'currency' => 'jpy',
                 'automatic_payment_methods' => ['enabled' => true],
                 'metadata' => [
@@ -150,7 +133,7 @@ class PaymentController extends Controller
             ]);
 
             return view('payment.create', [
-                'product'       => Product::with('sell')->find($product->id), // 画面表示用
+                'product'       => Product::with('sell')->find($product->id),
                 'clientSecret'  => $intent->client_secret,
                 'paymentIntent' => $intent->id,
                 'publicKey'     => $publicKey,
@@ -162,10 +145,6 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * POST /payment
-     * - 本番/開発で Stripe 成功後に叩く想定（testing では未使用でもOK）
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -173,7 +152,6 @@ class PaymentController extends Controller
             'payment_intent_id' => ['required','string'],
         ]);
 
-        // testing では Stripe 検証を省略してもOK
         if (!App::environment('testing')) {
             try {
                 $pi = PaymentIntent::retrieve($validated['payment_intent_id']);
@@ -193,19 +171,17 @@ class PaymentController extends Controller
             return redirect()->route('item')->with('error', 'この商品は購入できません。');
         }
 
-        // 本番/開発の確定（Eloquent 経由）
         DB::transaction(function () use ($product) {
             $p = Product::lockForUpdate()->with('sell')->findOrFail($product->id);
             if ($p->is_sold) return;
 
-            // sells を解決：なければ **name を含めて作成（NOT NULL対応）**
             $sell = $p->sell;
             if (!$sell) {
                 $sell = Sell::create([
                     'user_id'     => $p->user_id,
                     'product_id'  => $p->id,
                     'category_id' => $p->category_id ?? null,
-                    'name'        => $p->name,             // ★ 必須
+                    'name'        => $p->name,
                     'brand'       => $p->brand ?? null,
                     'price'       => (int)$p->price,
                     'image_path'  => $p->image_path ?? null,
@@ -215,13 +191,11 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // purchases：user_id × sell_id で冪等
             Purchase::updateOrCreate(
                 ['user_id' => Auth::id(), 'sell_id' => $sell->id],
                 ['amount' => (int)$p->price, 'purchased_at' => now()]
             );
 
-            // SOLD 同期（商品／出品）
             $p->update(['is_sold' => true]);
             $sell->update(['is_sold' => true]);
         });
@@ -229,10 +203,6 @@ class PaymentController extends Controller
         return redirect()->route('payment.done')->with('status', '決済が完了しました。');
     }
 
-    /**
-     * GET /payment/done
-     * - ビューが無ければ一覧へフォールバック（500回避）
-     */
     public function done()
     {
         if (view()->exists('payment.done')) {

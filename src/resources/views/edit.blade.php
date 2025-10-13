@@ -23,7 +23,6 @@
     @csrf
     @method('PATCH')
 
-    {{-- アイコン --}}
     <div class="profile-edit__icon-block">
       <figure class="profile-edit__icon">
         <img src="{{ $iconPath }}" alt="{{ $displayName.' のアイコン' }}">
@@ -31,7 +30,6 @@
 
       <label class="profile-edit__file-label">
         画像を選択する
-        {{-- .jpeg / .png のみ（*.jpg は選択不可ヒント） --}}
         <input type="file" name="icon" class="sr-only" accept=".jpeg,.png">
       </label>
       @error('icon')
@@ -39,7 +37,6 @@
       @enderror
     </div>
 
-    {{-- ユーザー名（必須・20文字以内） --}}
     <label class="form__group">
       <span class="form__label">ユーザー名</span>
       <input type="text"
@@ -52,7 +49,6 @@
       @error('display_name') <p class="error">{{ $message }}</p> @enderror
     </label>
 
-    {{-- 郵便番号（必須・123-4567） --}}
     <label class="form__group">
       <span class="form__label">郵便番号</span>
       <input type="text"
@@ -65,7 +61,6 @@
       @error('postal_code') <p class="error">{{ $message }}</p> @enderror
     </label>
 
-    {{-- 住所（必須） --}}
     <label class="form__group">
       <span class="form__label">住所</span>
       <input type="text"
@@ -75,7 +70,6 @@
       @error('address_pref_city') <p class="error">{{ $message }}</p> @enderror
     </label>
 
-    {{-- マンション名（任意） --}}
     <label class="form__group">
       <span class="form__label">マンション名</span>
       <input type="text"

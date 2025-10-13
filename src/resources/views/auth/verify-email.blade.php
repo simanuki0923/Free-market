@@ -29,10 +29,8 @@
             メール認証を完了してください。
         </p>
 
-        <!-- メールアプリを開く（スクショ中央のボタン相当） -->
         <a class="verify__button" href="mailto:">認証はこちらから</a>
 
-        <!-- 認証メールの再送（スクショ下部のリンク相当） -->
         <form class="verify__resend" method="post" action="{{ route('verification.send') }}">
             @csrf
             <button type="submit" class="verify__resend-link">認証メールを再送する</button>

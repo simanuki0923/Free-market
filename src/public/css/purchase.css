@@ -1,16 +1,12 @@
-/* =========================
-   基本トークン
-   ========================= */
 :root{
   --container: 1350px;
   --line: #e5e7eb;
   --muted:#6b7280;
   --black:#0b0b0b;
-  --primary:#ff5a5f;            /* 購入ボタンの赤 */
+  --primary:#ff5a5f;
   --bg:#ffffff;
 }
 
-/* ベース */
 *{ box-sizing: border-box; }
 body{ color:var(--black);}
 .container{
@@ -19,20 +15,14 @@ body{ color:var(--black);}
   padding: 24px 16px 64px;
 }
 
-/* =========================
-   グリッド
-   ========================= */
 .purchase__main{ background: var(--bg); }
 .purchase__grid{
   display: grid;
-  grid-template-columns: 1fr 320px;  /* 左：可変 / 右：固定 */
+  grid-template-columns: 1fr 320px;
   gap: 28px;
   align-items: start;
 }
 
-/* =========================
-   カード
-   ========================= */
 .card{
   background:#fff;
   border:1px solid var(--line);
@@ -56,9 +46,6 @@ body{ color:var(--black);}
 }
 .card__section{ padding:16px; }
 
-/* =========================
-   左カラム：商品概要
-   ========================= */
 .purchase-item__body{
   display:flex;
   gap:16px;
@@ -78,21 +65,20 @@ body{ color:var(--black);}
 .purchase-item__thumb img{
   width:100%;
   height:100%;
-  object-fit:cover;          /* 画像を正方形サムネに収める */
+  object-fit:cover;
 }
 .purchase-item__info{ display:flex; flex-direction:column; gap:6px; min-width:0; }
 .purchase-item__name{
   margin:0;
   font-size:16px;
   font-weight:700;
-  white-space:nowrap;        /* 長い商品名の省略 */
+  white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
   max-width:100%;
 }
 .purchase-item__price{ margin:0; font-size:16px; }
 
-/* 支払い方法フォーム */
 .form-label{
   display:block;
   font-size:12px;
@@ -109,11 +95,10 @@ body{ color:var(--black);}
   background:#fff;
 }
 .form-select option{
-  background:#838384;      /* ← 候補リストの背景 */
+  background:#838384;
   color:#111827;
 }
 
-/* 配送先 */
 .address{ display:flex; flex-direction:column; gap:8px; font-size:14px; }
 .address__row{ line-height:1.6; }
 .address__row .muted{
@@ -124,7 +109,6 @@ body{ color:var(--black);}
   margin-right:8px;
 }
 
-/* 「変更する」リンクボタン */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -149,9 +133,6 @@ body{ color:var(--black);}
   margin-left:auto;
 }
 
-/* =========================
-   右カラム：サマリ
-   ========================= */
 .summary__row{
   display:flex;
   align-items:center;
@@ -182,9 +163,6 @@ body{ color:var(--black);}
   cursor:not-allowed;
 }
 
-/* =========================
-   フラッシュ
-   ========================= */
 .flash{
   margin:0 0 16px;
   padding:12px 14px;
@@ -194,31 +172,25 @@ body{ color:var(--black);}
 .flash.success{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
 .flash.error{ background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
 
-/* 補助テキスト */
 .form-help{
   margin-top:8px;
   font-size:12px;
   color:var(--muted);
 }
 
-/* 細かな整形 */
 .purchase__left > .card + .card{ margin-top:16px; }
 
-/* =======================================================
-   ▼ 1400–1540px：元CSSから“見た目を変えない”明示設定
-   （ベースと同一指定を再掲して安定化）
-   ======================================================= */
 @media (min-width: 1400px) and (max-width: 1540px){
   .container{
-    max-width: var(--container);   /* 1100pxのまま */
-    padding: 24px 16px 64px;       /* そのまま */
+    max-width: var(--container);
+    padding: 24px 16px 64px;
   }
   .purchase__grid{
-    grid-template-columns: 1fr 320px; /* 2カラムのまま */
+    grid-template-columns: 1fr 320px;
     gap: 28px;
     align-items: start;
   }
-  .form-select{ width:280px; height:34px; } /* そのまま */
-  .purchase-item__thumb{ width:96px; height:96px; } /* そのまま */
-  .purchase-button--primary{ height:42px; } /* そのまま */
+  .form-select{ width:280px; height:34px; }
+  .purchase-item__thumb{ width:96px; height:96px; }
+  .purchase-button--primary{ height:42px; }
 }
