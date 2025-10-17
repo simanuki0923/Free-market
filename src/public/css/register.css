@@ -48,7 +48,7 @@ main {
 
 .register-form__heading {
   margin: 0 0 16px;
-  font-size: 22px;
+  font-size: 35px;
   font-weight: 700;
   text-align: center;
 }
@@ -58,8 +58,9 @@ main {
 .form__label--item {
   display: inline-block;
   margin-bottom: 8px;
-  font-size: 20px;
+  font-size: 23px;
   color: var(--muted);
+  font-weight:700;
 }
 
 .form__group input[type="text"],
@@ -99,7 +100,7 @@ main {
   border-radius: 6px;
   background: linear-gradient(180deg, var(--primary-grad-top), var(--primary-grad-btm));
   color: #fff;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: .04em;
   cursor: pointer;
@@ -111,7 +112,7 @@ main {
 .login__link { margin-top: 14px; text-align: center; }
 .login__button-submit {
   color: var(--link);
-  font-size: 13px;
+  font-size: 20px;
   text-decoration: none;
 }
 .login__button-submit:hover { text-decoration: underline; }

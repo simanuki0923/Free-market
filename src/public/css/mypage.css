@@ -18,12 +18,13 @@
 }
 
 .profile-icon {
-  width: 96px;
-  height: 96px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
   background: #e5e7eb;
   margin: 0;
+  transform:translatex(100px);
 }
 .profile-icon img {
   width: 100%;
@@ -48,6 +49,7 @@
   color: #111827;
   line-height: 1.3;
   margin-left: 50px;
+  transform:translatex(200px);
 }
 
 .edit-profile-btn {
@@ -55,7 +57,7 @@
   padding: 16px 42px;
   font-size: 20px;
   line-height: 1;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #f3a1a1;
   background: #fff5f5;
   color: #de4a4a;

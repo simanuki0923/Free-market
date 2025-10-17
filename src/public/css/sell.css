@@ -33,7 +33,7 @@
 }
 
 .sell-image-drop {
-  border: 1px dashed #cbd5e1;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   height: 120px;
   display: flex;
@@ -54,8 +54,8 @@
   display: inline-block;
   padding: 10px 16px;
   border-radius: 6px;
-  background: #ff6b6b;
-  color: #fff;
+  border: 2px solid #ff6b6b;
+  color: #ff6b6b;
   font-weight: 700;
 }
 .sell-image-button:hover{ opacity: .9; }
@@ -65,7 +65,7 @@
 
 .sell-label{
   display: block;
-  margin: 14px 0 6px;
+  margin: 14px 0 10px;
   font-weight: 700;
   font-size: 22px;
   color: #333;

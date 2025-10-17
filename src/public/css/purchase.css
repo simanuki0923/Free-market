@@ -23,12 +23,7 @@ body{ color:var(--black);}
   align-items: start;
 }
 
-.card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:8px;
-  overflow:hidden;
-}
+
 .card__header{
   padding:14px 16px;
   border-bottom:1px solid var(--line);
@@ -52,8 +47,8 @@ body{ color:var(--black);}
   align-items:center;
 }
 .purchase-item__thumb{
-  width:96px;
-  height:96px;
+  width:150px;
+  height:150px;
   border:1px solid var(--line);
   border-radius:8px;
   background:#f1f5f9;
@@ -76,8 +71,11 @@ body{ color:var(--black);}
   overflow:hidden;
   text-overflow:ellipsis;
   max-width:100%;
+  transform:translateY(-35px)
 }
-.purchase-item__price{ margin:0; font-size:16px; }
+.purchase-item__price{ margin:0; font-size:16px; transform:translateY(-35px);}
+
+.purchase-item__title{ margin:0; font-size:16px; transform:translateY(-35px);}
 
 .form-label{
   display:block;
@@ -138,7 +136,7 @@ body{ color:var(--black);}
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  font-size:14px;
+  font-size:20px;
 }
 .summary__row + .summary__row{ border-top:1px dashed var(--line); }
 
@@ -154,6 +152,7 @@ body{ color:var(--black);}
   font-weight:700;
   cursor:pointer;
   transition:opacity .15s ease, transform .02s ease;
+  font-size:20px;
 }
 .purchase-button--primary:hover{ opacity:.95; }
 .purchase-button--primary:active{ transform:translateY(1px); }
@@ -177,6 +176,37 @@ body{ color:var(--black);}
   font-size:12px;
   color:var(--muted);
 }
+
+/* 右カラム用の縦積みと枠ボックス */
+.purchase__right{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transform:translateY(20px)
+}
+
+/* 右側の「商品代金」「支払方法」をまとめて囲う枠 */
+.aside-box{
+  border: 1px solid black;
+  background: #fff;
+  overflow: hidden;   /* headerの境界を綺麗に */
+}
+
+/* 既存のカード見出し/中身をそのまま活かしつつ枠内に表示 */
+.aside-box .card__header{ border-bottom: 1px solid black; }
+.aside-box .card__section{ padding: 30px; }
+
+/* 購入ボタンは枠の外に単体表示 */
+.purchase__right .purchase-button--primary{
+  margin-top: 0;  /* 好みで微調整 */
+}
+
+/* 右カラムの「商品代金」と「支払方法」の区切りを30pxの実線に */
+.aside-box .summary__row + .summary__row{
+  border-top: 1px solid black;  /* 点線→実線、太さ30px */
+}
+
+
 
 .purchase__left > .card + .card{ margin-top:16px; }
 
