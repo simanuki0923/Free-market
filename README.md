@@ -19,10 +19,6 @@
 - php artisan db:seed
 
 - .env設定設定変更
-- APP_LOCALE=ja
-- APP_FALLBACK_LOCALE=ja
-- APP_FAKER_LOCALE=ja_JP
-
 - SESSION_DRIVER=file
 - QUEUE_CONNECTION=sync
 - CACHE_STORE=file
