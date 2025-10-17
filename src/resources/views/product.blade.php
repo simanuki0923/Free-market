@@ -78,7 +78,7 @@
         <div class="action-right">
           @if(!$product->is_sold && (!auth()->check() || $product->user_id !== auth()->id()))
             <a href="{{ route('purchase', ['item_id' => $product->id]) }}" class="purchase-button">
-              購入する
+              購入手続きへ
             </a>
           @elseif(auth()->check() && $product->user_id === auth()->id())
             <button class="purchase-button" disabled>自分の商品は購入できません</button>
@@ -115,7 +115,7 @@
 
       <section class="product-comments">
         <h3 class="comments-heading">
-          コメント（<span id="comments-total">{{ $commentsCount }}</span>件）
+          コメント（<span id="comments-total">{{ $commentsCount }}</span>）
         </h3>
 
         <ul id="comment-list" class="comment-list">

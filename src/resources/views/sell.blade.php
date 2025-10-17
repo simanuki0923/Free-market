@@ -33,7 +33,7 @@
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品の詳細</legend>
 
-      <label class="sell-label">カテゴリー <small>（複数選択可）</small></label>
+      <label class="sell-label">カテゴリー</label>
       @php
         $oldSelected = collect(old('categories', []))->map(fn($v)=>(string)$v)->all();
         // 念のためコントローラ未使用時のフォールバックも定義
@@ -97,7 +97,6 @@
     </fieldset>
 
     <fieldset class="sell-fieldset">
-      <legend class="sell-legend">販売価格</legend>
 
       <label class="sell-label" for="price">販売価格</label>
       <div class="sell-price">
