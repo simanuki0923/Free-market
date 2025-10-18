@@ -11,7 +11,9 @@ class Comment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','product_id','body',
+        'user_id',
+        'product_id',
+        'body',
     ];
 
     public function user(): BelongsTo

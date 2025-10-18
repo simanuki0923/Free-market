@@ -11,7 +11,11 @@ class Profile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id','postal_code','address1','address2','phone',
+        'user_id',
+        'postal_code',
+        'address1',
+        'address2',
+        'phone',
     ];
 
     public function user(): BelongsTo
