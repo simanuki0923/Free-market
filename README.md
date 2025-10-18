@@ -15,6 +15,8 @@
 - composer install
 - cp .env.local .env
 - php artisan key:generate
+- php artisan storage:link
+- chmod -R ug+rw storage bootstrap/cache
 - php artisan migrate
 - php artisan db:seed
 
