@@ -52,6 +52,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment',       [PaymentController::class, 'store'])->name('payment.store');
     Route::get('/payment/done',   [PaymentController::class, 'done'])->name('payment.done');
 
-    Route::get('/sell',  [SellController::class, 'create'])->name('sell.create'); // 出品フォーム表示
-    Route::post('/sell', [SellController::class, 'store'])->name('sell.store');   // 出品登録
-});
+    Route::get('/sell',  [SellController::class, 'create'])->name('sell.create');
+    Route::post('/sell', [SellController::class, 'store'])->name('sell.store');
