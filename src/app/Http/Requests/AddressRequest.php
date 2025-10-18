@@ -22,7 +22,6 @@ class AddressRequest extends FormRequest
             ],
             'address1' => ['required','string','max:255'],
             'address2' => ['nullable','string','max:255'],
-            'phone'     => ['nullable','string','max:50'],
             'item_id'   => ['bail','required','integer','exists:products,id'],
         ];
     }
@@ -33,7 +32,6 @@ class AddressRequest extends FormRequest
             'postal_code' => '郵便番号',
             'address1'    => '住所',
             'address2'    => '建物名',
-            'phone'       => '電話番号',
             'item_id'     => '商品ID',
         ];
     }
