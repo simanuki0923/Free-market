@@ -6,14 +6,11 @@
 
 @section('content')
 @php
-    // 表示タブ：URLの ?tab= を優先。未指定は 'all'
     $activeTab = strtolower(request('tab', 'all'));
-    // 実データタブ：コントローラから渡された $tab（なければ 'all'）
     $dataTab   = strtolower($tab ?? 'all');
 
     $isLoggedIn = Auth::check();
 
-    // 画像SRC決定ロジック（S3等の絶対URL／public/storage の相対パス両対応）
     $resolveImage = function ($product) {
         $path = $product->image_path ?? optional($product->sell)->image_path; // product優先→sellフォールバック
         if (!$path) {

@@ -2,9 +2,6 @@
 
 @section('css')
   <link rel="stylesheet" href="{{ asset('css/mypage.css') }}">
-  <style>
-    .sold-out-label{position:absolute;top:8px;left:8px;background:#000;color:#fff;padding:2px 6px;font-size:12px;border-radius:4px}
-  </style>
 @endsection
 
 @section('content')

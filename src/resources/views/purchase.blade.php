@@ -33,7 +33,6 @@
   @endif
 
   <div class="purchase__grid">
-    <!-- ===== 左カラム ===== -->
     <section class="purchase__left">
       <article class="purchase-item card">
         <div class="purchase-item__body">
@@ -48,7 +47,6 @@
         </div>
       </article>
 
-      <!-- 支払い方法の選択（編集は左で行う） -->
       <article class="card">
         <header class="card__header">
           <h2 class="card__title">支払い方法</h2>
@@ -82,9 +80,7 @@
       </article>
     </section>
 
-    <!-- ===== 右カラム ===== -->
     <aside class="purchase__right">
-      <!-- ここだけを枠で囲む -->
       <div class="aside-box">
         <article class="card">
           <div class="card__section summary__row">
@@ -105,7 +101,6 @@
         </article>
       </div>
 
-      <!-- 購入ボタンは枠の外に配置（要求どおり） -->
       <button
         type="submit"
         form="payment-form"
@@ -135,10 +130,8 @@
       return '未選択';
     }
 
-    // 初期反映
     summary.textContent = label(select.value);
 
-    // 変更時に右の表示だけ更新（枠内の表示は常に最新）
     select.addEventListener('change', function () {
       summary.textContent = label(this.value);
     });

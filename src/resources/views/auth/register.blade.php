@@ -105,8 +105,6 @@
         <p class="login__link">
             <a class="login__button-submit" href="{{ route('login') }}">ログインはこちら</a>
         </p>
-
-        {{-- 参考：登録直後の遷移は環境に合わせて実装 --}}
     </section>
 </main>
 </body>
