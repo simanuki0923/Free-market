@@ -95,8 +95,13 @@ main {
   cursor: pointer;
   transition: filter .15s ease, transform .02s ease;
 }
-.form__button-submit:hover { filter: brightness(0.95); }
-.form__button-submit:active { transform: translateY(1px); }
+.form__button-submit:hover {
+  filter: brightness(0.95);
+}
+
+.form__button-submit:active {
+  transform: translateY(1px);
+}
 
 .register__link {
   margin: 14px 0 2px;
@@ -107,13 +112,23 @@ main {
   color: #2a7bd2;
   text-decoration: none;
 }
-.register__button-submit:hover { text-decoration: underline; }
+.register__button-submit:hover {
+  text-decoration: underline;
+}
 
 @media (min-width: 1400px) and (max-width: 1540px) {
-  header { background: #111; padding: 8px 16px; }
-  header img { height: 28px; }
+  header {
+    background: #111;
+    padding: 8px 16px;
+  }
 
-  main { padding: 48px 16px; }
+  header img {
+    height: 28px;
+  }
+
+  main {
+    padding: 48px 16px;
+  }
 
   .login__content {
     width: min(420px, 100%);
@@ -121,13 +136,30 @@ main {
     box-shadow: 0 1px 2px rgba(0,0,0,.02);
   }
 
-  .login-form__heading { font-size: 20px; margin: 0 0 20px; }
+  .login-form__heading {
+    font-size: 20px;
+    margin: 0 0 20px;
+  }
 
   .form { gap: 18px; }
-  .form__label--item { font-size: 12px; margin-bottom: 6px; }
-  .form input[type="email"],
-  .form input[type="password"] { font-size: 14px; padding: 10px 2px; }
+  .form__label--item {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
 
-  .form__button-submit { height: 44px; font-size: 14px; }
-  .register__button-submit { font-size: 12px; }
+  .form input[type="email"],
+  .form input[type="password"] {
+    font-size: 14px;
+    padding: 10px 2px;
+  }
+
+  .form__button-submit {
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .register__button-submit {
+    font-size: 12px;
+  }
+
 }

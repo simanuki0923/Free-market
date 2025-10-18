@@ -13,9 +13,13 @@
 
 *,
 *::before,
-*::after { box-sizing: border-box; }
+*::after {
+  box-sizing: border-box;
+}
 
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+}
 
 body {
   margin: 0;
@@ -53,8 +57,13 @@ main {
   text-align: center;
 }
 
-.form { margin-top: 12px; }
-.form__group { display: block; margin: 14px 0; }
+.form {
+  margin-top: 12px;
+}
+.form__group {
+  display: block;
+  margin: 14px 0;
+}
 .form__label--item {
   display: inline-block;
   margin-bottom: 8px;
@@ -106,16 +115,25 @@ main {
   cursor: pointer;
   transition: transform .03s ease, filter .15s ease;
 }
-.form__button-submit:hover { filter: brightness(1.05); }
-.form__button-submit:active { transform: translateY(1px); }
+.form__button-submit:hover {
+  filter: brightness(1.05);
+}
+.form__button-submit:active {
+  transform: translateY(1px);
+}
 
-.login__link { margin-top: 14px; text-align: center; }
+.login__link {
+  margin-top: 14px;
+  text-align: center;
+}
 .login__button-submit {
   color: var(--link);
   font-size: 20px;
   text-decoration: none;
 }
-.login__button-submit:hover { text-decoration: underline; }
+.login__button-submit:hover {
+  text-decoration: underline;
+}
 
 .flash__message {
   margin: 0 0 12px;

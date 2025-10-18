@@ -1,4 +1,8 @@
-.container { max-width: 700px; margin: 0 auto; padding: 0 16px; }
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
 .sell-title {
   margin: 24px 0;
@@ -6,7 +10,10 @@
   text-align: center;
 }
 
-.sell-form { background: #fff; padding: 8px 0 48px; }
+.sell-form {
+  background: #fff;
+  padding: 8px 0 48px;
+}
 
 .sell-fieldset {
   border: 0;
@@ -58,10 +65,18 @@
   color: #ff6b6b;
   font-weight: 700;
 }
-.sell-image-button:hover{ opacity: .9; }
+.sell-image-button:hover{
+  opacity: .9;
+}
 
-.sell-preview{ margin-top: 12px; }
-.sell-preview img{ max-width: 100%; height: auto; border-radius: 6px; }
+.sell-preview{
+  margin-top: 12px;
+}
+.sell-preview img{
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
 
 .sell-label{
   display: block;
@@ -98,7 +113,9 @@
   box-shadow: 0 0 0 3px rgba(255,107,107,.15);
 }
 
-.sell-input--price{ padding-left: 28px; }
+.sell-input--price{
+  padding-left: 28px;
+}
 
 .sell-price{
   position: relative;
@@ -113,8 +130,16 @@
   font-weight: 700;
 }
 
-.sell-help{ margin-top: 6px; color: #6b7280; font-size: 12px; }
-.sell-error{ margin-top: 6px; color: #e11d48; font-size: 12px; }
+.sell-help{
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
+.sell-error{
+  margin-top: 6px;
+  color: #e11d48;
+  font-size: 12px;
+}
 
 .sell-submit{
   display: block;
@@ -129,7 +154,9 @@
   border-radius: 8px;
   font-size: 23px;
 }
-.sell-submit:hover{ opacity: .9; }
+.sell-submit:hover{
+  opacity: .9;
+}
 
 .chip-group {
   display: flex;
@@ -166,7 +193,9 @@
   transition: box-shadow .15s, background-color .15s, color .15s, border-color .15s;
 }
 
-.chip:hover span{ border-color: #bfc5ce; }
+.chip:hover span{
+  border-color: #bfc5ce;
+}
 
 .chip input[type="checkbox"]:focus + span{
   outline: 0;
@@ -186,7 +215,9 @@
   -moz-appearance: none;
   appearance: none;
 }
-#condition.sell-input:hover{ background: #eef0f3; }
+#condition.sell-input:hover{
+  background: #eef0f3;
+}
 #condition.sell-input:focus{
   background: #eef0f3;
   outline: none;
@@ -205,6 +236,10 @@
 }
 
 @media (min-width: 1400px) and (max-width: 1540px){
-  .container { max-width: 700px; }
-  .sell-legend::after { width: 660px; }
+  .container {
+    max-width: 700px;
+  }
+  .sell-legend::after {
+    width: 660px;
+  }
 }

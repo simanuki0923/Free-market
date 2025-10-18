@@ -62,7 +62,12 @@ body{ color:var(--black);}
   height:100%;
   object-fit:cover;
 }
-.purchase-item__info{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.purchase-item__info{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+}
 .purchase-item__name{
   margin:0;
   font-size:16px;
@@ -73,9 +78,17 @@ body{ color:var(--black);}
   max-width:100%;
   transform:translateY(-35px)
 }
-.purchase-item__price{ margin:0; font-size:16px; transform:translateY(-35px);}
+.purchase-item__price{
+  margin:0;
+  font-size:16px;
+  transform:translateY(-35px);
+}
 
-.purchase-item__title{ margin:0; font-size:16px; transform:translateY(-35px);}
+.purchase-item__title{
+  margin:0;
+  font-size:16px;
+  transform:translateY(-35px);
+}
 
 .form-label{
   display:block;
@@ -97,8 +110,15 @@ body{ color:var(--black);}
   color:#111827;
 }
 
-.address{ display:flex; flex-direction:column; gap:8px; font-size:14px; }
-.address__row{ line-height:1.6; }
+.address{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  font-size:14px;
+}
+.address__row{
+  line-height:1.6;
+}
 .address__row .muted{
   display:inline-block;
   min-width:72px;
@@ -138,7 +158,9 @@ body{ color:var(--black);}
   gap:12px;
   font-size:20px;
 }
-.summary__row + .summary__row{ border-top:1px dashed var(--line); }
+.summary__row + .summary__row{
+  border-top:1px dashed var(--line);
+}
 
 .purchase-button--primary{
   display:block;
@@ -154,8 +176,12 @@ body{ color:var(--black);}
   transition:opacity .15s ease, transform .02s ease;
   font-size:20px;
 }
-.purchase-button--primary:hover{ opacity:.95; }
-.purchase-button--primary:active{ transform:translateY(1px); }
+.purchase-button--primary:hover{
+  opacity:.95;
+}
+.purchase-button--primary:active{
+  transform:translateY(1px);
+}
 .purchase-button--primary:disabled{
   background:#d1d5db;
   color:#fff;
@@ -168,8 +194,16 @@ body{ color:var(--black);}
   border-radius:8px;
   font-size:14px;
 }
-.flash.success{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
-.flash.error{ background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
+.flash.success{
+  background:#ecfdf5;
+  color:#065f46;
+  border:1px solid #a7f3d0;
+}
+.flash.error{
+  background:#fef2f2;
+  color:#7f1d1d;
+  border:1px solid #fecaca;
+}
 
 .form-help{
   margin-top:8px;
@@ -177,7 +211,6 @@ body{ color:var(--black);}
   color:var(--muted);
 }
 
-/* 右カラム用の縦積みと枠ボックス */
 .purchase__right{
   display: flex;
   flex-direction: column;
@@ -185,30 +218,30 @@ body{ color:var(--black);}
   transform:translateY(20px)
 }
 
-/* 右側の「商品代金」「支払方法」をまとめて囲う枠 */
 .aside-box{
   border: 1px solid black;
   background: #fff;
-  overflow: hidden;   /* headerの境界を綺麗に */
+  overflow: hidden;
 }
 
-/* 既存のカード見出し/中身をそのまま活かしつつ枠内に表示 */
-.aside-box .card__header{ border-bottom: 1px solid black; }
-.aside-box .card__section{ padding: 30px; }
+.aside-box .card__header{
+  border-bottom: 1px solid black;
+}
+.aside-box .card__section{
+  padding: 30px;
+}
 
-/* 購入ボタンは枠の外に単体表示 */
 .purchase__right .purchase-button--primary{
-  margin-top: 0;  /* 好みで微調整 */
+  margin-top: 0;
 }
 
-/* 右カラムの「商品代金」と「支払方法」の区切りを30pxの実線に */
 .aside-box .summary__row + .summary__row{
-  border-top: 1px solid black;  /* 点線→実線、太さ30px */
+  border-top: 1px solid black;
 }
 
-
-
-.purchase__left > .card + .card{ margin-top:16px; }
+.purchase__left > .card + .card{
+  margin-top:16px;
+}
 
 @media (min-width: 1400px) and (max-width: 1540px){
   .container{
@@ -220,7 +253,15 @@ body{ color:var(--black);}
     gap: 28px;
     align-items: start;
   }
-  .form-select{ width:280px; height:34px; }
-  .purchase-item__thumb{ width:96px; height:96px; }
-  .purchase-button--primary{ height:42px; }
+  .form-select{
+    width:280px;
+    height:34px;
+  }
+  .purchase-item__thumb{
+    width:96px;
+    height:96px;
+  }
+  .purchase-button--primary{
+    height:42px;
+  }
 }
