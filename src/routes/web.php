@@ -54,3 +54,4 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/sell',  [SellController::class, 'create'])->name('sell.create');
     Route::post('/sell', [SellController::class, 'store'])->name('sell.store');
+});
