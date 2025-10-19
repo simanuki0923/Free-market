@@ -20,13 +20,14 @@
 - php artisan migrate
 - php artisan db:seed
 
+- 権限設定
+- sudo chown $USER:$USER src/.env
+- chmod 600 src/.env
+
 - .env設定設定変更
 - SESSION_DRIVER=file
 - QUEUE_CONNECTION=sync
 - CACHE_STORE=file
-
-- MAIL_STREAM_ALLOW_SELF_SIGNED=true
-- MAIL_STREAM_VERIFY_PEER=false
 
 ## 使用技術
 - docker
