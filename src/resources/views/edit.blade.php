@@ -25,7 +25,7 @@
 
     <div class="profile-edit__icon-block">
       <figure class="profile-edit__icon">
-        <img src="{{ $iconPath }}" alt="{{ $displayName.' のアイコン' }}">
+        <img src="{{ $iconPath }}" alt="">
       </figure>
 
       <label class="profile-edit__file-label">

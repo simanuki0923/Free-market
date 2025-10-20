@@ -29,7 +29,7 @@
 <main class="mypage__main container">
   <section class="profile-section" aria-label="プロフィール">
     <figure class="profile-icon">
-      <img src="{{ $iconPath }}" alt="{{ $displayName }} のアイコン">
+      <img src="{{ $iconPath }}" alt="">
     </figure>
     <div class="profile-info">
       <p class="user-name">{{ $displayName }}</p>
