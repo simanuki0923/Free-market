@@ -21,8 +21,8 @@
 - php artisan db:seed
 
 - 権限設定
-- sudo chown $USER:$USER src/.env
-- chmod 600 src/.env
+- chown www-data:www-data .env
+- chmod 640 .env
 
 - .env設定設定変更
 - SESSION_DRIVER=file
