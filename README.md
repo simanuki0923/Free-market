@@ -19,10 +19,14 @@
 - chmod -R ug+rw storage bootstrap/cache
 - php artisan migrate
 - php artisan db:seed
+- exit
 
 - 権限設定
-- chown www-data:www-data .env
-- chmod 640 .env
+- cd ~/Free-market/src
+- sudo chgrp www-data .env
+- chmod 644 .env
+- sudo chgrp www-data ~/Free-market ~/Free-market/src
+- chmod 755 ~/Free-market ~/Free-market/src
 
 - .env設定設定変更
 - SESSION_DRIVER=file
