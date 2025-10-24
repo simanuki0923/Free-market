@@ -11,6 +11,8 @@
 - docker compose up -d --build
 
 ### Laravel環境構築
+- sudo chmod -R 777 src/*
+- sudo chmod -R 777 src/.env
 - docker-compose exec php bash
 - composer install
 - cp .env.local .env
@@ -20,13 +22,7 @@
 - php artisan migrate
 - php artisan db:seed
 - exit
-
-- 権限設定
-- cd ~/Free-market/src
-- sudo chgrp www-data .env
-- chmod 644 .env
-- sudo chgrp www-data ~/Free-market ~/Free-market/src
-- chmod 755 ~/Free-market ~/Free-market/src
+- code .
 
 - .env設定設定変更
 - SESSION_DRIVER=file
