@@ -12,10 +12,10 @@
 
 ### Laravel環境構築
 - sudo chmod -R 777 src/*
+- cp src/.env.local src/.env
 - sudo chmod -R 777 src/.env
 - docker-compose exec php bash
 - composer install
-- cp .env.local .env
 - php artisan key:generate
 - php artisan storage:link
 - chmod -R ug+rw storage bootstrap/cache
