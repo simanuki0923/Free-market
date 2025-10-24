@@ -22,9 +22,9 @@
 - php artisan migrate
 - php artisan db:seed
 - exit
-- code .
 
-- .env設定設定変更
+### .env設定設定変更
+- code .
 - SESSION_DRIVER=file
 - QUEUE_CONNECTION=sync
 - CACHE_STORE=file
