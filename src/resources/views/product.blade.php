@@ -10,7 +10,7 @@
     $src = $product->image_url;
 
     if (!$src && optional($product->sell)->image_path) {
-        $src = $product->sell->image_path; // ★ 出品時の画像を利用
+        $src = $product->sell->image_path;
     }
 
     if (!$src) {
@@ -21,10 +21,27 @@
             : asset('storage/' . ltrim($src, '/'));
     }
 
-    $favoritesCount = $product->favorites_count ?? ($product->favoredByUsers()->count() ?? 0);
-    $commentsCount  = $commentsCount ?? ($product->comments_count ?? ($product->comments()->count() ?? 0));
+    $favoritesCount = $product->favorites_count
+        ?? ($product->favoredByUsers()->count() ?? 0);
+
+    $commentsCount = $commentsCount
+        ?? ($product->comments_count
+        ?? ($product->comments()->count() ?? 0));
 
     $isFavorited = $isFavorited ?? false;
+
+    $categoryNames = collect();
+
+    if (!empty($product->category_ids_json)
+        && is_array($product->category_ids_json)
+        && count($product->category_ids_json) > 0
+    ) {
+        $cats = \App\Models\Category::whereIn('id', $product->category_ids_json)->get();
+        $categoryNames = $cats->pluck('name');
+    }
+    if ($categoryNames->isEmpty() && !empty($product->category) && !empty($product->category->name)) {
+        $categoryNames = collect([$product->category->name]);
+    }
   @endphp
 
   <article class="product-detail__container">
@@ -87,20 +104,12 @@
           @endif
         </div>
 
-        {{-- 商品説明 / 商品情報 --}}
         <div class="product-info-item">
           <strong>商品説明</strong>
           <p class="description">{{ $product->description ?? '説明がありません' }}</p>
 
           <strong>商品の情報</strong>
-          @php
-            $categoryNames = collect();
-            if (method_exists($product, 'categories') && $product->relationLoaded('categories') && $product->categories->count()) {
-              $categoryNames = $product->categories->pluck('name');
-            } elseif (!empty($product->category) && !empty($product->category->name)) {
-              $categoryNames = collect([$product->category->name]);
-            }
-          @endphp
+
           <p class="category">
             カテゴリー：
             @if ($categoryNames->count())
@@ -109,6 +118,7 @@
               設定なし
             @endif
           </p>
+
           <p class="condition">商品の状態：{{ $product->condition ?? '—' }}</p>
         </div>
       </section>

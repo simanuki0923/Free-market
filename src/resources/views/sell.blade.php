@@ -19,7 +19,13 @@
       <legend class="sell-legend sell-legend--no-underline">商品画像</legend>
 
       <div class="sell-image-drop">
-        <input id="image" name="image" type="file" accept="image/*">
+        <input
+          id="image"
+          name="image"
+          type="file"
+          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+          @if(!old('image')) required @endif
+        >
         <label for="image" class="sell-image-button">画像を選択する</label>
       </div>
 
@@ -27,84 +33,153 @@
         <img id="imagePreview" alt="画像プレビュー">
       </figure>
 
-      @error('image') <p class="sell-error">{{ $message }}</p> @enderror
+      @error('image')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
     </fieldset>
 
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品の詳細</legend>
 
       <label class="sell-label">カテゴリー</label>
+
       @php
-        $oldSelected = collect(old('categories', []))->map(fn($v)=>(string)$v)->all();
-        // 念のためコントローラ未使用時のフォールバックも定義
-        $fallbackCats = collect([
-          'ファッション','家電','インテリア','レディース','メンズ','コスメ',
-          '本','ゲーム','スポーツ','キッチン','ハンドメイド','アクセサリー',
-          'おもちゃ','ベビー・キッズ',
-        ])->map(fn($n)=>['val'=>$n,'name'=>$n]);
-        $catsForView = (isset($categoriesList) && count($categoriesList))
-            ? $categoriesList
-            : $fallbackCats;
+        $oldSelectedIds = collect(old('categories', []))
+          ->map(fn($v) => (string)$v)
+          ->all();
       @endphp
 
       <div class="chip-group" role="group" aria-label="カテゴリーを選択">
-        @foreach($catsForView as $cat)
+        @foreach($categories as $category)
           @php
-            $val = (string)($cat['val'] ?? $cat->val ?? '');
-            $name = (string)($cat['name'] ?? $cat->name ?? $val);
+            $val  = (string)$category->id;
+            $name = (string)$category->name;
           @endphp
+
           <label class="chip">
             <input
               type="checkbox"
               name="categories[]"
               value="{{ $val }}"
-              {{ in_array($val, $oldSelected, true) ? 'checked' : '' }}
+              {{ in_array($val, $oldSelectedIds, true) ? 'checked' : '' }}
             >
             <span>{{ $name }}</span>
           </label>
         @endforeach
       </div>
-      @error('categories') <p class="sell-error">{{ $message }}</p> @enderror
+
+      @error('categories')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
+      @error('categories.*')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
 
       <label class="sell-label" for="condition">商品の状態</label>
+
       @php
-        $condList = $conditionList
-          ?? ['新品・未使用','未使用に近い','目立った傷や汚れなし','やや傷や汚れあり','傷や汚れあり','全体的に状態が悪い'];
+        $condList = [
+          '新品・未使用',
+          '未使用に近い',
+          '目立った傷や汚れなし',
+          'やや傷や汚れあり',
+          '傷や汚れあり',
+          '全体的に状態が悪い',
+        ];
       @endphp
-      <select id="condition" name="condition" class="sell-input">
-        <option value="" disabled {{ old('condition') ? '' : 'selected' }}>選択してください</option>
+
+      <select
+        id="condition"
+        name="condition"
+        class="sell-input"
+        required
+      >
+        <option value="" disabled {{ old('condition') ? '' : 'selected' }}>
+          選択してください
+        </option>
+
         @foreach($condList as $cond)
-          <option value="{{ $cond }}" {{ old('condition') === $cond ? 'selected' : '' }}>{{ $cond }}</option>
+          <option
+            value="{{ $cond }}"
+            {{ old('condition') === $cond ? 'selected' : '' }}
+          >
+            {{ $cond }}
+          </option>
         @endforeach
       </select>
-      @error('condition') <p class="sell-error">{{ $message }}</p> @enderror
+
+      @error('condition')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
     </fieldset>
 
     <fieldset class="sell-fieldset">
       <legend class="sell-legend">商品名と説明</legend>
 
       <label class="sell-label" for="name">商品名</label>
-      <input id="name" name="name" type="text" class="sell-input" value="{{ old('name') }}" maxlength="100">
-      @error('name') <p class="sell-error">{{ $message }}</p> @enderror
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="sell-input"
+        value="{{ old('name') }}"
+        maxlength="100"
+        required
+      >
+      @error('name')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
 
       <label class="sell-label" for="brand">ブランド名</label>
-      <input id="brand" name="brand" type="text" class="sell-input" value="{{ old('brand') }}" maxlength="100">
-      @error('brand') <p class="sell-error">{{ $message }}</p> @enderror
+      <input
+        id="brand"
+        name="brand"
+        type="text"
+        class="sell-input"
+        value="{{ old('brand') }}"
+        maxlength="100"
+      >
+      @error('brand')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
 
       <label class="sell-label" for="description">商品の説明</label>
-      <textarea id="description" name="description" class="sell-textarea" rows="8" maxlength="2000">{{ old('description') }}</textarea>
-      @error('description') <p class="sell-error">{{ $message }}</p> @enderror
+      <textarea
+        id="description"
+        name="description"
+        class="sell-textarea"
+        rows="8"
+        maxlength="255"
+        required
+      >{{ old('description') }}</textarea>
+      @error('description')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
     </fieldset>
 
     <fieldset class="sell-fieldset">
-
       <label class="sell-label" for="price">販売価格</label>
+
       <div class="sell-price">
         <span class="yen" aria-hidden="true">¥</span>
-        <input id="price" name="price" type="number" class="sell-input sell-input--price"
-               inputmode="numeric" pattern="[0-9]*" min="1" step="1" value="{{ old('price') }}" placeholder="0">
+        <input
+          id="price"
+          name="price"
+          type="number"
+          class="sell-input sell-input--price"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          min="0"
+          step="1"
+          value="{{ old('price') }}"
+          placeholder="0"
+          required
+        >
       </div>
-      @error('price') <p class="sell-error">{{ $message }}</p> @enderror
+
+      @error('price')
+        <p class="sell-error">{{ $message }}</p>
+      @enderror
     </fieldset>
 
     <button type="submit" class="sell-submit">出品する</button>
@@ -116,6 +191,7 @@
   const input = document.getElementById('image');
   const box   = document.querySelector('.sell-preview');
   const img   = document.getElementById('imagePreview');
+
   if (input && img && box) {
     input.addEventListener('change', (e) => {
       const [file] = e.target.files || [];
@@ -134,7 +210,9 @@
   const price = document.getElementById('price');
   if (price) {
     price.addEventListener('keydown', (e) => {
-      if (['e','E','+','-','.'].includes(e.key)) e.preventDefault();
+      if (['e','E','+','-','.'].includes(e.key)) {
+        e.preventDefault();
+      }
     });
   }
 })();
