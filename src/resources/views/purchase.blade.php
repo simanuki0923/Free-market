@@ -58,8 +58,8 @@
             <label for="payment_method" class="form-label"></label>
             <select id="payment_method" name="payment_method" class="form-select" required>
               <option value="" disabled {{ $initialPayment === '' ? 'selected' : '' }}>選択してください</option>
-              <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ払い</option>
-              <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>クレジットカード</option>
+              <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ支払い</option>
+              <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>カード支払い</option>
             </select>
           </form>
         </div>
@@ -92,8 +92,8 @@
             <span>支払い方法</span>
             <span id="summary-payment" aria-live="polite">
               @php
-                $pmText = $initialPayment === 'credit_card' ? 'クレジットカード'
-                         : ($initialPayment === 'convenience_store' ? 'コンビニ払い' : '未選択');
+                $pmText = $initialPayment === 'credit_card' ? 'カード支払い'
+                         : ($initialPayment === 'convenience_store' ? 'コンビニ支払い' : '未選択');
               @endphp
               {{ $pmText }}
             </span>
@@ -125,8 +125,8 @@
     if (!select || !summary) return;
 
     function label(v) {
-      if (v === 'credit_card') return 'クレジットカード';
-      if (v === 'convenience_store') return 'コンビニ払い';
+      if (v === 'credit_card') return 'カード支払い';
+      if (v === 'convenience_store') return 'コンビニ支払い';
       return '未選択';
     }
 
