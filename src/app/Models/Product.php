@@ -23,11 +23,13 @@ class Product extends Model
         'condition',
         'description',
         'is_sold',
+        'category_ids_json',
     ];
 
     protected $casts = [
         'price'   => 'integer',
         'is_sold' => 'boolean',
+        'category_ids_json' => 'array',
     ];
 
     public function user(): BelongsTo

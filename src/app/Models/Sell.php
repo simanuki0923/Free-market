@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Sell extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'product_id',
+        'user_id',
+        'product_id',
         'category_id',
         'name',
         'brand',
@@ -22,11 +23,13 @@ class Sell extends Model
         'condition',
         'description',
         'is_sold',
+        'category_ids_json',
     ];
 
     protected $casts = [
         'price'   => 'integer',
         'is_sold' => 'boolean',
+        'category_ids_json' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -44,17 +47,12 @@ class Sell extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function purchase(): HasOne
-    {
-        return $this->hasOne(Purchase::class);
-    }
-
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class);
     }
 
-    public function latestPurchase(): HasOne
+    public function latestPurchase()
     {
         return $this->hasOne(Purchase::class)->latestOfMany('purchased_at');
     }
@@ -79,11 +77,13 @@ class Sell extends Model
         $path = $this->image_path;
 
         if (!$path && $this->relationLoaded('product') && $this->product) {
-            $path = $this->product->image_url ?? $this->product->image_path ?? null;
+            $path = $this->product->image_url
+                ?? $this->product->image_path
+                ?? null;
         }
 
         if (!empty($path)) {
-            if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+            if (Str::startsWith($path, ['http://', 'https://'])) {
                 return $path;
             }
             return asset('storage/' . ltrim($path, '/'));
