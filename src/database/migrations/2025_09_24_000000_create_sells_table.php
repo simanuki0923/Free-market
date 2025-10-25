@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('condition', 50)->nullable();
             $table->text('description')->nullable();
             $table->boolean('is_sold')->default(false);
+            $table->text('category_ids_json')->nullable();
             $table->timestamps();
         });
     }
