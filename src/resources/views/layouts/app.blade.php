@@ -18,7 +18,7 @@
             </a>
 
             <form action="{{ route('search') }}" method="GET" class="header__search">
-                <input type="text" name="search" placeholder="何をお探しですか？" value="{{ request('search', request('q')) }}">
+                <input type="text" name="search" placeholder="なにをお探しですか？" value="{{ request('search', request('q')) }}">
             </form>
 
             <nav class="header__nav">

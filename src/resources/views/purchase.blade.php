@@ -51,6 +51,7 @@
         <header class="card__header">
           <h2 class="card__title">支払い方法</h2>
         </header>
+
         <div class="card__section">
           <form id="payment-form" action="{{ route('payment.create') }}" method="GET" class="purchase-form">
             <input type="hidden" name="item_id" value="{{ $product->id }}">
@@ -70,7 +71,9 @@
           <h2 class="card__title">配送先</h2>
           <a class="btn" href="{{ route('purchase.address.edit', ['item_id' => $product->id]) }}">変更する</a>
         </header>
-        <div class="card__section">
+
+        <!-- ↓ この section に line クラスを追加してフル幅の下線を引く -->
+        <div class="card__section card__section--with-line">
           <div class="address">
             <div class="address__row"><span class="muted"></span> {{ $recipient }}</div>
             <div class="address__row"><span class="muted"></span> {{ $postal ?: '未設定' }}</div>

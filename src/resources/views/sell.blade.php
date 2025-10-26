@@ -52,6 +52,11 @@
       <div class="chip-group" role="group" aria-label="カテゴリーを選択">
         @foreach($categories as $category)
           @php
+            // ID1, ID2は非表示にする
+            if (in_array($category->id, [1, 2], true)) {
+                continue;
+            }
+
             $val  = (string)$category->id;
             $name = (string)$category->name;
           @endphp
