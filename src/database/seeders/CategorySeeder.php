@@ -24,7 +24,6 @@ class CategorySeeder extends Seeder
             ['name' => 'アクセサリー',   'slug' => 'accessory'],
             ['name' => 'おもちゃ',       'slug' => 'toys'],
             ['name' => 'ベビー・キッズ', 'slug' => 'baby-kids'],
-            ['name' => 'その他',         'slug' => 'other'],
         ];
 
         foreach ($categories as $cat) {
