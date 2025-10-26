@@ -45,13 +45,11 @@ main{
   display:grid;
   place-items:center;
   padding:28px 16px;
+  transform: translateY(-100px);
 }
 .verify__content{
   width:clamp(320px, 70vw, 920px);
   min-height:320px;
-  background:var(--bg-card);
-  border-radius:var(--radius);
-  border:1px solid var(--border);
   margin:0 auto;
   display:flex;
   flex-direction:column;
@@ -59,7 +57,6 @@ main{
   justify-content:center;
   text-align:center;
   padding:48px 20px;
-  box-shadow:var(--shadow);
 }
 
 .verify__status{
@@ -74,7 +71,8 @@ main{
 .verify__lead{
   margin:6px 0 28px;
   color:#111;
-  font-size:14px;
+  font-size:29px;
+  font-weight: 700;
 }
 
 .verify__button{
@@ -84,6 +82,7 @@ main{
   color:#111;
   border:1px solid #c4c5c7;
   border-radius:8px;
+  font-size: 25px;
   font-weight:600;
   text-decoration:none;
   box-shadow:0 1px 0 rgba(0,0,0,.05);
@@ -109,9 +108,10 @@ main{
   padding:0;
   margin:0;
   color:var(--primary);
-  font-size:12px;
+  font-size:20px;
   cursor:pointer;
   text-decoration:none;
+  transform: translateY(30px);
 }
 
 .verify__resend button.verify__resend-link:hover{

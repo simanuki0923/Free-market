@@ -26,20 +26,38 @@ body{ color:var(--black);}
 
 .card__header{
   padding:14px 16px;
-  border-bottom:1px solid var(--line);
+  border-top:2.5px solid gray;
 }
+
 .card__header--with-action{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
+  position:relative;
+  border-top:2.5px solid gray;
 }
+
 .card__title{
   margin:0;
   font-size:16px;
   font-weight:700;
 }
-.card__section{ padding:16px; }
+.card__section{
+  position:relative;
+  padding:16px;
+}
+
+.card__section--with-line::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:-2px;
+  right:-2px;
+  height:2px;
+  background:gray;
+}
+
 
 .purchase-item__body{
   display:flex;
@@ -76,18 +94,18 @@ body{ color:var(--black);}
   overflow:hidden;
   text-overflow:ellipsis;
   max-width:100%;
-  transform:translateY(-35px)
+  transform:translateY(-10px)
 }
 .purchase-item__price{
   margin:0;
   font-size:16px;
-  transform:translateY(-35px);
+  transform:translateY(-10px);
 }
 
 .purchase-item__title{
   margin:0;
   font-size:16px;
-  transform:translateY(-35px);
+  transform:translateY(-10px);
 }
 
 .form-label{
@@ -108,6 +126,7 @@ body{ color:var(--black);}
 .form-select option{
   background:#838384;
   color:white;
+  border-bottom:2px solid gray;
 }
 
 .address{

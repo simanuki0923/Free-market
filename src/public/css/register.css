@@ -68,8 +68,9 @@ main {
   display: inline-block;
   margin-bottom: 8px;
   font-size: 23px;
-  color: var(--muted);
+  color: black;
   font-weight:700;
+  transform:translateY(32px);
 }
 
 .form__group input[type="text"],
@@ -81,11 +82,9 @@ main {
   padding: 8px 12px;
   font-size: 14px;
   color: var(--text);
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 4px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease;
+  transform:translateY(30px);
 }
 .form__group input:focus {
   border-color: #b7b7b7;
@@ -114,17 +113,14 @@ main {
   letter-spacing: .04em;
   cursor: pointer;
   transition: transform .03s ease, filter .15s ease;
+  transform:translateY(70px);
 }
-.form__button-submit:hover {
-  filter: brightness(1.05);
-}
-.form__button-submit:active {
-  transform: translateY(1px);
-}
+
 
 .login__link {
   margin-top: 14px;
   text-align: center;
+  transform:translateY(70px);
 }
 .login__button-submit {
   color: var(--link);

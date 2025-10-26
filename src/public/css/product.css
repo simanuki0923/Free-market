@@ -367,3 +367,33 @@
     min-width: 410px;
   }
 }
+
+@media (max-width:1399px){
+  .product-detail__container{
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 80px;
+    margin-left: 150px;
+  }
+  .product-detail__image{
+    width: 300px;
+  }
+  .product-title{
+    font-size: 35px;
+  }
+  .price{
+    font-size: 30px;
+  }
+  .price small{
+    font-size: 20px;
+  }
+  .comment-body{
+    width: 350px;
+  }
+  .comment-submit{
+    width: 350px;
+  }
+  .purchase-button{
+    min-width: 350px;
+  }
+}
