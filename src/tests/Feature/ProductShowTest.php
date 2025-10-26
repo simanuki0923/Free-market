@@ -66,7 +66,7 @@ class ProductShowTest extends TestCase
 
         $html = $response->getContent();
         $this->assertMatchesRegularExpression(
-            '/コメント（\s*<span[^>]*id="comments-total"[^>]*>\s*2\s*<\/span>\s*件）/u',
+            '/コメント（\s*<span[^>]*id="comments-total"[^>]*>\s*2\s*<\/span>\s*）/u',
             $html
         );
 
