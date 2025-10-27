@@ -23,8 +23,6 @@ class PaymentController extends Controller
     {
         $this->middleware('auth');
 
-        // Stripe秘密鍵セット（本番・開発用）
-        // testing環境ではスキップでOK
         if (!App::environment('testing')) {
             $secret = config('services.stripe.secret') ?? env('STRIPE_SECRET_KEY');
             if ($secret) {
@@ -33,140 +31,170 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * 決済画面表示
-     * - productId と payment_method を受ける
-     * - testing 環境ではこの時点でDB登録までやって即完了へ
-     * - local/production ではStripeのPaymentIntent発行→payment.create画面へ
-     */
     public function create(Request $request)
     {
-        $productId = $request->input('productId') ?? $request->input('item_id');
+        $productId      = $request->input('productId') ?? $request->input('item_id');
+        $selectedMethod = $request->input('payment_method');
+
         abort_unless($productId, 404, '商品が指定されていません。');
 
         $product = Product::query()->findOrFail((int)$productId);
 
-        // 自分の商品や売切れ商品は買わせない
         if ($product->user_id === Auth::id() || $product->is_sold) {
             return redirect()
                 ->route('item')
                 ->with('error', '購入できない商品です。');
         }
 
-        /**
-         * testing環境だけはここで即購入処理して /payment/done に飛ばす
-         * （FeatureTest用のショートカット）
-         */
+        if (empty($selectedMethod)) {
+            return redirect()
+                ->route('item')
+                ->with('error', '支払い方法が選択されていません。');
+        }
+
         if (App::environment('testing')) {
             try {
-                DB::transaction(function () use ($product, $request) {
+                DB::transaction(function () use ($product, $selectedMethod) {
 
-                    // 対象商品をロック
-                    $p = DB::table('products')
-                        ->lockForUpdate()
-                        ->where('id', $product->id)
-                        ->first();
+                    $p = Product::lockForUpdate()
+                        ->with('sell')
+                        ->findOrFail($product->id);
 
-                    if (!$p) {
-                        abort(404);
-                    }
-                    if (!empty($p->is_sold)) {
-                        return; // すでに売却済みなら何もしない
+                    if ($p->is_sold) {
+                        return;
                     }
 
-                    // sellsレコード用意
-                    $sellId = null;
-                    if (Schema::hasTable('sells')) {
-                        $sellId = DB::table('sells')
-                            ->where('product_id', $p->id)
-                            ->value('id');
-
-                        if (!$sellId) {
-                            $sellId = DB::table('sells')->insertGetId([
-                                'user_id'     => $p->user_id,
-                                'product_id'  => $p->id,
-                                'category_id' => $p->category_id ?? null,
-                                'name'        => $p->name,
-                                'brand'       => $p->brand ?? null,
-                                'price'       => (int)$p->price,
-                                'image_path'  => $p->image_path ?? null,
-                                'condition'   => $p->condition ?? null,
-                                'description' => $p->description ?? null,
-                                'is_sold'     => false,
-                                'created_at'  => now(),
-                                'updated_at'  => now(),
-                            ]);
-                        }
-                    }
-
-                    // purchases作成 or 既存
-                    $purchaseId = null;
-                    if ($sellId && Schema::hasTable('purchases')) {
-
-                        $existingPurchase = DB::table('purchases')
-                            ->where('user_id', Auth::id())
-                            ->where('sell_id', $sellId)
-                            ->first();
-
-                        if (!$existingPurchase) {
-                            $purchaseId = DB::table('purchases')->insertGetId([
-                                'user_id'      => Auth::id(),
-                                'sell_id'      => $sellId,
-                                'amount'       => (int)$p->price,
-                                'purchased_at' => now(),
-                                'created_at'   => now(),
-                                'updated_at'   => now(),
-                            ]);
-                        } else {
-                            $purchaseId = $existingPurchase->id;
-                        }
-
-                        // paymentsも保存（testingではダミーのtxn_id）
-                        if (Schema::hasTable('payments')) {
-                            DB::table('payments')->updateOrInsert(
-                                ['purchase_id' => $purchaseId],
-                                [
-                                    'payment_method'  => $request->input('payment_method', 'credit_card'),
-                                    'provider_txn_id' => 'test-intent',
-                                    'paid_amount'     => (int)$p->price,
-                                    'paid_at'         => now(),
-                                    'updated_at'      => now(),
-                                    'created_at'      => now(),
-                                ]
-                            );
-                        }
-                    }
-
-                    // 商品とsellsを売済みにする
-                    DB::table('products')->where('id', $p->id)->update([
-                        'is_sold'    => true,
-                        'updated_at' => now(),
-                    ]);
-
-                    if ($sellId) {
-                        DB::table('sells')->where('id', $sellId)->update([
-                            'is_sold'    => true,
-                            'updated_at' => now(),
+                    $sell = $p->sell;
+                    if (!$sell) {
+                        $sell = Sell::create([
+                            'user_id'     => $p->user_id,
+                            'product_id'  => $p->id,
+                            'category_id' => $p->category_id ?? null,
+                            'name'        => $p->name,
+                            'brand'       => $p->brand ?? null,
+                            'price'       => (int)$p->price,
+                            'image_path'  => $p->image_path ?? null,
+                            'condition'   => $p->condition ?? null,
+                            'description' => $p->description ?? null,
+                            'is_sold'     => false,
                         ]);
                     }
+
+                    $purchase = Purchase::updateOrCreate(
+                        [
+                            'user_id' => Auth::id(),
+                            'sell_id' => $sell->id,
+                        ],
+                        [
+                            'amount'          => (int)$p->price,
+                            'payment_method'  => $selectedMethod,
+                            'purchased_at'    => now(),
+                        ]
+                    );
+
+                    Payment::updateOrCreate(
+                        [
+                            'purchase_id' => $purchase->id,
+                        ],
+                        [
+                            'payment_method'  => $selectedMethod,
+                            'provider_txn_id' => 'test-intent',
+                            'paid_amount'     => (int)$p->price,
+                            'paid_at'         => now(),
+                        ]
+                    );
+
+                    // SOLD化
+                    $p->update(['is_sold' => true]);
+                    $sell->update(['is_sold' => true]);
                 });
 
                 return redirect()
                     ->route('payment.done')
-                    ->with('status', 'テスト決済が完了しました。');
+                    ->with([
+                        'status'          => 'テスト決済が完了しました。',
+                        'payment_method'  => $selectedMethod,
+                    ]);
 
             } catch (\Throwable $e) {
-                Log::warning('Test payment finalize failed: ' . $e->getMessage());
+                Log::warning('Test finalize failed: ' . $e->getMessage());
                 return redirect()
                     ->route('item')
                     ->with('error', 'テスト決済処理に失敗しました。');
             }
         }
 
-        /**
-         * ここから local / production の通常ルート
-         * local でもStripeのIntentは作るけど、あとでstore()側で強制成功させるようにする
-         */
+        if ($selectedMethod === 'convenience_store') {
+            try {
+                DB::transaction(function () use ($product, $selectedMethod) {
+
+                    $p = Product::lockForUpdate()
+                        ->with('sell')
+                        ->findOrFail($product->id);
+
+                    if ($p->is_sold) {
+                        return;
+                    }
+
+                    $sell = $p->sell;
+                    if (!$sell) {
+                        $sell = Sell::create([
+                            'user_id'     => $p->user_id,
+                            'product_id'  => $p->id,
+                            'category_id' => $p->category_id ?? null,
+                            'name'        => $p->name,
+                            'brand'       => $p->brand ?? null,
+                            'price'       => (int)$p->price,
+                            'image_path'  => $p->image_path ?? null,
+                            'condition'   => $p->condition ?? null,
+                            'description' => $p->description ?? null,
+                            'is_sold'     => false,
+                        ]);
+                    }
+
+                    $purchase = Purchase::updateOrCreate(
+                        [
+                            'user_id' => Auth::id(),
+                            'sell_id' => $sell->id,
+                        ],
+                        [
+                            'amount'          => (int)$p->price,
+                            'payment_method'  => $selectedMethod,
+                            'purchased_at'    => now(),
+                        ]
+                    );
+
+                    Payment::updateOrCreate(
+                        [
+                            'purchase_id' => $purchase->id,
+                        ],
+                        [
+                            'payment_method'  => $selectedMethod,
+                            'provider_txn_id' => 'convenience-store-reservation',
+                            'paid_amount'     => (int)$p->price,
+                            'paid_at'         => null,
+                        ]
+                    );
+
+                    $p->update(['is_sold' => true]);
+                    $sell->update(['is_sold' => true]);
+                });
+
+                return redirect()
+                    ->route('payment.done')
+                    ->with([
+                        'status'          => 'コンビニ支払いの受付が完了しました。',
+                        'payment_method'  => $selectedMethod,
+                    ]);
+
+            } catch (\Throwable $e) {
+                Log::warning('Convenience finalize failed: ' . $e->getMessage());
+                return redirect()
+                    ->route('item')
+                    ->with('error', 'コンビニ支払いの確定に失敗しました。');
+            }
+        }
+
         try {
             $publicKey = config('services.stripe.public') ?? env('STRIPE_PUBLIC_KEY');
             $secret    = config('services.stripe.secret') ?? env('STRIPE_SECRET_KEY');
@@ -179,28 +207,22 @@ class PaymentController extends Controller
 
             Stripe::setApiKey($secret);
 
-            // StripeのPaymentIntentを作成
             $intent = PaymentIntent::create([
                 'amount'   => (int) $product->price * 100,
                 'currency' => 'jpy',
                 'automatic_payment_methods' => ['enabled' => true],
                 'metadata' => [
-                    'product_id' => (string) $product->id,
-                    'user_id'    => (string) Auth::id(),
+                    'product_id' => (string)$product->id,
+                    'user_id'    => (string)Auth::id(),
                 ],
             ]);
 
-            // 確認画面を表示
-            // フォームで hidden にして store() に送るもの：
-            // - product_id
-            // - payment_intent_id
-            // - payment_method
             return view('payment.create', [
                 'product'         => Product::with('sell')->find($product->id),
                 'clientSecret'    => $intent->client_secret,
                 'paymentIntent'   => $intent->id,
                 'publicKey'       => $publicKey,
-                'payment_method'  => $request->input('payment_method'), // ラジオボタン等で選んだ値を引き継ぐ
+                'payment_method'  => $selectedMethod,
             ]);
 
         } catch (\Throwable $e) {
@@ -211,34 +233,23 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * 決済確定 (POST)
-     * - local / testing 環境ではStripeの最終確認をスキップして強制成功させる
-     * - purchases / payments をINSERT
-     * - product / sellを売済みにして /payment/done へ
-     */
     public function store(Request $request)
     {
-        // ---- 1) バリデーション ----
-        // local で payment_method が送られてこないと弾かれてしまうので、
-        // "nullable" にしてデフォルトをあとで補完するようにする
         $validated = $request->validate([
             'product_id'        => ['required','integer','exists:products,id'],
             'payment_intent_id' => ['required','string'],
-            'payment_method'    => ['nullable','in:convenience_store,credit_card,bank_transfer'],
+            'payment_method'    => ['required','in:credit_card,convenience_store,bank_transfer'],
         ]);
 
-        // ---- 2) Stripeの最終確認 ----
-        // local / testing ではStripeを実際に確定できないのでスキップして疑似成功扱いにする
-        $stripeTxnId = $validated['payment_intent_id'];
-        $isLocalLike = App::environment(['local','testing']);
+        $selectedMethod = $validated['payment_method'];
+        $stripeTxnId    = $validated['payment_intent_id'];
+        $isLocalLike    = App::environment(['local','testing']);
 
         if (!$isLocalLike) {
             try {
                 $pi = PaymentIntent::retrieve($validated['payment_intent_id']);
                 $stripeTxnId = $pi->id;
 
-                // 本番では本当に成功してない限りは保存しない
                 if (!in_array($pi->status, ['succeeded', 'requires_capture'], true)) {
                     return back()->with('error', '決済が未完了です（status: '.$pi->status.'）。');
                 }
@@ -248,29 +259,24 @@ class PaymentController extends Controller
             }
         }
 
-        // ---- 3) DB登録 ----
         $product = Product::with('sell')->findOrFail($validated['product_id']);
 
-        // 自分が出品したもの or すでに売れたものはNG
         if ($product->user_id === Auth::id() || $product->is_sold) {
             return redirect()
                 ->route('item')
                 ->with('error', 'この商品は購入できません。');
         }
 
-        DB::transaction(function () use ($product, $validated, $stripeTxnId) {
+        DB::transaction(function () use ($product, $selectedMethod, $stripeTxnId) {
 
-            // 商品をロックして二重購入防止
             $p = Product::lockForUpdate()
                 ->with('sell')
                 ->findOrFail($product->id);
 
             if ($p->is_sold) {
-                // 既に売れてたら何もしない
                 return;
             }
 
-            // sellsレコードを用意
             $sell = $p->sell;
             if (!$sell) {
                 $sell = Sell::create([
@@ -287,45 +293,42 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // purchases（購入情報）を作成/更新
             $purchase = Purchase::updateOrCreate(
                 [
                     'user_id' => Auth::id(),
                     'sell_id' => $sell->id,
                 ],
                 [
-                    'amount'       => (int)$p->price,
-                    'purchased_at' => now(),
+                    'amount'          => (int)$p->price,
+                    'payment_method'  => $selectedMethod,
+                    'purchased_at'    => now(),
                 ]
             );
 
-            // payments（支払い情報）を作成/更新
             Payment::updateOrCreate(
                 [
                     'purchase_id' => $purchase->id,
                 ],
                 [
-                    'payment_method'  => $validated['payment_method'] ?? 'credit_card', // localでnullでもOKにする
+                    'payment_method'  => $selectedMethod,
                     'provider_txn_id' => $stripeTxnId,
                     'paid_amount'     => (int)$p->price,
-                    'paid_at'         => now(), // もし本番でオーソリだけならここをnullでも可
+                    'paid_at'         => now(),
                 ]
             );
 
-            // product と sell を売済みにする
             $p->update(['is_sold' => true]);
             $sell->update(['is_sold' => true]);
         });
 
-        // ---- 4) 完了画面へ ----
         return redirect()
             ->route('payment.done')
-            ->with('status', '決済が完了しました。');
+            ->with([
+                'status'          => '決済が完了しました。',
+                'payment_method'  => $selectedMethod,
+            ]);
     }
 
-    /**
-     * 完了画面
-     */
     public function done()
     {
         if (view()->exists('payment.done')) {
