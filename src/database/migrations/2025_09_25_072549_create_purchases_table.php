@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('sell_id')->constrained('sells')->cascadeOnDelete();
             $table->unsignedInteger('amount');
+            $table->string('payment_method', 50);
             $table->timestamp('purchased_at')->useCurrent();
             $table->timestamps();
             $table->unique(['user_id','sell_id']);
