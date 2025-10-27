@@ -12,7 +12,6 @@
 <body>
 <div class="container">
 
-  {{-- コントローラー(store)側から back()->with('error', ...) された場合に見えるようにする --}}
   @if (session('error'))
     <div class="alert alert-danger">{{ session('error') }}</div>
   @endif
@@ -31,16 +30,13 @@
 
       <div class="card-body">
 
-        {{-- 最終送信フォーム --}}
         <form id="card-form" action="{{ route('payment.store') }}" method="POST">
           @csrf
 
-          {{-- PaymentController@store() のバリデーションが要求する項目たち --}}
           <input type="hidden" name="product_id" value="{{ $product->id }}">
           <input type="hidden" name="payment_intent_id" id="payment_intent_id" value="">
           <input type="hidden" name="payment_method" value="{{ $payment_method }}">
 
-          {{-- Stripe Elements のカード入力欄 --}}
           <div class="form-group">
             <label>カード番号</label>
             <div id="card-number" class="form-control"></div>
@@ -56,7 +52,6 @@
             <div id="card-cvc" class="form-control"></div>
           </div>
 
-          {{-- フロント側Stripeエラー表示用 --}}
           <div id="card-errors" class="text-danger" aria-live="polite"></div>
 
           <div class="button-group mt-3">
@@ -71,16 +66,13 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-  // コントローラーで渡している $publicKey / $clientSecret を利用する
   const stripe = Stripe("{{ $publicKey }}");
   const elements = stripe.elements();
 
-  // Stripe Elementsの各パーツを作成
   const cardNumber = elements.create('cardNumber');
   const cardExpiry = elements.create('cardExpiry');
   const cardCvc    = elements.create('cardCvc');
 
-  // DOMにマウント
   cardNumber.mount('#card-number');
   cardExpiry.mount('#card-expiry');
   cardCvc.mount('#card-cvc');
@@ -96,26 +88,19 @@
     btn.disabled = true;
     errEl.textContent = '';
 
-    // Stripe側でカード決済の最終確認を行う
     const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
       payment_method: { card: cardNumber }
     });
 
     if (error) {
-      // ここはまだサーバーにPOSTしていないので、ユーザーにエラーを見せて再入力させる
       errEl.textContent = error.message || '決済に失敗しました';
       btn.disabled = false;
       return;
     }
 
-    // 戻ってきたpaymentIntentのステータスで分岐
-    // succeeded            → 完全に成功
-    // requires_capture     → オーソリ(仮押さえ)済み、あとでキャプチャ可能
-    // processing           → 一部のカードや3Dセキュア後で "処理中" のことがある
     const okStatuses = ['succeeded', 'requires_capture', 'processing'];
 
     if (paymentIntent && okStatuses.includes(paymentIntent.status)) {
-      // このIDを hidden にセットしてフォームを通常送信
       intentInput.value = paymentIntent.id;
       form.submit();
     } else {
