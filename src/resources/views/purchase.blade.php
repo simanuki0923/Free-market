@@ -21,7 +21,8 @@
   $phone       = optional($profile)->phone ?? '';
   $addressDisp = trim($addr1 . ' ' . $addr2);
 
-  $initialPayment = old('payment_method') ?? (optional($payment)->payment_method ?? '');
+  // ★ 反映の要：old() → request() → DB/既存順で初期値を決定
+  $initialPayment = old('payment_method', request('payment_method', optional($payment)->payment_method));
 @endphp
 
 <main class="purchase__main container">
@@ -58,7 +59,7 @@
 
             <label for="payment_method" class="form-label"></label>
             <select id="payment_method" name="payment_method" class="form-select" required>
-              <option value="" disabled {{ $initialPayment === '' ? 'selected' : '' }}>選択してください</option>
+              <option value="" disabled {{ $initialPayment === '' || $initialPayment === null ? 'selected' : '' }}>選択してください</option>
               <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ支払い</option>
               <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>カード支払い</option>
             </select>
@@ -72,7 +73,6 @@
           <a class="btn" href="{{ route('purchase.address.edit', ['item_id' => $product->id]) }}">変更する</a>
         </header>
 
-        <!-- ↓ この section に line クラスを追加してフル幅の下線を引く -->
         <div class="card__section card__section--with-line">
           <div class="address">
             <div class="address__row"><span class="muted"></span> {{ $recipient }}</div>
@@ -120,25 +120,25 @@
   </div>
 </main>
 
-@push('scripts')
 <script>
-  (function () {
-    var select  = document.getElementById('payment_method');
-    var summary = document.getElementById('summary-payment');
-    if (!select || !summary) return;
+(function () {
+  var select  = document.getElementById('payment_method');
+  var summary = document.getElementById('summary-payment');
+  if (!select || !summary) return;
 
-    function label(v) {
-      if (v === 'credit_card') return 'カード支払い';
-      if (v === 'convenience_store') return 'コンビニ支払い';
-      return '未選択';
-    }
+  function label(v) {
+    if (v === 'credit_card') return 'カード支払い';
+    if (v === 'convenience_store') return 'コンビニ支払い';
+    return '未選択';
+  }
 
-    summary.textContent = label(select.value);
-
-    select.addEventListener('change', function () {
-      summary.textContent = label(this.value);
-    });
-  })();
+  summary.textContent = label(select.value);
+  select.addEventListener('change', function () {
+    summary.textContent = label(this.value);
+  });
+  select.addEventListener('input', function () {
+    summary.textContent = label(this.value);
+  });
+})();
 </script>
-@endpush
 @endsection
