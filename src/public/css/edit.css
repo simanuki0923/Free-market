@@ -49,9 +49,8 @@
   display: inline-flex;
   padding: 7px 12px;
   font-size: 20px;
-  line-height: 1;
-  border-radius: 10%;
-  border: 2px solid #de4a4a;
+  border-radius: 15px;
+  border: 1px solid #de4a4a;
   background: #fff5f5;
   color: #de4a4a;
   cursor: pointer;
@@ -126,14 +125,6 @@
   cursor: pointer;
   transition: filter .15s ease, transform .02s ease;
   transform: translate(70px, 50px);
-}
-
-.profile-edit__submit:hover{
-  filter: brightness(.96);
-}
-
-.profile-edit__submit:active{
-  transform: translateY(1px);
 }
 
 .status{

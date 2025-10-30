@@ -132,13 +132,6 @@ input:focus{
   color: #fff;
   width: min(800px, 100%);
 }
-.btn-primary:hover{
-  background: var(--brand-hover);
-  filter: saturate(1.05);
-}
-.btn-primary:active{
-  transform: translateY(1px);
-}
 
 @media (min-width:1400px) and (max-width:1540px){
   .container{ max-width: 720px; padding: 32px 16px 64px; }
