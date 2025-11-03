@@ -9,7 +9,7 @@
   $displayName = old('display_name', $profile->display_name ?? $user->name ?? 'ユーザー');
   $iconPath = ($profile?->icon_image_path)
       ? asset('storage/'.$profile->icon_image_path)
-      : asset('img/sample.jpg');
+      : '';
 @endphp
 
 <main class="profile-edit__main container">
@@ -25,12 +25,16 @@
 
     <div class="profile-edit__icon-block">
       <figure class="profile-edit__icon">
-        <img src="{{ $iconPath }}" alt="">
+        <img id="iconPreview" src="{{ $iconPath }}" alt="">
       </figure>
 
       <label class="profile-edit__file-label">
         画像を選択する
-        <input type="file" name="icon" class="sr-only" accept=".jpeg,.png">
+        <input id="iconInput"
+               type="file"
+               name="icon"
+               class="sr-only"
+               accept=".jpg,.jpeg,.png,image/jpeg,image/png">
       </label>
       @error('icon')
         <p class="error">{{ $message }}</p>
@@ -85,4 +89,56 @@
     @endif
   </form>
 </main>
+
+<script>
+  (function () {
+    const input  = document.getElementById('iconInput');
+    const img    = document.getElementById('iconPreview');
+    const form   = document.getElementById('profileEditForm');
+    const maxMB  = 5;
+    if (!input || !img) return;
+
+    let tempURL = null;
+    const revokeTempURL = () => {
+      if (tempURL) {
+        URL.revokeObjectURL(tempURL);
+        tempURL = null;
+      }
+    };
+
+    input.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const okTypes = ['image/jpeg', 'image/png'];
+      if (!okTypes.includes(file.type)) {
+        alert('JPEG または PNG を選択してください。');
+        input.value = '';
+        return;
+      }
+      if (file.size > maxMB * 1024 * 1024) {
+        alert(`ファイルサイズは ${maxMB}MB 以下にしてください。`);
+        input.value = '';
+        return;
+      }
+
+      revokeTempURL();
+      tempURL = URL.createObjectURL(file);
+      img.src = tempURL;
+
+      img.onload = () => revokeTempURL();
+    });
+
+    if (form) {
+      const initialSrc = img.src;
+      form.addEventListener('reset', () => {
+        input.value = '';
+        revokeTempURL();
+        img.src = initialSrc;
+      });
+    }
+
+    window.addEventListener('beforeunload', revokeTempURL);
+  })();
+</script>
 @endsection
