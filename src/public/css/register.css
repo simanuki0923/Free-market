@@ -23,7 +23,6 @@ html, body {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
   line-height: 1.6;
   color: var(--text);
 }
@@ -85,6 +84,8 @@ main {
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease;
   transform:translateY(30px);
+  border: 2px solid grey;
+  box-sizing: border-box;
 }
 .form__group input:focus {
   border-color: #b7b7b7;
