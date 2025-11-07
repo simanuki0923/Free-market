@@ -6,7 +6,7 @@
 
 @section('content')
 <main class="product-detail__main container">
-  @php
+ @php
     $src = $product->image_url;
 
     if (!$src && optional($product->sell)->image_path) {
@@ -30,19 +30,45 @@
 
     $isFavorited = $isFavorited ?? false;
 
-    $categoryNames = collect();
+    /**
+     * カテゴリ表示用の配列を一本化
+     * - category_ids_json があればそれを優先（複数チップ）
+     * - なければ 親→子 のパンくず（チップ）
+     * - それも無ければ単一カテゴリ名
+     */
+    use App\Models\Category;
+
+    $categoryTags = collect();
 
     if (!empty($product->category_ids_json)
         && is_array($product->category_ids_json)
         && count($product->category_ids_json) > 0
     ) {
-        $cats = \App\Models\Category::whereIn('id', $product->category_ids_json)->get();
-        $categoryNames = $cats->pluck('name');
+        $categoryTags = Category::whereIn('id', $product->category_ids_json)->pluck('name')->values();
+    } else {
+        // 親→子 パンくず
+        $categoryTags = collect(array_values(array_filter([
+            optional(optional($product->category)->parent)->name ?? null,
+            optional($product->category)->name ?? null,
+        ])));
+        // どちらも無ければ単一名でフォールバック
+        if ($categoryTags->isEmpty() && !empty($product->category?->name)) {
+            $categoryTags = collect([$product->category->name]);
+        }
     }
-    if ($categoryNames->isEmpty() && !empty($product->category) && !empty($product->category->name)) {
-        $categoryNames = collect([$product->category->name]);
-    }
-  @endphp
+
+    /**
+     * 状態ラベル
+     */
+    $conditionMap = [
+        'new'       => '新品・未使用',
+        'like_new'  => '未使用に近い',
+        'good'      => '良好',
+        'used'      => 'やや傷や汚れあり',
+        'poor'      => '全体的に状態が悪い',
+    ];
+    $conditionLabel = $conditionMap[$product->condition] ?? ($product->condition ?? '―');
+@endphp
 
   <article class="product-detail__container">
     <figure class="product-detail__image">
@@ -107,20 +133,24 @@
         <div class="product-info-item">
           <strong>商品説明</strong>
           <p class="description">{{ $product->description ?? '説明がありません' }}</p>
-
           <strong>商品の情報</strong>
 
-          <p class="category">
-            カテゴリー：
-            @if ($categoryNames->count())
-              {{ $categoryNames->join(' / ') }}
-            @else
-              設定なし
-            @endif
-          </p>
+              <div class="kv">
+                <span class="kv__key">カテゴリー</span>
+                <span class="kv__tags">
+                  @forelse($categoryTags as $name)
+                    <span class="tag">{{ $name }}</span>
+                  @empty
+                    <span class="kv__val">―</span>
+                  @endforelse
+                </span>
+              </div>
 
-          <p class="condition">商品の状態：{{ $product->condition ?? '—' }}</p>
-        </div>
+              <div class="kv">
+                <span class="kv__key">商品の状態</span>
+                <span class="kv__val">{{ $conditionLabel }}</span>
+              </div>
+         </div>
       </section>
 
       <section class="product-comments">

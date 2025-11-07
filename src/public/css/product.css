@@ -85,6 +85,7 @@
   font-size: 15px;
   color: #111827;
   margin: 6px 0;
+  display: none;
 }
 .product-info-item .category b,
 .product-info-item .condition b{
@@ -249,7 +250,8 @@
   font-size:11px;
   border-radius:9999px;
   border:1px solid var(--line);
-  background:#f8fafc;
+  background:#c8c9ca;
+  transform:translateX(20px);
 }
 
 .comment-list{
@@ -336,6 +338,18 @@
   color:#d33;
   font-size:12px;
   margin:4px 0 0;
+}
+
+.kv__val{
+  font-size:13px;
+  color:#111827;
+  transform:translateX(30px);
+}
+
+.kv__tags{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
 }
 
 @media (min-width: 1400px) and (max-width: 1540px){
