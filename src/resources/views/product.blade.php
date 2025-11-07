@@ -30,12 +30,6 @@
 
     $isFavorited = $isFavorited ?? false;
 
-    /**
-     * カテゴリ表示用の配列を一本化
-     * - category_ids_json があればそれを優先（複数チップ）
-     * - なければ 親→子 のパンくず（チップ）
-     * - それも無ければ単一カテゴリ名
-     */
     use App\Models\Category;
 
     $categoryTags = collect();
@@ -46,20 +40,15 @@
     ) {
         $categoryTags = Category::whereIn('id', $product->category_ids_json)->pluck('name')->values();
     } else {
-        // 親→子 パンくず
         $categoryTags = collect(array_values(array_filter([
             optional(optional($product->category)->parent)->name ?? null,
             optional($product->category)->name ?? null,
         ])));
-        // どちらも無ければ単一名でフォールバック
         if ($categoryTags->isEmpty() && !empty($product->category?->name)) {
             $categoryTags = collect([$product->category->name]);
         }
     }
 
-    /**
-     * 状態ラベル
-     */
     $conditionMap = [
         'new'       => '新品・未使用',
         'like_new'  => '未使用に近い',
