@@ -48,19 +48,51 @@
       </article>
 
       <article class="card">
-        <header class="card__header">
-          <h2 class="card__title">支払い方法</h2>
-        </header>
+          <header class="card__header">
+            <h2 class="card__title">支払い方法</h2>
+          </header>
 
         <div class="card__section">
-          <form id="payment-form" action="{{ route('payment.create') }}" method="GET" class="purchase-form">
-            <input type="hidden" name="item_id" value="{{ $product->id }}">
+            <form id="payment-form" action="{{ route('payment.create') }}" method="GET" class="purchase-form">
+              <input type="hidden" name="item_id" value="{{ $product->id }}">
 
-            <label for="payment_method" class="form-label"></label>
-            <select id="payment_method" name="payment_method" class="form-select" required>
-              <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ支払い</option>
-              <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>カード支払い</option>
-            </select>
+              @php
+                $pmList  = ['convenience_store' => 'コンビニ支払い', 'credit_card' => 'カード支払い'];
+                $pmValue = $initialPayment ?: '';                // 初期は未選択。初期✓を付けたいなら 'convenience_store'
+                $pmLabel = $pmList[$pmValue] ?? '選択してください';
+              @endphp
+
+              <div class="selectbox" data-selectbox data-name="payment_method">
+                <select id="payment-native" name="payment_method" class="sr-only-select" required>
+                  <option value="" disabled {{ $pmValue ? '' : 'selected' }}></option>
+                  @foreach($pmList as $val => $text)
+                  <option value="{{ $val }}" {{ $pmValue === $val ? 'selected' : '' }}>{{ $text }}</option>
+                  @endforeach
+                </select>
+
+                <button type="button"
+                  class="selectbox__trigger sell-input"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="payment-listbox">
+                  <span class="selectbox__label">{{ $pmLabel }}</span>
+                  <span class="selectbox__caret" aria-hidden="true"></span>
+                </button>
+
+              <ul id="payment-listbox" class="selectbox__list" role="listbox" tabindex="-1">
+                @foreach($pmList as $val => $text)
+                @php $selected = ($pmValue === $val); @endphp
+                <li role="option"
+                  class="selectbox__option {{ $selected ? 'is-selected' : '' }}"
+                  data-value="{{ $val }}"
+                  aria-selected="{{ $selected ? 'true' : 'false' }}"
+                  tabindex="-1">
+                  <span class="selectbox__check" aria-hidden="true"></span>
+                  <span class="selectbox__text">{{ $text }}</span>
+                </li>
+                @endforeach
+              </ul>
+            </div>
           </form>
         </div>
       </article>
@@ -119,22 +151,110 @@
 
 <script>
 (function () {
-  var select  = document.getElementById('payment_method');
-  var summary = document.getElementById('summary-payment');
-  if (!select || !summary) return;
-
-  function label(v) {
+  function pmLabel(v){
     if (v === 'credit_card') return 'カード支払い';
     if (v === 'convenience_store') return 'コンビニ支払い';
-    return '未選択';
+    return '選択してください';
   }
 
-  summary.textContent = label(select.value);
-  select.addEventListener('change', function () {
-    summary.textContent = label(this.value);
+  var summary = document.getElementById('summary-payment');
+
+  var root = document.querySelector('[data-selectbox][data-name="payment_method"]');
+  if (!root) return;
+
+  var native  = document.getElementById('payment-native');
+  var trigger = root.querySelector('.selectbox__trigger');
+  var labelEl = root.querySelector('.selectbox__label');
+  var list    = root.querySelector('.selectbox__list');
+  var opts    = Array.from(root.querySelectorAll('.selectbox__option'));
+
+  function setByValue(val) {
+    opts.forEach(o => {
+      var sel = (o.dataset.value || '') === val;
+      o.classList.toggle('is-selected', sel);
+      o.setAttribute('aria-selected', String(sel));
+    });
+    labelEl.textContent = pmLabel(val) || '選択してください';
+    if (native) native.value = val || '';
+    if (summary) summary.textContent = pmLabel(val || '');
+  }
+
+  function openList() {
+    root.classList.add('is-open');
+    trigger.setAttribute('aria-expanded','true');
+    opts.forEach(el => el.classList.remove('is-active'));
+    var current = opts.find(el => el.classList.contains('is-selected'));
+    if (current) current.classList.add('is-active');
+    list.focus({ preventScroll: true });
+  }
+  function closeList(returnFocus=false) {
+    root.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded','false');
+    if (returnFocus) trigger.focus({ preventScroll:true });
+  }
+
+  setByValue(native?.value || '');
+
+  trigger.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (root.classList.contains('is-open')) closeList(true); else openList();
   });
-  select.addEventListener('input', function () {
-    summary.textContent = label(this.value);
+
+  opts.forEach(function (o) {
+    o.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setByValue(o.dataset.value || '');
+      closeList(true);
+    });
+    o.addEventListener('mouseenter', function () {
+      opts.forEach(el => el.classList.remove('is-active'));
+      o.classList.add('is-active');
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!root.contains(e.target)) closeList(false);
+  });
+
+  function activeIndex(){ return opts.findIndex(o => o.classList.contains('is-active')); }
+  list.addEventListener('keydown', function (e) {
+    let i = activeIndex();
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      i = Math.min(opts.length - 1, (i < 0 ? 0 : i + 1));
+      opts.forEach(el => el.classList.remove('is-active'));
+      opts[i].classList.add('is-active');
+      opts[i].scrollIntoView({ block:'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      i = Math.max(0, (i < 0 ? 0 : i - 1));
+      opts.forEach(el => el.classList.remove('is-active'));
+      opts[i].classList.add('is-active');
+      opts[i].scrollIntoView({ block:'nearest' });
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      opts.forEach(el => el.classList.remove('is-active'));
+      opts[0].classList.add('is-active');
+      opts[0].scrollIntoView({ block:'nearest' });
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      const last = opts.at(-1);
+      opts.forEach(el => el.classList.remove('is-active'));
+      last.classList.add('is-active');
+      last.scrollIntoView({ block:'nearest' });
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const cur = opts[activeIndex()] || opts.find(el => el.classList.contains('is-selected'));
+      if (cur) setByValue(cur.dataset.value || '');
+      closeList(true);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closeList(true);
+    }
+  });
+
+  native?.addEventListener('change', function () {
+    setByValue(this.value || '');
   });
 })();
 </script>
