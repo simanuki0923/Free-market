@@ -41,7 +41,6 @@
             <img src="{{ $src }}" alt="{{ $product->name ?? '商品画像' }}">
           </figure>
           <div class="purchase-item__info">
-            <h1 class="purchase-item__title">商品購入</h1>
             <h2 class="purchase-item__name">{{ $product->name }}</h2>
             <p class="purchase-item__price">¥ {{ number_format((int)$product->price) }}</p>
           </div>
@@ -59,7 +58,6 @@
 
             <label for="payment_method" class="form-label"></label>
             <select id="payment_method" name="payment_method" class="form-select" required>
-              <option value="" disabled {{ $initialPayment === '' || $initialPayment === null ? 'selected' : '' }}>選択してください</option>
               <option value="convenience_store" {{ $initialPayment === 'convenience_store' ? 'selected' : '' }}>コンビニ支払い</option>
               <option value="credit_card"       {{ $initialPayment === 'credit_card' ? 'selected' : '' }}>カード支払い</option>
             </select>
@@ -75,7 +73,6 @@
 
         <div class="card__section card__section--with-line">
           <div class="address">
-            <div class="address__row"><span class="muted"></span> {{ $recipient }}</div>
             <div class="address__row"><span class="muted"></span> {{ $postal ?: '未設定' }}</div>
             <div class="address__row"><span class="muted"></span> {{ $addressDisp ?: '未設定' }}</div>
           </div>
