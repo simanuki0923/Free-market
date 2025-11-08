@@ -184,7 +184,7 @@
             @csrf
           @endif
 
-          <label for="comment-body" class="comment-label">商品のコメント</label>
+          <label for="comment-body" class="comment-label">商品へのコメント</label>
           <textarea
             id="comment-body"
             name="body"
