@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SearchController;
+// use App\Http\Controllers\SearchController; // ★ 不要になったので削除
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\FavoriteController;
@@ -22,7 +22,8 @@ Route::get('/item/{item_id}', [ProductController::class, 'show'])
     ->whereNumber('item_id')
     ->name('item.show');
 
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+// ★ /search ルートは削除
+// Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('mypage');

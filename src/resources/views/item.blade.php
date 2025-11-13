@@ -20,23 +20,29 @@
             ? $path
             : asset('storage/' . ltrim($path, '/'));
     };
+
+    // ★ 現在のクエリ（keyword, page など）を保持
+    $currentQuery = request()->query();
 @endphp
 
 <main class="product-list" aria-label="{{ $activeTab === 'mylist' ? 'マイリスト' : 'おすすめ一覧' }}">
   <div class="container">
 
     <nav class="tab-buttons" role="tablist" aria-label="一覧切替タブ">
-      <a href="{{ route('item') }}"
+      {{-- おすすめタブ（tab=all, pageは1にリセット） --}}
+      <a href="{{ route('item', array_merge($currentQuery, ['tab' => 'all', 'page' => 1])) }}"
          class="tab-link {{ $activeTab === 'all' ? 'active' : '' }}"
          @if($activeTab === 'all') aria-current="page" @endif>おすすめ</a>
 
-      <a href="{{ route('item', ['tab' => 'mylist']) }}"
+      {{-- マイリストタブ --}}
+      <a href="{{ route('item', array_merge($currentQuery, ['tab' => 'mylist', 'page' => 1])) }}"
          class="tab-link {{ $activeTab === 'mylist' ? 'active' : '' }}"
          @if($activeTab === 'mylist') aria-current="page" @endif>マイリスト</a>
     </nav>
 
     <section class="product-list__section">
       @if ($activeTab === 'mylist' && !$isLoggedIn)
+        {{-- マイリスト + 未ログイン：必要なら案内メッセージを追加 --}}
       @else
         @php
           $count = ($products ?? collect())->count();
@@ -76,6 +82,7 @@
 
           @if($isPaginator && $products->hasPages())
             <div class="pagination">
+              {{-- page 以外のクエリ（keyword, tab など）を維持してページング --}}
               {{ $products->appends(request()->query())->links() }}
             </div>
           @endif

@@ -13,12 +13,18 @@
 <body>
     <header class="header">
         <div class="header__inner">
-            <a href="/" class="header__logo">
+            <a href="{{ route('item') }}" class="header__logo">
                 <img src="{{ asset('img/logo.svg') }}" alt="COACHTECHロゴ">
             </a>
 
-            <form action="{{ route('search') }}" method="GET" class="header__search">
-                <input type="text" name="search" placeholder="なにをお探しですか？" value="{{ request('search', request('q')) }}">
+            {{-- ★ 検索 → item ルート / パラメータ名 keyword --}}
+            <form action="{{ route('item') }}" method="GET" class="header__search">
+                <input
+                    type="text"
+                    name="keyword"
+                    placeholder="なにをお探しですか？"
+                    value="{{ request('keyword') }}"
+                >
             </form>
 
             <nav class="header__nav">
