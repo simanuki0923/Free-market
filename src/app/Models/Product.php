@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
@@ -27,10 +28,31 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price'   => 'integer',
-        'is_sold' => 'boolean',
-        'category_ids_json' => 'array',
+        'price'            => 'integer',
+        'is_sold'          => 'boolean',
+        'category_ids_json'=> 'array',
     ];
+
+    /**
+     * 商品キーワード検索（部分一致）
+     * - name / brand / description を対象に LIKE 検索
+     */
+    public function scopeKeywordSearch(Builder $query, ?string $keyword): Builder
+    {
+        $keyword = trim((string) $keyword);
+
+        if ($keyword !== '') {
+            $like = '%' . $keyword . '%';
+
+            $query->where(function (Builder $q) use ($like) {
+                $q->where('name', 'LIKE', $like)
+                  ->orWhere('brand', 'LIKE', $like)
+                  ->orWhere('description', 'LIKE', $like);
+            });
+        }
+
+        return $query;
+    }
 
     public function user(): BelongsTo
     {
