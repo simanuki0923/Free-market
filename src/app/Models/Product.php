@@ -83,4 +83,9 @@ class Product extends Model
     {
         return $this->hasOne(Sell::class);
     }
+
+    public function transactions(): HasMany
+{
+    return $this->hasMany(Transaction::class);
+}
 }

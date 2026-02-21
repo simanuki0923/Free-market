@@ -91,4 +91,9 @@ class Sell extends Model
 
         return asset('img/no-image.png');
     }
+
+    public function transactions(): HasMany
+{
+    return $this->hasMany(Transaction::class);
+}
 }
