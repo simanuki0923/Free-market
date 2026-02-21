@@ -1,87 +1,275 @@
-:root{
-  --container: 2300px;
-  --border: #e5e7eb;
-  --muted: #6b7280;
+/* app.css */
+
+/* ====== base ====== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.header{
-  background:#0b0b0b;
-  border-bottom:1px solid var(--border);
-}
-.header__inner{
-  max-width:var(--container);
-  margin:0 auto;
-  padding:10px 16px;
-  min-height:56px;
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:center;
-  column-gap:16px;
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
-.header__logo{ justify-self:start; }
-.header__logo img{ height:26px; display:block; }
-
-.header__search{
-  justify-self:center;
-  width:100%;
-  max-width:520px;
-  min-width:0;
-}
-.header__search input[type="text"]{
-  width:100%;
-  height:34px;
-  padding:0 12px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  background:#fff;
-  outline:none;
-}
-.header__search input::placeholder{
-  color:black;
-  font-weight:600;
-  font-size: 20px;
-  transform: translate(50px, 5px);
+img {
+  display: block;
+  max-width: 100%;
 }
 
-.header__nav{ justify-self:end; }
-.nav__list{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  margin:0; padding:0; list-style:none;
-  transform: translateX(-15%);
+/* ====== header ====== */
+.header {
+  height: 80px;
+  background: #000;
 }
-.nav__item-link,
-.nav__item-button{
-  color:#fff;
-  text-decoration:none;
-  font-size:20px; line-height:1;
-  background:none; border:0; cursor:pointer;
-}
-.nav__item-button:hover,
-.nav__item-link:hover{ text-decoration:underline; }
-.nav__item-link-sell{
-  padding:9px 18px;
-  background:#fff;
-  color:#000;
-  border-radius:6px;
-  font-weight:600;
-  text-decoration:none;
-  line-height:1;
-}
-.nav__item-link-sell:hover{ filter:brightness(0.92); }
 
-@media (min-width:1400px) and (max-width:1540px){
-  .header__search{ max-width:520px; }
+.header__inner {
+  width: 100%;
+  height: 80px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 40px;
+  gap: 32px;
+}
+
+/* ====== logo ====== */
+.header__logo {
+  width: 320px;
+  /* 調整済 */
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+
+  text-decoration: none;
+}
+
+.header__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ====== search ====== */
+/* form.header__search -> input の構造に合わせる */
+.header__search {
+  flex: 1;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header__search input {
+  width: 480px;
+  height: 50px;
+
+  border-radius: 5px;
+  border: none;
+  outline: none;
+
+  background: #fff;
+  color: #000;
+
+  font-size: 24px;
+  font-weight: 400;
+
+  /* ここがズレ防止の重要ポイント */
+  line-height: 50px;
+  /* 高さと一致 */
+  padding: 0 16px;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.header__search input::placeholder {
+  color: #000;
+  opacity: 1;
+}
+
+/* ====== nav ====== */
+.header__nav {
+  flex: 0 0 auto;
+}
+
+.nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav__item {
+  display: flex;
+  align-items: center;
+}
+
+.nav__form {
+  margin: 0;
+  display: flex;
+  /* formの高さズレ防止 */
+  align-items: center;
+}
+
+/* button と a を完全に同じ箱にしてズレ防止 */
+.nav__item-link {
+  height: 50px;
+  /* 出品ボタンと同じ基準 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  font-weight: 400;
+
+  /* ここがズレ防止の重要ポイント */
+  line-height: 50px;
+  /* 高さと一致 */
+
+  padding: 0;
+  margin: 0;
+
+  color: #fff;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.nav__item-button {
+  height: 50px;
+  /* 出品ボタンと同じ基準 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  font-weight: 400;
+
+  /* ここがズレ防止の重要ポイント */
+  line-height: 50px;
+  /* 高さと一致 */
+
+  padding: 0;
+  margin-top: 5px;
+
+  color: #fff;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 出品ボタン */
+.nav__item-link-sell {
+  width: 100px;
+  height: 50px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  color: #000;
+  border-radius: 4px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   Responsive: 1400px〜1540px の範囲だけ調整
+   ========================================================= */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  .header__inner {
+    padding: 0 24px;
+    gap: 24px;
+  }
+
+  .header__logo {
+    width: 300px;
+    height: 36px;
+  }
+
+  .header__search input {
+    width: 460px;
+  }
+
+  .nav__list {
+    gap: 24px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+  .header {
+    height: 70px;
+  }
+
+  .header__inner {
+    height: 70px;
+    padding: 0 16px;
+    /* 余白を縮める */
+    gap: 12px;
+    /* 要素間も縮める */
+  }
+
+  /* ロゴを縮める */
+  .header__logo {
+    width: 180px;
+    height: 28px;
+  }
+
+  /* 検索欄も縮める（flexは維持） */
+  .header__search {
+    height: 40px;
+    justify-content: flex-start;
+    /* 中央寄せだと詰まるので左寄せ */
+  }
+
+  .header__search input {
+    width: 260px;
+    /* ここが効く：画面幅に合わせて縮小 */
+    height: 40px;
+
+    font-size: 16px;
+    line-height: 40px;
+    padding: 0 12px;
+  }
+
+  /* ナビの文字を縮めて詰める */
+  .nav__list {
+    gap: 12px;
+  }
+
   .nav__item-link,
-  .nav__item-button{ font-size:16px; }
-  .nav__item-link-sell{ padding:8px 14px; border-radius:6px; }
-}
+  .nav__item-button {
+    height: 40px;
+    font-size: 16px;
+    line-height: 40px;
+  }
 
-@media (max-width:1399px){
-  .header__search{ max-width:350px; }
-  .nav__item-link,
-  .nav__item-button{ font-size:16px; }
-  .nav__item-link-sell{ padding:8px 14px; border-radius:6px; }
+  /* 出品ボタンも縮める */
+  .nav__item-link-sell {
+    width: 72px;
+    height: 40px;
+    border-radius: 4px;
+  }
 }

@@ -2,12 +2,14 @@
   max-width: 500px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .card {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   background: #fff;
+  overflow: hidden;
 }
 
 .card-header {
@@ -18,6 +20,7 @@
   padding: 10px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  line-height: 1.4;
 }
 
 .card-body {
@@ -46,7 +49,7 @@
 
 .form-control:focus-within {
   border-color: #80bdff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
   outline: 0;
 }
 
@@ -54,8 +57,14 @@
   width: 100%;
   background: transparent;
 }
-.StripeElement--focus { /* フォーカスは親の :focus-within が担当 */ }
-.StripeElement--invalid { /* 内側の見た目調整のみ（例：色など） */ }
+
+.StripeElement--focus {
+  /* フォーカスは親の :focus-within が担当 */
+}
+
+.StripeElement--invalid {
+  /* 内側の見た目調整のみ（例：色など） */
+}
 
 #card-errors {
   color: #dc3545;
@@ -74,8 +83,12 @@
   border-radius: 5px;
   display: inline-block;
   margin-right: 10px;
+  margin-top: 6px;
   cursor: pointer;
   border: 1px solid transparent;
+  line-height: 1.4;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .btn-primary:hover {
@@ -93,9 +106,72 @@
   border-color: #545b62;
 }
 
+/* ===========================
+   768px ～ 850px 調整（タブレット小～中）
+   - 横幅を少し広げる
+   - 余白を詰めて見切れ防止
+   - ボタンの押しやすさ維持
+   =========================== */
+@media (min-width: 768px) and (max-width: 850px) {
+  .container {
+    max-width: 680px;
+    padding: 16px;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .card-header {
+    font-size: 1.15rem;
+    padding: 12px 14px;
+  }
+
+  .card-body {
+    padding: 18px 16px;
+  }
+
+  .form-control {
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    min-height: 42px;
+    margin-bottom: 14px;
+  }
+
+  #card-errors {
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-size: 0.9rem;
+    padding: 9px 12px;
+    margin-right: 8px;
+    margin-top: 8px;
+  }
+}
+
+/* 既存の大型PC帯 */
 @media (min-width: 1400px) and (max-width: 1540px) {
-  .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-  .card { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 10px; background: #fff; }
-  .card-header { font-size: 1.25rem; padding: 10px; }
-  .form-control { min-height: 44px; }
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .card-header {
+    font-size: 1.25rem;
+    padding: 10px;
+  }
+
+  .form-control {
+    min-height: 44px;
+  }
 }

@@ -28,7 +28,8 @@
   font-size: 20px;
   color: black;
 }
-.sell-legend::after{
+
+.sell-legend::after {
   content: "";
   position: absolute;
   left: 0;
@@ -49,13 +50,15 @@
   background: #fafafa;
   position: relative;
 }
-.sell-image-drop input[type=file]{
+
+.sell-image-drop input[type=file] {
   position: absolute;
   inset: 0;
   opacity: 0;
   cursor: pointer;
 }
-.sell-image-button{
+
+.sell-image-button {
   display: inline-block;
   padding: 10px 16px;
   border-radius: 6px;
@@ -63,16 +66,22 @@
   color: #ff6b6b;
   font-weight: 700;
 }
-.sell-image-button:hover{ opacity: .9; }
 
-.sell-preview{ margin-top: 12px; }
-.sell-preview img{
+.sell-image-button:hover {
+  opacity: .9;
+}
+
+.sell-preview {
+  margin-top: 12px;
+}
+
+.sell-preview img {
   max-width: 100%;
   height: auto;
   border-radius: 6px;
 }
 
-.sell-label{
+.sell-label {
   display: block;
   margin: 14px 0 10px;
   font-weight: 700;
@@ -80,7 +89,7 @@
   color: #333;
 }
 
-.sell-input{
+.sell-input {
   width: 100%;
   height: 40px;
   padding: 8px 12px;
@@ -90,7 +99,7 @@
   background: #fff;
 }
 
-.sell-textarea{
+.sell-textarea {
   width: 100%;
   min-height: 160px;
   padding: 10px 12px;
@@ -101,15 +110,22 @@
 }
 
 .sell-input:focus,
-.sell-textarea:focus{
+.sell-textarea:focus {
   outline: none;
   border-color: #ff6b6b;
-  box-shadow: 0 0 0 3px rgba(255,107,107,.15);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, .15);
 }
 
-.sell-input--price{ padding-left: 28px; }
-.sell-price{ position: relative; max-width: 700px; }
-.sell-price .yen{
+.sell-input--price {
+  padding-left: 28px;
+}
+
+.sell-price {
+  position: relative;
+  max-width: 700px;
+}
+
+.sell-price .yen {
   position: absolute;
   left: 10px;
   top: 50%;
@@ -117,10 +133,19 @@
   font-weight: 700;
 }
 
-.sell-help{ margin-top: 6px; color: #6b7280; font-size: 12px; }
-.sell-error{ margin-top: 6px; color: #e11d48; font-size: 12px; }
+.sell-help {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
 
-.sell-submit{
+.sell-error {
+  margin-top: 6px;
+  color: #e11d48;
+  font-size: 12px;
+}
+
+.sell-submit {
   display: block;
   width: 700px;
   max-width: 100%;
@@ -133,104 +158,268 @@
   border-radius: 8px;
   font-size: 23px;
 }
-.sell-submit:hover{ opacity: .9; }
 
-.chip-group{
+.sell-submit:hover {
+  opacity: .9;
+}
+
+.chip-group {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 12px;
   margin-top: 6px;
 }
-.chip{ position: relative; display: inline-flex; align-items: center; }
-.chip input[type="checkbox"]{
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  opacity: 0; cursor: pointer;
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
-.chip span{
+
+.chip input[type="checkbox"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip span {
   display: inline-block;
   padding: 8px 14px;
   border: 2px solid #fb2d2d;
   border-radius: 9999px;
   background: #fff;
   color: #444;
-  font-size: 13px; line-height: 1;
+  font-size: 13px;
+  line-height: 1;
   user-select: none;
   transition: box-shadow .15s, background-color .15s, color .15s, border-color .15s;
 }
-.chip:hover span{ border-color: #bfc5ce; }
-.chip input[type="checkbox"]:focus + span{
-  outline: 0; box-shadow: 0 0 0 3px rgba(255,107,107,.25); border-color: #ff6b6b;
-}
-.chip input[type="checkbox"]:checked + span{
-  background: #ff6b6b; color: #fff; border-color: #ff6b6b; box-shadow: 0 2px 0 rgba(0,0,0,.06) inset;
+
+.chip:hover span {
+  border-color: #bfc5ce;
 }
 
-.sell-legend.sell-legend--no-underline::after{ display: none; }
-
-.sr-only-select{
-  position: absolute!important;
-  width: 1px!important; height: 1px!important;
-  padding: 0!important; margin: -1px!important;
-  overflow: hidden!important; clip: rect(0 0 0 0)!important;
-  white-space: nowrap!important; border: 0!important;
+.chip input[type="checkbox"]:focus+span {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, .25);
+  border-color: #ff6b6b;
 }
 
-.selectbox{ position: relative; max-width: 700px; }
-.selectbox__trigger{
+.chip input[type="checkbox"]:checked+span {
+  background: #ff6b6b;
+  color: #fff;
+  border-color: #ff6b6b;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .06) inset;
+}
+
+.sell-legend.sell-legend--no-underline::after {
+  display: none;
+}
+
+.sr-only-select {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.selectbox {
+  position: relative;
+  max-width: 700px;
+}
+
+.selectbox__trigger {
   width: 100%;
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  cursor: pointer; background: #fff;
-  border: 1px solid #d1d5db; border-radius: 6px;
-  height: 40px; padding: 8px 12px; font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
 }
-.selectbox__trigger:focus{
-  outline: none; border-color: #ff6b6b;
-  box-shadow: 0 0 0 3px rgba(255,107,107,.15);
+
+.selectbox__trigger:focus {
+  outline: none;
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, .15);
 }
-.selectbox__caret{
-  width: 0; height: 0;
+
+.selectbox__caret {
+  width: 0;
+  height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 7px solid #6b7280;
   flex: 0 0 auto;
 }
-.selectbox.is-open .selectbox__caret{ transform: rotate(180deg); }
 
-.selectbox__list{
-  position: absolute; z-index: 50;
-  top: calc(100% + 6px); left: 0; right: 0;
-  background: #2f3033; color: #fff;
+.selectbox.is-open .selectbox__caret {
+  transform: rotate(180deg);
+}
+
+.selectbox__list {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #2f3033;
+  color: #fff;
   border-radius: 6px;
-  box-shadow: 0 10px 26px rgba(0,0,0,.18), 0 6px 10px rgba(0,0,0,.12);
-  padding: 6px 0; margin: 0; list-style: none;
-  max-height: 240px; overflow: auto;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .18), 0 6px 10px rgba(0, 0, 0, .12);
+  padding: 6px 0;
+  margin: 0;
+  list-style: none;
+  max-height: 240px;
+  overflow: auto;
   display: none;
 }
-.selectbox.is-open .selectbox__list{ display: block; }
 
-.selectbox__option{
-  display: grid; grid-template-columns: 24px 1fr;
-  align-items: center; gap: 6px;
-  padding: 8px 12px; cursor: pointer; user-select: none;
+.selectbox.is-open .selectbox__list {
+  display: block;
 }
+
+.selectbox__option {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
 .selectbox__option:hover,
-.selectbox__option:focus{ background: #3a3b3f; }
+.selectbox__option:focus {
+  background: #3a3b3f;
+}
 
-.selectbox__check{
-  width: 24px; height: 20px; display: inline-grid; place-items: center;
+.selectbox__check {
+  width: 24px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
 }
-.selectbox__option.is-selected .selectbox__check::before{
-  content: "✓"; font-weight: 700;
+
+.selectbox__option.is-selected .selectbox__check::before {
+  content: "✓";
+  font-weight: 700;
 }
-.selectbox__option.is-selected .selectbox__text{ font-weight: 700; }
+
+.selectbox__option.is-selected .selectbox__text {
+  font-weight: 700;
+}
 
 #price[type="number"]::-webkit-outer-spin-button,
-#price[type="number"]::-webkit-inner-spin-button{
-  -webkit-appearance: none; margin: 0;
+#price[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
-#price[type="number"]{ -moz-appearance: textfield; } 
 
-@media (min-width: 1400px) and (max-width: 1540px){
-  .container{ max-width: 700px; }
-  .sell-legend::after{ width: 660px; }
+#price[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ===========================
+   768px〜850px（タブレット横〜小さめPC）
+   レイアウトを崩さず少し詰める
+   =========================== */
+@media (min-width: 768px) and (max-width: 850px) {
+  .container {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .sell-title {
+    margin: 20px 0;
+    font-size: 28px;
+    /* h1が大きすぎる場合の保険 */
+  }
+
+  .sell-form {
+    padding: 8px 0 40px;
+  }
+
+  .sell-fieldset {
+    padding: 16px 0;
+  }
+
+  .sell-legend {
+    font-size: 18px;
+    padding-bottom: 10px;
+  }
+
+  .sell-legend::after {
+    width: 100%;
+    height: 2px;
+  }
+
+  .sell-label {
+    font-size: 18px;
+    margin: 12px 0 8px;
+  }
+
+  .sell-input,
+  .sell-textarea,
+  .selectbox__trigger {
+    font-size: 14px;
+  }
+
+  .sell-textarea {
+    min-height: 140px;
+  }
+
+  .sell-image-drop {
+    height: 110px;
+  }
+
+  .sell-image-button {
+    padding: 9px 14px;
+    font-size: 14px;
+  }
+
+  .chip-group {
+    gap: 8px 10px;
+  }
+
+  .chip span {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .sell-submit {
+    width: 100%;
+    margin-top: 24px;
+    font-size: 20px;
+    padding: 12px 14px;
+  }
+
+  .sell-price,
+  .selectbox {
+    max-width: 100%;
+  }
+}
+
+/* 1400px〜1540px（既存調整） */
+@media (min-width: 1400px) and (max-width: 1540px) {
+  .container {
+    max-width: 700px;
+  }
+
+  .sell-legend::after {
+    width: 660px;
+  }
 }
