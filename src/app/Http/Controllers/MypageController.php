@@ -27,7 +27,9 @@ class MypageController extends Controller
 
         $perPage = 24;
 
+        // =========================
         // 出品した商品
+        // =========================
         $mySells = Sell::query()
             ->where('user_id', $user->id)
             ->with(['product.category'])
@@ -39,7 +41,9 @@ class MypageController extends Controller
                 'p3'   => $request->query('p3'),
             ]);
 
+        // =========================
         // 購入した商品
+        // =========================
         $purchasedProducts = Product::query()
             ->join('sells', 'sells.product_id', '=', 'products.id')
             ->join('purchases', 'purchases.sell_id', '=', 'sells.id')
@@ -60,25 +64,36 @@ class MypageController extends Controller
                 'p3'   => $request->query('p3'),
             ]);
 
-        /**
-         * 取引中の商品（Transactionベース）
-         * Transactionのidをそのまま chat.buyer / chat.seller の {transaction} に使える
-         */
+        // =========================
+        // 取引中の商品（Transactionベース）
+        // =========================
         $tradingQuery = Transaction::query()
             ->with(['product'])
+            ->withUnreadCountFor((int) $user->id) // ← 未読件数付与
             ->where(function ($q) use ($user) {
+                // 自分が出品者 or 購入者の取引
                 $q->where('seller_id', $user->id)
                   ->orWhere('buyer_id', $user->id);
             });
 
-        // transactions.status がある場合はステータスで判定
+        // ステータス判定（仕様対応）
+        // - 購入者: buyer_completed は取引中一覧から除外
+        // - 出品者: buyer_completed を取引中一覧に含める（評価導線）
         if (Schema::hasColumn('transactions', 'status')) {
-            // ★要件対応:
-            // buyer_completed（購入者が取引完了押下後）は
-            // 購入者・出品者ともに「取引中」タブから除外する
-            $tradingQuery->whereIn('status', ['ongoing', 'trading']);
+            $tradingQuery->where(function ($q) use ($user) {
+                // 購入者として見ている取引
+                $q->where(function ($buyerQ) use ($user) {
+                    $buyerQ->where('buyer_id', $user->id)
+                           ->whereIn('status', ['ongoing', 'trading']);
+                })
+                // 出品者として見ている取引
+                ->orWhere(function ($sellerQ) use ($user) {
+                    $sellerQ->where('seller_id', $user->id)
+                            ->whereIn('status', ['ongoing', 'trading', 'buyer_completed']);
+                });
+            });
         } elseif (Schema::hasColumn('transactions', 'completed_at')) {
-            // completed_at が入ったら完了扱い＝取引中から除外
+            // 旧構成（statusカラムなし）
             $tradingQuery->whereNull('completed_at');
         } elseif (Schema::hasColumn('transactions', 'is_completed')) {
             $tradingQuery->where('is_completed', 0);
@@ -103,10 +118,15 @@ class MypageController extends Controller
                 'p2'   => $request->query('p2'),
             ]);
 
-        /**
-         * 受けた評価の平均値・件数
-         * ratee_user_id = 自分（評価された側）
-         */
+        // 取引中タブに表示する未読総数（任意）
+        $tradingUnreadTotal = 0;
+        foreach ($tradingProducts as $transaction) {
+            $tradingUnreadTotal += (int) ($transaction->unread_messages_count ?? 0);
+        }
+
+        // =========================
+        // 受けた評価の平均値・件数
+        // =========================
         $ratingSummary = TransactionRating::query()
             ->where('ratee_user_id', $user->id)
             ->whereNotNull('rating')
@@ -119,13 +139,14 @@ class MypageController extends Controller
             : 0.0;
 
         return view('mypage', [
-            'user'              => $user,
-            'page'              => $tab,
-            'mySells'           => $mySells,
-            'purchasedProducts' => $purchasedProducts,
-            'tradingProducts'   => $tradingProducts,
-            'ratingAverage'     => $ratingAverage,
-            'ratingCount'       => $ratingCount,
+            'user'               => $user,
+            'page'               => $tab,
+            'mySells'            => $mySells,
+            'purchasedProducts'  => $purchasedProducts,
+            'tradingProducts'    => $tradingProducts,
+            'tradingUnreadTotal' => $tradingUnreadTotal,
+            'ratingAverage'      => $ratingAverage,
+            'ratingCount'        => $ratingCount,
         ]);
     }
 }

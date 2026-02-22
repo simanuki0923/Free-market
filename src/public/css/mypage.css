@@ -158,7 +158,9 @@
   color: #ff0000;
 }
 
-.trade-count {
+/* 取引中タブの未読件数（スクショ仕様） */
+.trade-count,
+.trade-tab-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -217,6 +219,7 @@
   object-fit: cover;
 }
 
+/* 旧: 赤丸だけ（互換維持。Bladeで使わなくても残してOK） */
 .product-thumb--trading .trade-dot {
   position: absolute;
   top: 6px;
@@ -228,6 +231,50 @@
   background: #ff0000;
 
   box-shadow: 0 0 0 2px #f5f5f5 inset;
+}
+
+/* =========================================
+   追加: スクショ仕様（カード左上の小さい赤丸数字）
+   Bladeで .trade-unread-dot を使用
+   ========================================= */
+.product-thumb--trading {
+  position: relative;
+}
+
+.trade-unread-dot {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border-radius: 999px;
+
+  background: #ff0000;
+  color: #fff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: 0 0 0 1px #f5f5f5;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 2桁以上のときの崩れ防止 */
+.trade-unread-dot.is-double,
+.trade-unread-dot[data-digits="2"],
+.trade-unread-dot[data-digits="3"] {
+  width: auto;
+  min-width: 18px;
+  padding: 0 3px;
+  border-radius: 999px;
 }
 
 .sold-out-label {
@@ -340,7 +387,8 @@
     /* PCフル時より少し戻す */
   }
 
-  .trade-count {
+  .trade-count,
+  .trade-tab-count {
     width: 26px;
     height: 26px;
     min-width: 26px;
@@ -350,7 +398,7 @@
 
   .product-list {
     max-width: 1048px;
-    /* 4列×194 + gap 22*? を想定して中央寄せ */
+    /* 4列×194 + gap */
     grid-template-columns: repeat(4, minmax(0, 194px));
     gap: 40px 30px;
   }
@@ -366,6 +414,24 @@
     height: 18px;
     top: 6px;
     left: 6px;
+  }
+
+  /* スクショ仕様（未読数字丸）も同じ位置・サイズに合わせる */
+  .trade-unread-dot {
+    top: 6px;
+    left: 6px;
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    font-size: 8px;
+    box-shadow: 0 0 0 1px #f5f5f5;
+  }
+
+  .trade-unread-dot.is-double,
+  .trade-unread-dot[data-digits="2"],
+  .trade-unread-dot[data-digits="3"] {
+    min-width: 16px;
+    padding: 0 2px;
   }
 
   .sold-out-label {
@@ -482,11 +548,12 @@
     gap: 6px;
     padding: 0 2px;
     transform: translateX(190px);
-    /* 左ずらし解除 */
+    /* 既存レイアウト準拠（必要なら0pxへ調整） */
     flex: 0 0 auto;
   }
 
-  .trade-count {
+  .trade-count,
+  .trade-tab-count {
     width: 22px;
     height: 22px;
     min-width: 22px;
@@ -515,6 +582,24 @@
     top: 5px;
     left: 5px;
     box-shadow: 0 0 0 1.5px #f5f5f5 inset;
+  }
+
+  /* スクショ仕様（未読数字丸） */
+  .trade-unread-dot {
+    top: 5px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    font-size: 8px;
+    box-shadow: 0 0 0 1px #f5f5f5;
+  }
+
+  .trade-unread-dot.is-double,
+  .trade-unread-dot[data-digits="2"],
+  .trade-unread-dot[data-digits="3"] {
+    min-width: 15px;
+    padding: 0 2px;
   }
 
   .sold-out-label {

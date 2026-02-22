@@ -20,9 +20,6 @@ Route::get('/item/{item_id}', [ProductController::class, 'show'])
     ->whereNumber('item_id')
     ->name('item.show');
 
-// ★ /search ルートは削除
-// Route::get('/search', [SearchController::class, 'index'])->name('search');
-
 Route::middleware('auth')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('mypage');
 
@@ -98,6 +95,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/{transaction}/complete', [ChatPreviewController::class, 'completeTransaction'])
         ->whereNumber('transaction')
         ->name('chat.complete');
+
+    // 互換ルート（古いbladeが chat.buyer.complete を参照しても動くようにする）
+    Route::post('/chat/{transaction}/buyer-complete', [ChatPreviewController::class, 'completeTransaction'])
+        ->whereNumber('transaction')
+        ->name('chat.buyer.complete');
 
     /**
      * 評価送信（購入者 / 出品者）

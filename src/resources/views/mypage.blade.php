@@ -9,29 +9,22 @@
   $user    = $user ?? auth()->user();
   $profile = optional($user)->profile;
 
-  $displayName = optional($profile)->display_name ?? ($user->name ?? 'ユーザー');
+  $displayName = optional($profile)->display_name ?? ($user->name ?? 'ユーザー名');
 
   $iconPath = !empty(optional($profile)->icon_image_path)
       ? asset('storage/'.ltrim($profile->icon_image_path, '/'))
       : asset('img/sample.jpg');
 
-  // ★評価（平均値を優先。なければ profile.rating を使用）
   $ratingRaw = isset($ratingAverage)
       ? (float) $ratingAverage
       : (float) (optional($profile)->rating ?? 0);
 
-  // 星表示用（0〜5）
   $rating = (int) max(0, min(5, round($ratingRaw)));
-
-  // 件数（表示用）
   $ratingCount = (int) ($ratingCount ?? 0);
 
-  // 星アイコン（public/img に配置する想定）
-  // star_on.png = ON（黄色） / star_off.png = OFF（グレー）
   $starOn  = asset('img/star_on.png');
   $starOff = asset('img/star_off.png');
 
-  // 表示タブ判定
   $active = in_array(($page ?? request()->query('page', 'sell')), ['sell','buy','trading'], true)
             ? ($page ?? request()->query('page', 'sell'))
             : 'sell';
@@ -43,21 +36,8 @@
           : asset('storage/'.ltrim($path, '/'));
   };
 
-  // 取引中件数（Paginatorなら total()、LengthAwarePaginator も含む）
-  $tradingCount = 0;
-  if (isset($tradingProducts)) {
-    if ($tradingProducts instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
-      $tradingCount = (int) $tradingProducts->total();
-    } elseif ($tradingProducts instanceof \Illuminate\Contracts\Pagination\Paginator) {
-      // simplePaginate の場合など
-      $tradingCount = (int) $tradingProducts->count();
-    } elseif (is_countable($tradingProducts)) {
-      $tradingCount = (int) count($tradingProducts);
-    }
-  }
-
-  // 表示用（0件なら非表示判定で使う）
-  $tradingCountDisplay = (int) $tradingCount;
+  // 取引中タブの未読総数（Controllerで計算済みを優先）
+  $tradingUnreadTotal = (int) ($tradingUnreadTotal ?? 0);
 @endphp
 
 <main class="mypage__main container">
@@ -69,7 +49,6 @@
     <div class="profile-info">
       <p class="user-name">{{ $displayName }}</p>
 
-      {{-- ★ユーザー評価（星） --}}
       <div class="user-rating" aria-label="ユーザー評価">
         @for ($i = 1; $i <= 5; $i++)
           <img
@@ -80,7 +59,6 @@
         @endfor
       </div>
 
-      {{-- ★平均値 / 件数 --}}
       <div class="user-rating-summary" aria-label="評価の概要">
         <span class="user-rating-average">{{ number_format($ratingRaw, 1) }}</span>
         <span class="user-rating-count">({{ $ratingCount }}件)</span>
@@ -101,13 +79,15 @@
       購入した商品
     </a>
 
-    {{-- ★取引中（右横に件数表示 / 0件なら非表示） --}}
     <a href="{{ route('mypage', ['page' => 'trading']) }}"
        class="toggle-link {{ $active==='trading' ? 'active' : '' }}">
       <span>取引中の商品</span>
 
-      @if ($tradingCountDisplay > 0)
-        <span class="trade-count" aria-label="取引中件数">{{ $tradingCountDisplay }}</span>
+      {{-- スクショ仕様: タブ右に赤い件数（小さめ） --}}
+      @if ($tradingUnreadTotal > 0)
+        <span class="trade-tab-count" aria-label="未読メッセージ件数 {{ $tradingUnreadTotal }} 件">
+          {{ $tradingUnreadTotal }}
+        </span>
       @endif
     </a>
   </nav>
@@ -184,20 +164,18 @@
     </section>
   @endif
 
-  {{-- ★取引中（画像に赤●を表示 / クリックで取引チャットへ遷移） --}}
+  {{-- 取引中（スクショ仕様：カード左上に小さい赤丸数字） --}}
   @if ($active === 'trading')
     <section class="product-list" role="list">
       @forelse ($tradingProducts ?? [] as $t)
         @php
-          // 取引ID（Transactionモデルなら通常は $t->id）
           $transactionId = $t->id ?? $t->transaction_id ?? null;
 
-          // 商品情報
-          $pid   = $t->product_id ?? optional($t->product)->id ?? null;
           $name  = $t->name ?? optional($t->product)->name ?? '商品';
           $thumb = $resolveImage($t->image_path ?? optional($t->product)->image_path);
 
-          // 現在ユーザーの役割判定（chat.buyer / chat.seller を切り分け）
+          $unreadCount = (int) ($t->unread_messages_count ?? 0);
+
           $sellerId = (int) ($t->seller_id ?? 0);
           $buyerId  = (int) ($t->buyer_id ?? 0);
           $myId     = (int) (auth()->id() ?? 0);
@@ -218,14 +196,22 @@
           @else
             <div class="product-card" title="取引チャットに遷移できません">
           @endif
+
               <figure class="product-thumb product-thumb--trading">
                 <img src="{{ $thumb }}" alt="{{ $name }}">
-                <span class="trade-dot" aria-label="取引中"></span>
+
+                {{-- スクショ仕様：左上の小さい赤丸数字 --}}
+                @if ($unreadCount > 0)
+                  <span class="trade-unread-dot" aria-label="未読メッセージ {{ $unreadCount }} 件">
+                    {{ $unreadCount }}
+                  </span>
+                @endif
               </figure>
 
               <div class="product-meta">
                 <p class="product-name">{{ $name }}</p>
               </div>
+
           @if ($chatUrl)</a>@else</div>@endif
         </article>
       @empty

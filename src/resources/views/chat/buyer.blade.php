@@ -56,6 +56,7 @@
       </div>
 
       <div class="trade-chat__header-right">
+        {{-- 購入者用の取引完了 --}}
         <form action="{{ route('chat.complete', ['transaction' => $transaction->id ?? 0]) }}" method="POST">
           @csrf
           <button type="submit" class="trade-chat__complete-btn">取引を完了する</button>
@@ -105,7 +106,6 @@
             @endif
           </div>
 
-          {{-- 編集/削除（自分メッセージのみ） --}}
           @if($isMe)
             <div class="trade-chat__message-actions">
               <a href="{{ route('chat.message.edit', ['message' => $message->id]) }}">編集</a>
@@ -177,7 +177,6 @@
             @csrf
 
             <div class="trade-chat__rating" role="radiogroup" aria-label="評価">
-              {{-- CSS/JSなしでも送れるようradioを表示 --}}
               @for($i = 5; $i >= 1; $i--)
                 <input
                   type="radio"

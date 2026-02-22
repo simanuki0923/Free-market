@@ -164,10 +164,16 @@
 
     {{-- 取引完了後の評価モーダル（出品者） --}}
     @if(!empty($showRatingModal) && $showRatingModal === true)
-      <div class="trade-chat__modal-overlay" role="dialog" aria-modal="true" aria-label="取引完了">
+      <div class="trade-chat__modal-overlay" role="dialog" aria-modal="true" aria-labelledby="seller-rating-modal-title">
         <div class="trade-chat__modal">
-          <p class="trade-chat__modal-title">取引が完了しました。</p>
+          <p id="seller-rating-modal-title" class="trade-chat__modal-title">取引が完了しました。</p>
           <p class="trade-chat__modal-text">今回の取引相手はどうでしたか？</p>
+
+          @if($errors->has('rating'))
+            <div class="trade-chat__errors" aria-live="polite">
+              <p class="trade-chat__error">{{ $errors->first('rating') }}</p>
+            </div>
+          @endif
 
           <form action="{{ route('chat.rate', ['transaction' => $transaction->id ?? 0]) }}" method="POST">
             @csrf
@@ -180,10 +186,15 @@
                   name="rating"
                   value="{{ $i }}"
                   class="trade-chat__rating-input"
-                  {{ old('rating') == $i ? 'checked' : '' }}
+                  {{ (string) old('rating') === (string) $i ? 'checked' : '' }}
                   required
                 >
-                <label for="seller-rating-{{ $i }}" class="trade-chat__rating-star" aria-label="{{ $i }}点">★</label>
+                <label
+                  for="seller-rating-{{ $i }}"
+                  class="trade-chat__rating-star"
+                  aria-label="{{ $i }}点"
+                  title="{{ $i }}点"
+                >★</label>
               @endfor
             </div>
 
