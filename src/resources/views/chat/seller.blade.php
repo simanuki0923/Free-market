@@ -1,10 +1,27 @@
-@extends('layouts.app')
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('css')
-<link rel="stylesheet" href="{{ asset('css/chat-seller.css') }}">
-@endsection
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-@section('content')
+  <link rel="stylesheet" href="{{ asset('css/chat-seller.css') }}">
+  <title>取引チャット</title>
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <a href="{{ route('item') }}" class="header__logo">
+      <img src="{{ asset('img/logo.svg') }}" alt="COACHTECHロゴ">
+    </a>
+  </div>
+</header>
+
 <div class="trade-chat">
   <aside class="trade-chat__side">
     <div class="trade-chat__side-head">
@@ -72,31 +89,75 @@
           </div>
 
           <div class="trade-chat__message-content {{ $isMe ? 'is-mine' : 'is-theirs' }}">
-            <div class="trade-chat__bubble">
-              @if(!empty($message->body))
-                <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
-              @endif
+            {{-- 表示モード --}}
+            <div class="trade-chat__message-view" data-message-view="{{ $message->id }}">
+              <div class="trade-chat__bubble">
+                @if(!empty($message->body))
+                  <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
+                @endif
 
-              @if(!empty($message->image_url))
-                <div class="trade-chat__message-image">
-                  <img src="{{ $message->image_url }}" alt="送信画像">
+                @if(!empty($message->image_url))
+                  <div class="trade-chat__message-image">
+                    <img src="{{ $message->image_url }}" alt="送信画像">
+                  </div>
+                @endif
+              </div>
+
+              @if($isMe && !empty($message->id))
+                <div class="trade-chat__message-actions">
+                  <button
+                    type="button"
+                    class="trade-chat__action-link trade-chat__action-btn"
+                    data-edit-open="{{ $message->id }}"
+                  >
+                    編集
+                  </button>
+
+                  <form action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
+                        method="POST"
+                        onsubmit="return confirm('このメッセージを削除しますか？');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
+                      削除
+                    </button>
+                  </form>
                 </div>
               @endif
             </div>
 
+            {{-- 編集モード（自分のメッセージのみ） --}}
             @if($isMe && !empty($message->id))
-              <div class="trade-chat__message-actions">
-                <a href="{{ route('chat.message.edit', ['message' => $message->id]) }}" class="trade-chat__action-link">
-                  編集
-                </a>
-                <form action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
-                      method="POST"
-                      onsubmit="return confirm('このメッセージを削除しますか？');">
+              <div class="trade-chat__message-edit" data-message-edit="{{ $message->id }}" hidden>
+                <form
+                  action="{{ route('chat.message.update', ['message' => $message->id]) }}"
+                  method="POST"
+                  class="trade-chat__message-edit-form"
+                >
                   @csrf
-                  @method('DELETE')
-                  <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
-                    削除
-                  </button>
+                  @method('PATCH')
+
+                  <textarea
+                    name="body"
+                    class="trade-chat__message-edit-textarea"
+                    maxlength="400"
+                    rows="3"
+                    required
+                  >{{ old('body', $message->body ?? '') }}</textarea>
+
+                  <div class="trade-chat__message-edit-actions">
+                    <button
+                      type="button"
+                      class="trade-chat__action-link trade-chat__action-btn"
+                      data-edit-cancel="{{ $message->id }}"
+                    >
+                      キャンセル
+                    </button>
+
+                    <button type="submit" class="trade-chat__message-save-btn">
+                      保存
+                    </button>
+                  </div>
                 </form>
               </div>
             @endif
@@ -107,82 +168,129 @@
       @endforelse
     </section>
 
-    @if ($errors->any())
-      <div class="trade-chat__errors">
-        <ul>
-          @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
+    {{-- 入力エリア --}}
+    <footer class="trade-chat__composer">
+      {{-- バリデーションエラー表示 --}}
+      @if($errors->any())
+        <div class="trade-chat__errors">
+          @foreach($errors->all() as $error)
+            <p class="trade-chat__error">{{ $error }}</p>
           @endforeach
-        </ul>
+        </div>
+      @endif
+
+      @if(session('status'))
+        <div class="trade-chat__status">
+          {{ session('status') }}
+        </div>
+      @endif
+
+      <form action="{{ route('chat.message.store', ['transaction' => $transaction->id ?? 0]) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <input
+          class="trade-chat__input"
+          type="text"
+          name="body"
+          value="{{ old('body', $draftBody ?? '') }}"
+          placeholder="取引メッセージを記入してください"
+          autocomplete="off"
+          maxlength="400"
+        >
+
+        <label class="trade-chat__image-add">
+          <input type="file" name="image" accept=".png,.jpeg,image/png,image/jpeg">
+          <span>画像を追加</span>
+        </label>
+
+        <button type="submit" class="trade-chat__modal-submit" aria-label="送信">
+          <img src="{{ asset('img/inputbuttun.png') }}" alt="送信">
+        </button>
+      </form>
+    </footer>
+
+    {{-- 取引完了後の評価モーダル（購入者） --}}
+    @if(!empty($showRatingModal) && $showRatingModal === true)
+      <div class="trade-chat__modal-overlay" role="dialog" aria-modal="true" aria-label="取引完了">
+        <div class="trade-chat__modal">
+          <p class="trade-chat__modal-title">取引が完了しました。</p>
+          <p class="trade-chat__modal-text">今回の取引相手はどうでしたか？</p>
+
+          <form action="{{ route('chat.rate', ['transaction' => $transaction->id ?? 0]) }}" method="POST">
+            @csrf
+
+            <div class="trade-chat__rating" role="radiogroup" aria-label="評価">
+              @for($i = 5; $i >= 1; $i--)
+                <input
+                  type="radio"
+                  id="buyer-rating-{{ $i }}"
+                  name="rating"
+                  value="{{ $i }}"
+                  class="trade-chat__rating-input"
+                  {{ old('rating') == $i ? 'checked' : '' }}
+                  required
+                >
+                <label for="buyer-rating-{{ $i }}" class="trade-chat__rating-star" aria-label="{{ $i }}点">★</label>
+              @endfor
+            </div>
+
+            <div class="trade-chat__modal-actions">
+              <button type="submit" class="trade-chat__modal-submit-btn">送信する</button>
+            </div>
+          </form>
+        </div>
       </div>
     @endif
-
-    @if (session('status'))
-      <p class="trade-chat__status">{{ session('status') }}</p>
-    @endif
-
-    <section class="trade-chat__composer">
-      <form action="{{ route('chat.message.store', ['transaction' => $transaction->id]) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="trade-chat__composer-row">
-          <textarea
-            name="body"
-            class="trade-chat__textarea"
-            rows="3"
-            maxlength="400"
-            placeholder="取引メッセージを記入してください"
-          >{{ old('body', $draftBody ?? '') }}</textarea>
-        </div>
-
-        <div class="trade-chat__composer-actions">
-          <label class="trade-chat__file-label">
-            画像を追加
-            <input type="file" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
-          </label>
-
-          <div class="trade-chat__composer-buttons">
-            <button type="submit" class="trade-chat__send-btn" aria-label="送信">送信</button>
-          </div>
-        </div>
-      </form>
-
-      <form action="{{ route('chat.draft.save', ['transaction' => $transaction->id]) }}" method="POST" class="trade-chat__draft-form">
-        @csrf
-        <input type="hidden" name="body" value="{{ old('body', $draftBody ?? '') }}">
-        <button type="submit" class="trade-chat__draft-btn">下書き保存</button>
-      </form>
-    </section>
   </main>
 </div>
 
-@if(!empty($showRatingModal))
-  <div class="trade-chat__modal-backdrop" role="dialog" aria-modal="true" aria-label="取引評価">
-    <div class="trade-chat__modal">
-      <h2 class="trade-chat__modal-title">購入者が取引完了しました。</h2>
-      <p class="trade-chat__modal-subtitle">今回の取引相手を評価してください。</p>
+{{-- インライン編集切替JS（画面遷移なし） --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function closeAllEditors() {
+    document.querySelectorAll('[data-message-edit]').forEach(function (el) {
+      el.hidden = true;
+    });
+    document.querySelectorAll('[data-message-view]').forEach(function (el) {
+      el.hidden = false;
+    });
+  }
 
-      <form action="{{ route('chat.rate', ['transaction' => $transaction->id]) }}" method="POST">
-        @csrf
-        <div class="trade-chat__rating">
-          @for($i = 1; $i <= 5; $i++)
-            <input
-              type="radio"
-              id="seller-rating-{{ $i }}"
-              name="rating"
-              value="{{ $i }}"
-              {{ (int) old('rating', 5) === $i ? 'checked' : '' }}
-              required
-            >
-            <label for="seller-rating-{{ $i }}" class="trade-chat__rating-star" aria-label="{{ $i }}点">★</label>
-          @endfor
-        </div>
+  document.querySelectorAll('[data-edit-open]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const id = this.dataset.editOpen;
 
-        <div class="trade-chat__modal-actions">
-          <button type="submit" class="trade-chat__modal-submit-btn">送信する</button>
-        </div>
-      </form>
-    </div>
-  </div>
-@endif
-@endsection
+      // 他の編集中を閉じる（1件だけ編集にする）
+      closeAllEditors();
+
+      const view = document.querySelector('[data-message-view="' + id + '"]');
+      const edit = document.querySelector('[data-message-edit="' + id + '"]');
+
+      if (view) view.hidden = true;
+      if (edit) {
+        edit.hidden = false;
+        const textarea = edit.querySelector('textarea[name="body"]');
+        if (textarea) {
+          textarea.focus();
+          const len = textarea.value.length;
+          textarea.setSelectionRange(len, len);
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-edit-cancel]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const id = this.dataset.editCancel;
+      const view = document.querySelector('[data-message-view="' + id + '"]');
+      const edit = document.querySelector('[data-message-edit="' + id + '"]');
+
+      if (edit) edit.hidden = true;
+      if (view) view.hidden = false;
+    });
+  });
+});
+</script>
+
+</body>
+</html>

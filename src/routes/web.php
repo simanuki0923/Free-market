@@ -64,15 +64,12 @@ Route::middleware('auth')->group(function () {
         ->name('chat.seller');
 
     /**
-     * メッセージ送信 / 編集 / 削除
+     * メッセージ送信 / 編集（更新） / 削除
+     * ※ インライン編集化により chat.message.edit (GET) は不要
      */
     Route::post('/chat/{transaction}/message', [ChatPreviewController::class, 'storeMessage'])
         ->whereNumber('transaction')
         ->name('chat.message.store');
-
-    Route::get('/chat/message/{message}/edit', [ChatPreviewController::class, 'editMessage'])
-        ->whereNumber('message')
-        ->name('chat.message.edit');
 
     Route::patch('/chat/message/{message}', [ChatPreviewController::class, 'updateMessage'])
         ->whereNumber('message')
@@ -95,11 +92,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/{transaction}/complete', [ChatPreviewController::class, 'completeTransaction'])
         ->whereNumber('transaction')
         ->name('chat.complete');
-
-    // 互換ルート（古いbladeが chat.buyer.complete を参照しても動くようにする）
-    Route::post('/chat/{transaction}/buyer-complete', [ChatPreviewController::class, 'completeTransaction'])
-        ->whereNumber('transaction')
-        ->name('chat.buyer.complete');
 
     /**
      * 評価送信（購入者 / 出品者）

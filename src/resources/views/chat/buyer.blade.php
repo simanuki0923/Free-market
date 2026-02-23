@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{{ asset('css/chat-buyer.css') }}">
-  <title>取引チャット（購入者）</title>
+  <title>取引チャット</title>
 </head>
 <body>
 
@@ -89,7 +89,7 @@
         @endphp
 
         <div class="trade-chat__message-row {{ $isMe ? 'is-mine' : 'is-theirs' }}">
-          {{-- 名前＋アイコン（自分/相手で順番を分ける） --}}
+          {{-- 名前＋アイコン --}}
           <div class="trade-chat__message-head {{ $isMe ? 'is-mine' : 'is-theirs' }}">
             @if($isMe)
               <p class="trade-chat__message-name">{{ auth()->user()->name ?? 'ユーザー名' }}</p>
@@ -100,39 +100,79 @@
             @endif
           </div>
 
-          {{-- 吹き出し＋操作リンクをまとめる（CSS設計に合わせる） --}}
+          {{-- 吹き出し＋編集/削除 --}}
           <div class="trade-chat__message-content {{ $isMe ? 'is-mine' : 'is-theirs' }}">
-            <div class="trade-chat__bubble">
-              @if(!empty($message->body))
-                <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
-              @endif
+            {{-- 表示モード --}}
+            <div class="trade-chat__message-view" data-message-view="{{ $message->id }}">
+              <div class="trade-chat__bubble">
+                @if(!empty($message->body))
+                  <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
+                @endif
 
-              @if(!empty($message->image_url))
-                <div class="trade-chat__message-image">
-                  <img src="{{ $message->image_url }}" alt="送信画像">
+                @if(!empty($message->image_url))
+                  <div class="trade-chat__message-image">
+                    <img src="{{ $message->image_url }}" alt="送信画像">
+                  </div>
+                @endif
+              </div>
+
+              @if($isMe && !empty($message->id))
+                <div class="trade-chat__message-actions">
+                  <button
+                    type="button"
+                    class="trade-chat__action-link trade-chat__action-btn"
+                    data-edit-open="{{ $message->id }}"
+                  >
+                    編集
+                  </button>
+
+                  <form
+                    action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
+                    method="POST"
+                    onsubmit="return confirm('このメッセージを削除しますか？')"
+                  >
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
+                      削除
+                    </button>
+                  </form>
                 </div>
               @endif
             </div>
 
+            {{-- 編集モード（自分のメッセージのみ） --}}
             @if($isMe && !empty($message->id))
-              <div class="trade-chat__message-actions">
-                <a
-                  href="{{ route('chat.message.edit', ['message' => $message->id]) }}"
-                  class="trade-chat__action-link"
-                >
-                  編集
-                </a>
-
+              <div class="trade-chat__message-edit" data-message-edit="{{ $message->id }}" hidden>
                 <form
-                  action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
+                  action="{{ route('chat.message.update', ['message' => $message->id]) }}"
                   method="POST"
-                  onsubmit="return confirm('このメッセージを削除しますか？')"
+                  class="trade-chat__message-edit-form"
                 >
                   @csrf
-                  @method('DELETE')
-                  <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
-                    削除
-                  </button>
+                  @method('PATCH')
+
+                  <textarea
+                    name="body"
+                    class="trade-chat__message-edit-textarea"
+                    maxlength="400"
+                    rows="3"
+                    required
+                  >{{ old('body', $message->body ?? '') }}</textarea>
+
+                  <div class="trade-chat__message-edit-actions">
+                    <button
+                      type="button"
+                      class="trade-chat__action-link trade-chat__action-btn"
+                      data-edit-cancel="{{ $message->id }}"
+                    >
+                      キャンセル
+                    </button>
+
+                    <button type="submit" class="trade-chat__message-save-btn">
+                      保存
+                    </button>
+                  </div>
                 </form>
               </div>
             @endif
@@ -147,7 +187,7 @@
 
     {{-- 入力エリア --}}
     <footer class="trade-chat__composer">
-      {{-- バリデーションエラー表示（要件対応） --}}
+      {{-- バリデーションエラー表示 --}}
       @if($errors->any())
         <div class="trade-chat__errors">
           @foreach($errors->all() as $error)
@@ -220,6 +260,54 @@
     @endif
   </main>
 </div>
+
+{{-- インライン編集切替JS（画面遷移なし） --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function closeAllEditors() {
+    document.querySelectorAll('[data-message-edit]').forEach(function (el) {
+      el.hidden = true;
+    });
+    document.querySelectorAll('[data-message-view]').forEach(function (el) {
+      el.hidden = false;
+    });
+  }
+
+  document.querySelectorAll('[data-edit-open]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const id = this.dataset.editOpen;
+
+      // 他の編集中を閉じる（1件だけ編集にする）
+      closeAllEditors();
+
+      const view = document.querySelector('[data-message-view="' + id + '"]');
+      const edit = document.querySelector('[data-message-edit="' + id + '"]');
+
+      if (view) view.hidden = true;
+      if (edit) {
+        edit.hidden = false;
+        const textarea = edit.querySelector('textarea[name="body"]');
+        if (textarea) {
+          textarea.focus();
+          const len = textarea.value.length;
+          textarea.setSelectionRange(len, len);
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-edit-cancel]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const id = this.dataset.editCancel;
+      const view = document.querySelector('[data-message-view="' + id + '"]');
+      const edit = document.querySelector('[data-message-edit="' + id + '"]');
+
+      if (edit) edit.hidden = true;
+      if (view) view.hidden = false;
+    });
+  });
+});
+</script>
 
 </body>
 </html>
