@@ -1,4 +1,4 @@
-/* chat-seller.css */
+/* chat-buyer.css / chat-seller.css 共通 */
 
 /* =========================
    Figma Color Tokens
@@ -34,6 +34,8 @@ body {
     margin: 0;
     background: var(--c-white);
     color: var(--c-black);
+
+    /* 全体をInter優先 */
     font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
     font-weight: 400;
 }
@@ -66,7 +68,7 @@ select {
 
 .header__logo img {
     display: block;
-    height: 36px;
+    height: 36.01px;
     width: 370px;
 }
 
@@ -76,6 +78,7 @@ select {
 .trade-chat {
     width: 100%;
     height: calc(100vh - 68px);
+    /* ヘッダー分を引く */
     display: flex;
     background: var(--c-white);
     border-top: 1px solid var(--c-line);
@@ -91,7 +94,8 @@ select {
    Side (その他の取引)
 ========================= */
 .trade-chat__side {
-    width: 260px;
+    width: 259px;
+    height: 902px;
     background: var(--c-gray-500);
     color: var(--c-white);
     display: flex;
@@ -114,18 +118,20 @@ select {
 .trade-chat__side-list {
     padding: 10px 10px 14px;
     overflow: auto;
+
+    /* 商品名ボタンを縦に並べる */
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
+/* 商品名ボタンのみ表示パターン */
 .trade-chat__side-product {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 197px;
-    height: 40px;
+    min-height: 40px;
     background: var(--c-white);
     color: var(--c-black);
     text-decoration: none;
@@ -133,38 +139,27 @@ select {
     font-weight: 700;
     font-size: 24px;
     margin-left: 25px;
-    padding: 0 34px 0 10px;
-    /* バッジ分の余白 */
-}
-
-.trade-chat__side-product span:first-child {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    padding: 4px 8px;
+    position: relative;
 }
 
 .trade-chat__badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 5px;
-    border-radius: 999px;
-    background: #ff0000;
-    color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    line-height: 1;
+    min-width: 22px;
+    height: 22px;
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--c-red-500);
+    color: var(--c-white);
+    font-size: 12px;
     font-weight: 700;
-    border: 1px solid #fff;
+    line-height: 1;
 }
 
-/* 旧構造互換 */
+/* 旧構造互換（アイコン＋ユーザー名＋商品名） */
 .trade-chat__side-item {
     display: block;
     text-decoration: none;
@@ -246,6 +241,10 @@ select {
     min-width: 0;
 }
 
+.trade-chat__header-right {
+    flex: 0 0 auto;
+}
+
 .trade-chat__title {
     margin: 0;
     font-size: 36px;
@@ -258,13 +257,16 @@ select {
 .trade-chat__complete-btn {
     appearance: none;
     border: 0;
-    background: var(--c-red-500);
+    background: var(--c-red-300);
     color: var(--c-white);
     font-weight: 700;
     padding: 10px 16px;
     border-radius: 999px;
     cursor: pointer;
     font-size: 20px;
+    line-height: 1;
+    width: 172px;
+    height: 54px;
 }
 
 .trade-chat__complete-btn:hover {
@@ -281,8 +283,9 @@ select {
 }
 
 .trade-chat__avatar--sm {
-    width: 36px;
-    height: 36px;
+    /* 仕様寄せ: 20pxは大きすぎるので縮小 */
+    width: 60px;
+    height: 60px;
 }
 
 .trade-chat__avatar--md {
@@ -312,6 +315,7 @@ select {
     justify-content: center;
     background: var(--c-gray-300);
     margin-left: 50px;
+    overflow: hidden;
 }
 
 .trade-chat__product-image img {
@@ -332,6 +336,7 @@ select {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
 .trade-chat__product-name {
@@ -361,12 +366,18 @@ select {
     background: var(--c-white);
 }
 
+.trade-chat__message-empty p {
+    margin: 0;
+    color: var(--c-gray-700);
+    font-size: 14px;
+}
+
+/* ユーザ（自分）=右 / 他ユーザ=左 */
 .trade-chat__message-row {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 18px;
+    margin-bottom: 28px;
 }
 
 .trade-chat__message-row.is-theirs {
@@ -379,44 +390,82 @@ select {
     text-align: right;
 }
 
+/* 上段（名前＋アイコン）
+   吹き出し幅に合わせる */
 .trade-chat__message-head {
+    width: 460px;
+    max-width: 60vw;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    margin-bottom: 6px;
+    line-height: 1;
 }
 
+/* 相手（左）：アイコン → 名前 */
+.trade-chat__message-head.is-theirs,
 .trade-chat__message-row.is-theirs .trade-chat__message-head {
-    flex-direction: row;
     justify-content: flex-start;
+    flex-direction: row;
 }
 
+/* 自分（右）：名前 → アイコン（row-reverseは使わない） */
+.trade-chat__message-head.is-mine,
 .trade-chat__message-row.is-mine .trade-chat__message-head {
-    flex-direction: row-reverse;
     justify-content: flex-end;
+    flex-direction: row;
 }
 
+/* 名前 */
 .trade-chat__message-name {
     margin: 0;
     font-size: 20px;
     font-weight: 700;
+    line-height: 1.2;
     color: var(--c-black);
+    white-space: nowrap;
 }
 
+/* 吹き出し＋編集/削除のラッパー */
+.trade-chat__message-content {
+    width: 460px;
+    max-width: 60vw;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trade-chat__message-content.is-theirs,
+.trade-chat__message-row.is-theirs .trade-chat__message-content {
+    align-items: flex-start;
+}
+
+.trade-chat__message-content.is-mine,
+.trade-chat__message-row.is-mine .trade-chat__message-content {
+    align-items: flex-end;
+}
+
+/* 吹き出し */
 .trade-chat__bubble {
     background: var(--c-gray-300);
     border-radius: 4px;
-    padding: 12px 12px 10px;
-    width: 460px;
-    max-width: 60vw;
+    padding: 12px 14px;
+    width: 100%;
+    max-width: 100%;
 }
 
+/* メッセージ文字 */
 .trade-chat__message-text {
     margin: 0;
     font-size: 20px;
     color: var(--c-black);
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     font-weight: 700;
     text-align: center;
+    /* スクショ寄せ */
+    line-height: 1.4;
 }
 
 .trade-chat__message-image {
@@ -429,11 +478,19 @@ select {
     display: block;
 }
 
+/* 編集/削除（吹き出しの外に表示） */
 .trade-chat__message-actions {
+    width: 100%;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: flex-end;
-    font-size: 11px;
+    align-items: center;
+    margin-top: 2px;
+    line-height: 1;
+}
+
+.trade-chat__message-actions form {
+    margin: 0;
 }
 
 .trade-chat__message-actions a {
@@ -441,7 +498,12 @@ select {
     text-decoration: none;
     font-weight: 400;
     font-size: 15px;
-    line-height: 1.2;
+    line-height: 1;
+    margin-bottom: -2px;
+}
+
+.trade-chat__message-actions a:hover {
+    text-decoration: underline;
 }
 
 .trade-chat__message-actions form button {
@@ -452,7 +514,11 @@ select {
     color: var(--c-gray-900);
     font-weight: 400;
     font-size: 15px;
-    line-height: 1.2;
+    line-height: 1;
+}
+
+.trade-chat__message-actions form button:hover {
+    text-decoration: underline;
 }
 
 /* =========================
@@ -465,6 +531,25 @@ select {
     flex: 0 0 auto;
 }
 
+/* バリデーション/通知 */
+.trade-chat__errors {
+    margin-bottom: 8px;
+}
+
+.trade-chat__error {
+    margin: 0 0 4px;
+    color: #d33;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trade-chat__status {
+    margin-bottom: 8px;
+    color: #0a7a2f;
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .trade-chat__composer form {
     display: flex;
     align-items: center;
@@ -473,6 +558,7 @@ select {
 
 .trade-chat__input {
     flex: 1;
+    width: 937px;
     height: 44px;
     border: 1px solid var(--c-gray-700);
     border-radius: 4px;
@@ -482,6 +568,7 @@ select {
 }
 
 .trade-chat__image-add {
+    width: 143px;
     height: 44px;
     display: inline-flex;
     align-items: center;
@@ -515,6 +602,7 @@ select {
     justify-content: center;
     font-size: 0;
     line-height: 0;
+    flex: 0 0 auto;
 }
 
 .trade-chat__modal-submit img {
@@ -529,35 +617,13 @@ select {
 }
 
 /* =========================
-   Errors / Status
-========================= */
-.trade-chat__errors {
-    margin-bottom: 10px;
-}
-
-.trade-chat__error {
-    margin: 0 0 4px;
-    color: #d33;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.trade-chat__status {
-    margin-bottom: 10px;
-    color: #1a7f37;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-/* =========================
    Modal (評価) - Figma準拠
-   ※ buyer側に合わせて統一
 ========================= */
 .trade-chat__modal-overlay {
     position: fixed;
     inset: 0;
     background: transparent;
-    /* 暗転なし */
+    /* ← 暗転をなくす */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -584,7 +650,6 @@ select {
     padding: 0;
 }
 
-/* タイトル */
 .trade-chat__modal-title {
     margin: 0;
     padding: 21px 23px 20px;
@@ -593,10 +658,9 @@ select {
     line-height: 1.2;
     font-weight: 400;
     color: #000000;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid black;
 }
 
-/* 説明文 */
 .trade-chat__modal-text {
     margin: 0;
     padding: 44px 23px 0;
@@ -608,7 +672,7 @@ select {
     transform: translateY(-10px);
 }
 
-/* モーダル内エラー表示 */
+/* エラー表示（必要時） */
 .trade-chat__modal .trade-chat__errors {
     margin: 8px 23px 0;
 }
@@ -624,7 +688,7 @@ select {
 .trade-chat__rating {
     display: flex;
     flex-direction: row-reverse;
-    /* hover/checked制御用 */
+    /* hover/checked 制御用 */
     justify-content: flex-start;
     align-items: center;
     gap: 13px;
@@ -646,7 +710,7 @@ select {
     appearance: none !important;
 }
 
-/* 星ラベル */
+/* 星ラベル（100x100） */
 .trade-chat__rating-star {
     width: 100px;
     height: 100px;
@@ -674,7 +738,7 @@ select {
     color: #FFF048;
 }
 
-/* 旧クラス互換（.trade-chat__stars 構成でも動く） */
+/* 旧クラス互換（.trade-chat__stars 構成でも動作） */
 .trade-chat__stars {
     display: flex;
     flex-direction: row-reverse;
@@ -725,7 +789,7 @@ select {
 /* 下部帯 */
 .trade-chat__modal-actions {
     margin-top: 10px;
-    border-top: 1px solid #000;
+    border-top: 1px solid black;
     min-height: 72px;
     display: flex;
     justify-content: flex-end;
@@ -784,11 +848,42 @@ select {
     .trade-chat__product-image {
         width: 170px;
         height: 170px;
+        margin-left: 10px;
+    }
+
+    .trade-chat__product-name {
+        font-size: 30px;
+        margin-left: 10px;
+    }
+
+    .trade-chat__product-price {
+        font-size: 24px;
+        margin-left: 10px;
+    }
+
+    .trade-chat__message-head,
+    .trade-chat__message-content {
+        width: 420px;
+        max-width: 70vw;
+    }
+
+    .trade-chat__avatar--sm {
+        width: 28px;
+        height: 28px;
+        flex-basis: 28px;
+    }
+
+    .trade-chat__message-name {
+        font-size: 12px;
+    }
+
+    .trade-chat__message-text {
+        font-size: 14px;
     }
 
     .trade-chat__bubble {
-        width: 420px;
-        max-width: 70vw;
+        width: 100%;
+        max-width: 100%;
     }
 
     .trade-chat__modal-submit {
@@ -801,46 +896,13 @@ select {
         height: 54px;
     }
 
-    /* タブレット時のモーダル縮小 */
-    .trade-chat__modal {
-        width: min(598px, 92vw);
-        min-height: auto;
+    .trade-chat__image-add {
+        font-size: 14px;
+        padding: 0 10px;
     }
 
-    .trade-chat__modal-title {
-        font-size: 26px;
-        padding: 16px 18px 14px;
-    }
-
-    .trade-chat__modal-text {
+    .trade-chat__input {
         font-size: 16px;
-        padding: 24px 18px 0;
-        transform: none;
-    }
-
-    .trade-chat__rating {
-        margin: 12px 18px 0;
-        gap: 8px;
-        min-height: 64px;
-    }
-
-    .trade-chat__rating-star {
-        width: 56px;
-        height: 56px;
-        font-size: 48px;
-        margin-top: 0;
-    }
-
-    .trade-chat__modal-actions {
-        min-height: 56px;
-        padding: 8px 12px;
-    }
-
-    .trade-chat__modal-submit-btn {
-        width: 100px;
-        height: 40px;
-        font-size: 18px;
-        margin-top: 0;
     }
 }
 
@@ -854,7 +916,8 @@ select {
         height: 220px;
     }
 
-    .trade-chat__bubble {
+    .trade-chat__message-head,
+    .trade-chat__message-content {
         width: 520px;
         max-width: 60vw;
     }

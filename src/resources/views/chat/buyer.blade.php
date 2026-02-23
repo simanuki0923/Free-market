@@ -89,34 +89,54 @@
         @endphp
 
         <div class="trade-chat__message-row {{ $isMe ? 'is-mine' : 'is-theirs' }}">
-          <div class="trade-chat__message-head">
-            <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
-            <p class="trade-chat__message-name">
-              {{ $isMe ? (auth()->user()->name ?? 'ユーザー名') : ($partnerUser->name ?? 'ユーザー名') }}
-            </p>
-          </div>
-
-          <div class="trade-chat__bubble">
-            <p class="trade-chat__message-text">{!! nl2br(e($message->body ?? '')) !!}</p>
-
-            @if(!empty($message->image_url))
-              <div class="trade-chat__message-image">
-                <img src="{{ $message->image_url }}" alt="送信画像">
-              </div>
+          {{-- 名前＋アイコン（自分/相手で順番を分ける） --}}
+          <div class="trade-chat__message-head {{ $isMe ? 'is-mine' : 'is-theirs' }}">
+            @if($isMe)
+              <p class="trade-chat__message-name">{{ auth()->user()->name ?? 'ユーザー名' }}</p>
+              <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
+            @else
+              <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
+              <p class="trade-chat__message-name">{{ $partnerUser->name ?? 'ユーザー名' }}</p>
             @endif
           </div>
 
-          @if($isMe)
-            <div class="trade-chat__message-actions">
-              <a href="{{ route('chat.message.edit', ['message' => $message->id]) }}">編集</a>
+          {{-- 吹き出し＋操作リンクをまとめる（CSS設計に合わせる） --}}
+          <div class="trade-chat__message-content {{ $isMe ? 'is-mine' : 'is-theirs' }}">
+            <div class="trade-chat__bubble">
+              @if(!empty($message->body))
+                <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
+              @endif
 
-              <form action="{{ route('chat.message.destroy', ['message' => $message->id]) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit" onclick="return confirm('このメッセージを削除しますか？')">削除</button>
-              </form>
+              @if(!empty($message->image_url))
+                <div class="trade-chat__message-image">
+                  <img src="{{ $message->image_url }}" alt="送信画像">
+                </div>
+              @endif
             </div>
-          @endif
+
+            @if($isMe && !empty($message->id))
+              <div class="trade-chat__message-actions">
+                <a
+                  href="{{ route('chat.message.edit', ['message' => $message->id]) }}"
+                  class="trade-chat__action-link"
+                >
+                  編集
+                </a>
+
+                <form
+                  action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
+                  method="POST"
+                  onsubmit="return confirm('このメッセージを削除しますか？')"
+                >
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
+                    削除
+                  </button>
+                </form>
+              </div>
+            @endif
+          </div>
         </div>
       @empty
         <div class="trade-chat__message-empty">

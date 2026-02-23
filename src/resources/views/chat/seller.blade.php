@@ -1,39 +1,20 @@
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.app')
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+@section('css')
+<link rel="stylesheet" href="{{ asset('css/chat-seller.css') }}">
+@endsection
 
-  <link rel="stylesheet" href="{{ asset('css/chat-seller.css') }}">
-  <title>取引チャット（出品者）</title>
-</head>
-<body>
-
-<header class="header">
-  <div class="header__inner">
-    <a href="{{ route('item') }}" class="header__logo">
-      <img src="{{ asset('img/logo.svg') }}" alt="COACHTECHロゴ">
-    </a>
-  </div>
-</header>
-
+@section('content')
 <div class="trade-chat">
-  {{-- 左サイド（その他の取引） --}}
   <aside class="trade-chat__side">
     <div class="trade-chat__side-head">
-      <p class="trade-chat__side-title">その他の取引</p>
+      <h2 class="trade-chat__side-title">その他の取引</h2>
     </div>
 
     <div class="trade-chat__side-list">
       @forelse($otherTransactions ?? [] as $t)
         <a class="trade-chat__side-product" href="{{ $t->chat_url ?? route('chat.seller', ['transaction' => $t->id]) }}">
           <span>{{ $t->product_name ?? '商品名' }}</span>
-
           @if(($t->unread_messages_count ?? 0) > 0)
             <span class="trade-chat__badge">{{ $t->unread_messages_count }}</span>
           @endif
@@ -44,9 +25,7 @@
     </div>
   </aside>
 
-  {{-- メイン --}}
   <main class="trade-chat__main">
-    {{-- ヘッダー --}}
     <header class="trade-chat__header">
       <div class="trade-chat__header-left">
         <div class="trade-chat__avatar trade-chat__avatar--md"></div>
@@ -54,12 +33,11 @@
           「{{ $partnerUser->name ?? 'ユーザー名' }}」さんとの取引画面
         </h1>
       </div>
-
-      {{-- 出品者側は完了ボタンを表示しない（購入者が完了するため） --}}
-      <div class="trade-chat__header-right"></div>
+      <div class="trade-chat__header-right">
+        {{-- seller側は購入者が完了処理を行う --}}
+      </div>
     </header>
 
-    {{-- 商品情報 --}}
     <section class="trade-chat__product">
       <div class="trade-chat__product-image">
         @if(!empty($product) && !empty($product->image_url))
@@ -75,7 +53,6 @@
       </div>
     </section>
 
-    {{-- チャット本文 --}}
     <section class="trade-chat__messages" aria-label="チャットメッセージ">
       @forelse($messages ?? [] as $message)
         @php
@@ -84,129 +61,128 @@
         @endphp
 
         <div class="trade-chat__message-row {{ $isMe ? 'is-mine' : 'is-theirs' }}">
-          <div class="trade-chat__message-head">
-            <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
-            <p class="trade-chat__message-name">
-              {{ $isMe ? (auth()->user()->name ?? 'ユーザー名') : ($partnerUser->name ?? 'ユーザー名') }}
-            </p>
-          </div>
-
-          <div class="trade-chat__bubble">
-            <p class="trade-chat__message-text">{!! nl2br(e($message->body ?? '')) !!}</p>
-
-            @if(!empty($message->image_url))
-              <div class="trade-chat__message-image">
-                <img src="{{ $message->image_url }}" alt="送信画像">
-              </div>
+          <div class="trade-chat__message-head {{ $isMe ? 'is-mine' : 'is-theirs' }}">
+            @if($isMe)
+              <p class="trade-chat__message-name">{{ auth()->user()->name ?? 'ユーザー名' }}</p>
+              <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
+            @else
+              <div class="trade-chat__avatar trade-chat__avatar--sm"></div>
+              <p class="trade-chat__message-name">{{ $partnerUser->name ?? 'ユーザー名' }}</p>
             @endif
           </div>
 
-          {{-- 編集/削除（自分メッセージのみ） --}}
-          @if($isMe)
-            <div class="trade-chat__message-actions">
-              <a href="{{ route('chat.message.edit', ['message' => $message->id]) }}">編集</a>
+          <div class="trade-chat__message-content {{ $isMe ? 'is-mine' : 'is-theirs' }}">
+            <div class="trade-chat__bubble">
+              @if(!empty($message->body))
+                <p class="trade-chat__message-text">{!! nl2br(e($message->body)) !!}</p>
+              @endif
 
-              <form action="{{ route('chat.message.destroy', ['message' => $message->id]) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit" onclick="return confirm('このメッセージを削除しますか？')">削除</button>
-              </form>
+              @if(!empty($message->image_url))
+                <div class="trade-chat__message-image">
+                  <img src="{{ $message->image_url }}" alt="送信画像">
+                </div>
+              @endif
             </div>
-          @endif
+
+            @if($isMe && !empty($message->id))
+              <div class="trade-chat__message-actions">
+                <a href="{{ route('chat.message.edit', ['message' => $message->id]) }}" class="trade-chat__action-link">
+                  編集
+                </a>
+                <form action="{{ route('chat.message.destroy', ['message' => $message->id]) }}"
+                      method="POST"
+                      onsubmit="return confirm('このメッセージを削除しますか？');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="trade-chat__action-link trade-chat__action-link--danger">
+                    削除
+                  </button>
+                </form>
+              </div>
+            @endif
+          </div>
         </div>
       @empty
-        <div class="trade-chat__message-empty">
-          <p>まだメッセージはありません。</p>
-        </div>
+        <p class="trade-chat__empty">まだメッセージはありません。</p>
       @endforelse
     </section>
 
-    {{-- 入力エリア --}}
-    <footer class="trade-chat__composer">
-      {{-- バリデーションエラー表示 --}}
-      @if($errors->any())
-        <div class="trade-chat__errors">
-          @foreach($errors->all() as $error)
-            <p class="trade-chat__error">{{ $error }}</p>
+    @if ($errors->any())
+      <div class="trade-chat__errors">
+        <ul>
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
           @endforeach
-        </div>
-      @endif
-
-      @if(session('status'))
-        <div class="trade-chat__status">
-          {{ session('status') }}
-        </div>
-      @endif
-
-      <form action="{{ route('chat.message.store', ['transaction' => $transaction->id ?? 0]) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <input
-          class="trade-chat__input"
-          type="text"
-          name="body"
-          value="{{ old('body', $draftBody ?? '') }}"
-          placeholder="取引メッセージを記入してください"
-          autocomplete="off"
-          maxlength="400"
-        >
-
-        <label class="trade-chat__image-add">
-          <input type="file" name="image" accept=".png,.jpeg,image/png,image/jpeg">
-          <span>画像を追加</span>
-        </label>
-
-        <button type="submit" class="trade-chat__modal-submit" aria-label="送信">
-          <img src="{{ asset('img/inputbuttun.png') }}" alt="送信">
-        </button>
-      </form>
-    </footer>
-
-    {{-- 取引完了後の評価モーダル（出品者） --}}
-    @if(!empty($showRatingModal) && $showRatingModal === true)
-      <div class="trade-chat__modal-overlay" role="dialog" aria-modal="true" aria-labelledby="seller-rating-modal-title">
-        <div class="trade-chat__modal">
-          <p id="seller-rating-modal-title" class="trade-chat__modal-title">取引が完了しました。</p>
-          <p class="trade-chat__modal-text">今回の取引相手はどうでしたか？</p>
-
-          @if($errors->has('rating'))
-            <div class="trade-chat__errors" aria-live="polite">
-              <p class="trade-chat__error">{{ $errors->first('rating') }}</p>
-            </div>
-          @endif
-
-          <form action="{{ route('chat.rate', ['transaction' => $transaction->id ?? 0]) }}" method="POST">
-            @csrf
-
-            <div class="trade-chat__rating" role="radiogroup" aria-label="評価">
-              @for($i = 5; $i >= 1; $i--)
-                <input
-                  type="radio"
-                  id="seller-rating-{{ $i }}"
-                  name="rating"
-                  value="{{ $i }}"
-                  class="trade-chat__rating-input"
-                  {{ (string) old('rating') === (string) $i ? 'checked' : '' }}
-                  required
-                >
-                <label
-                  for="seller-rating-{{ $i }}"
-                  class="trade-chat__rating-star"
-                  aria-label="{{ $i }}点"
-                  title="{{ $i }}点"
-                >★</label>
-              @endfor
-            </div>
-
-            <div class="trade-chat__modal-actions">
-              <button type="submit" class="trade-chat__modal-submit-btn">送信する</button>
-            </div>
-          </form>
-        </div>
+        </ul>
       </div>
     @endif
+
+    @if (session('status'))
+      <p class="trade-chat__status">{{ session('status') }}</p>
+    @endif
+
+    <section class="trade-chat__composer">
+      <form action="{{ route('chat.message.store', ['transaction' => $transaction->id]) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <div class="trade-chat__composer-row">
+          <textarea
+            name="body"
+            class="trade-chat__textarea"
+            rows="3"
+            maxlength="400"
+            placeholder="取引メッセージを記入してください"
+          >{{ old('body', $draftBody ?? '') }}</textarea>
+        </div>
+
+        <div class="trade-chat__composer-actions">
+          <label class="trade-chat__file-label">
+            画像を追加
+            <input type="file" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
+          </label>
+
+          <div class="trade-chat__composer-buttons">
+            <button type="submit" class="trade-chat__send-btn" aria-label="送信">送信</button>
+          </div>
+        </div>
+      </form>
+
+      <form action="{{ route('chat.draft.save', ['transaction' => $transaction->id]) }}" method="POST" class="trade-chat__draft-form">
+        @csrf
+        <input type="hidden" name="body" value="{{ old('body', $draftBody ?? '') }}">
+        <button type="submit" class="trade-chat__draft-btn">下書き保存</button>
+      </form>
+    </section>
   </main>
 </div>
 
-</body>
-</html>
+@if(!empty($showRatingModal))
+  <div class="trade-chat__modal-backdrop" role="dialog" aria-modal="true" aria-label="取引評価">
+    <div class="trade-chat__modal">
+      <h2 class="trade-chat__modal-title">購入者が取引完了しました。</h2>
+      <p class="trade-chat__modal-subtitle">今回の取引相手を評価してください。</p>
+
+      <form action="{{ route('chat.rate', ['transaction' => $transaction->id]) }}" method="POST">
+        @csrf
+        <div class="trade-chat__rating">
+          @for($i = 1; $i <= 5; $i++)
+            <input
+              type="radio"
+              id="seller-rating-{{ $i }}"
+              name="rating"
+              value="{{ $i }}"
+              {{ (int) old('rating', 5) === $i ? 'checked' : '' }}
+              required
+            >
+            <label for="seller-rating-{{ $i }}" class="trade-chat__rating-star" aria-label="{{ $i }}点">★</label>
+          @endfor
+        </div>
+
+        <div class="trade-chat__modal-actions">
+          <button type="submit" class="trade-chat__modal-submit-btn">送信する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+@endif
+@endsection
