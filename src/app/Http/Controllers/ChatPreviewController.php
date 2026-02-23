@@ -41,7 +41,6 @@ class ChatPreviewController extends Controller
         $user = $request->user();
         $this->authorizeParticipant($transaction);
 
-        // 必要な関連を読み込み
         $transaction->loadMissing([
             'product',
             'buyer',
@@ -50,54 +49,54 @@ class ChatPreviewController extends Controller
             'ratings',
         ]);
 
-        // 既読化（相手メッセージを既読）
+        // 相手メッセージを既読化
         $this->markMessagesAsRead($transaction, (int) $user->id);
 
-        // 相手ユーザー
         $partnerUser = $screenRole === 'buyer'
             ? $transaction->seller
             : $transaction->buyer;
 
-        // 他の取引一覧（サイドバー）
-        // ※ buyer_completed を出品者側には残す（評価導線）
+        // サイドバー用の他取引一覧
         $otherTransactions = Transaction::query()
             ->with(['product'])
             ->withUnreadCountFor((int) $user->id)
-            ->where(function ($q) use ($user) {
-                $q->where('buyer_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('buyer_id', $user->id)
                     ->orWhere('seller_id', $user->id);
             })
             ->whereKeyNot($transaction->id)
             ->orderByDesc('updated_at')
             ->get()
-            ->filter(function (Transaction $t) use ($user) {
-                // completed は除外
-                if ($t->status === 'completed') {
+            ->filter(function (Transaction $targetTransaction) use ($user) {
+                if ($targetTransaction->status === 'completed') {
                     return false;
                 }
 
-                $isBuyer = (int) $t->buyer_id === (int) $user->id;
-                $isSeller = (int) $t->seller_id === (int) $user->id;
+                $isBuyer = (int) $targetTransaction->buyer_id === (int) $user->id;
+                $isSeller = (int) $targetTransaction->seller_id === (int) $user->id;
 
                 // 購入者側：buyer_completed は取引中から除外
-                if ($isBuyer && $t->status === 'buyer_completed') {
+                if ($isBuyer && $targetTransaction->status === 'buyer_completed') {
                     return false;
                 }
 
                 // 出品者側：buyer_completed は評価導線として残す
-                if ($isSeller && in_array($t->status, ['ongoing', 'trading', 'buyer_completed'], true)) {
+                if (
+                    $isSeller
+                    && in_array($targetTransaction->status, ['ongoing', 'trading', 'buyer_completed'], true)
+                ) {
                     return true;
                 }
 
-                return in_array($t->status, ['ongoing', 'trading'], true);
+                return in_array($targetTransaction->status, ['ongoing', 'trading'], true);
             })
-            ->map(function (Transaction $t) use ($user) {
-                $t->product_name = $t->product?->name ?? '商品名';
-                $t->chat_url = ((int) $t->seller_id === (int) $user->id)
-                    ? route('chat.seller', ['transaction' => $t->id])
-                    : route('chat.buyer', ['transaction' => $t->id]);
+            ->map(function (Transaction $targetTransaction) use ($user) {
+                $targetTransaction->product_name = $targetTransaction->product?->name ?? '商品名';
+                $targetTransaction->chat_url = ((int) $targetTransaction->seller_id === (int) $user->id)
+                    ? route('chat.seller', ['transaction' => $targetTransaction->id])
+                    : route('chat.buyer', ['transaction' => $targetTransaction->id]);
 
-                return $t;
+                return $targetTransaction;
             })
             ->values();
 
@@ -109,19 +108,18 @@ class ChatPreviewController extends Controller
         ];
 
         // Blade互換 messages
-        $messages = $transaction->messages->map(function (ChatMessage $m) {
+        $messages = $transaction->messages->map(function (ChatMessage $message) {
             return (object) [
-                'id'         => $m->id,
-                'user_id'    => $m->user_id,
-                'body'       => $m->body,
-                'image_url'  => $m->image_url ?? null,
-                'created_at' => $m->created_at,
+                'id'         => $message->id,
+                'user_id'    => $message->user_id,
+                'body'       => $message->body,
+                'image_url'  => $this->resolveChatMessageImageUrl($message),
+                'created_at' => $message->created_at,
+                'edited_at'  => $message->edited_at ?? null,
             ];
         });
 
-        // --- 評価モーダル表示判定（重要） ---
-        // buyer: complete押下後の ?rate=1 で表示
-        // seller: 購入者完了後 + 未評価ならチャット表示時に自動表示
+        // 評価モーダル表示判定
         $alreadyRatedByMe = $transaction->ratings()
             ->where('rater_user_id', $user->id)
             ->exists();
@@ -173,15 +171,14 @@ class ChatPreviewController extends Controller
         ]);
 
         $body = trim((string) ($validated['body'] ?? ''));
-        $imageUrl = null;
+        $imagePath = null;
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('chat-images', 'public');
-            $imageUrl = Storage::disk('public')->url($path);
+            $imagePath = $request->file('image')->store('chat-images', 'public');
         }
 
         // 空白だけ送信対策（最終防御）
-        if ($body === '' && $imageUrl === null) {
+        if ($body === '' && $imagePath === null) {
             return back()
                 ->withErrors(['body' => '本文または画像を入力してください。'])
                 ->withInput();
@@ -191,23 +188,131 @@ class ChatPreviewController extends Controller
             'transaction_id' => (int) $transaction->id,
             'user_id'        => (int) $user->id,
             'body'           => $body !== '' ? $body : null,
-            'image_url'      => $imageUrl,
+            'image_path'     => $imagePath, // DB定義に合わせる
         ]);
 
         // 下書きクリア
         $request->session()->forget($this->draftSessionKey((int) $transaction->id));
 
-        // 一覧の並び順用
-        $transaction->touch();
+        // 一覧の並び順更新
+        $transaction->update([
+            'last_message_at' => now(),
+        ]);
 
-        // 送信後は自分の役割に応じたチャット画面へ戻す
-        $routeName = ((int) $transaction->buyer_id === (int) $user->id)
-            ? 'chat.buyer'
-            : 'chat.seller';
-
-        return redirect()
-            ->route($routeName, ['transaction' => $transaction->id])
+        return $this->redirectToChatByUserRole($transaction, (int) $user->id)
             ->with('status', 'メッセージを送信しました。');
+    }
+
+    /**
+     * 本文下書き保存（本文のみ）
+     */
+    public function saveDraft(Request $request, Transaction $transaction): RedirectResponse
+    {
+        $user = $request->user();
+        $this->authorizeParticipant($transaction);
+
+        $validated = $request->validate([
+            'body' => ['nullable', 'string', 'max:400'],
+        ], [
+            'body.max' => '本文は400文字以内で入力してください。',
+        ]);
+
+        $draftBody = (string) ($validated['body'] ?? '');
+        $request->session()->put($this->draftSessionKey((int) $transaction->id), $draftBody);
+
+        return $this->redirectToChatByUserRole($transaction, (int) $user->id)
+            ->with('status', '下書きを保存しました。');
+    }
+
+    /**
+     * メッセージ編集画面
+     */
+    public function editMessage(Request $request, ChatMessage $message)
+    {
+        $transaction = $message->transaction()->firstOrFail();
+        $this->authorizeParticipant($transaction);
+        $this->authorizeMessageOwner($message, (int) $request->user()->id);
+
+        $transaction->loadMissing(['buyer', 'seller', 'product']);
+        $message->loadMissing('user');
+
+        // 必要なら専用viewに変更（chat.message-edit など）
+        return view('chat.message-edit', [
+            'transaction' => $transaction,
+            'message'     => $message,
+            'myId'        => (int) $request->user()->id,
+        ]);
+    }
+
+    /**
+     * メッセージ更新
+     * - 本文のみ更新（画像差し替え要件がない前提）
+     */
+    public function updateMessage(Request $request, ChatMessage $message): RedirectResponse
+    {
+        $transaction = $message->transaction()->firstOrFail();
+        $this->authorizeParticipant($transaction);
+        $this->authorizeMessageOwner($message, (int) $request->user()->id);
+
+        $validated = $request->validate([
+            'body' => ['required', 'string', 'max:400'],
+        ], [
+            'body.required' => '本文を入力してください。',
+            'body.max'      => '本文は400文字以内で入力してください。',
+        ]);
+
+        $newBody = trim((string) $validated['body']);
+
+        if ($newBody === '') {
+            return back()
+                ->withErrors(['body' => '本文を入力してください。'])
+                ->withInput();
+        }
+
+        $message->update([
+            'body'      => $newBody,
+            'edited_at' => now(),
+        ]);
+
+        $transaction->update([
+            'last_message_at' => now(),
+        ]);
+
+        return $this->redirectToChatByUserRole($transaction, (int) $request->user()->id)
+            ->with('status', 'メッセージを更新しました。');
+    }
+
+    /**
+     * メッセージ削除
+     */
+    public function destroyMessage(Request $request, ChatMessage $message): RedirectResponse
+    {
+        $transaction = $message->transaction()->firstOrFail();
+        $this->authorizeParticipant($transaction);
+        $this->authorizeMessageOwner($message, (int) $request->user()->id);
+
+        // 画像があればストレージ削除（public配下のみ）
+        $imagePath = $message->image_path ?? null;
+        if (!empty($imagePath) && !str_starts_with($imagePath, 'http://') && !str_starts_with($imagePath, 'https://')) {
+            try {
+                Storage::disk('public')->delete(ltrim($imagePath, '/'));
+            } catch (\Throwable $e) {
+                Log::warning('チャット画像削除失敗', [
+                    'chat_message_id' => $message->id,
+                    'image_path'      => $imagePath,
+                    'error'           => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $message->delete();
+
+        $transaction->update([
+            'last_message_at' => now(),
+        ]);
+
+        return $this->redirectToChatByUserRole($transaction, (int) $request->user()->id)
+            ->with('status', 'メッセージを削除しました。');
     }
 
     /**
@@ -272,15 +377,11 @@ class ChatPreviewController extends Controller
         $buyerId = (int) ($transaction->buyer_id ?? 0);
         $sellerId = (int) ($transaction->seller_id ?? 0);
 
-        // 念のため当事者チェック（authorizeParticipant済みだが明示）
         if (!in_array($myId, [$buyerId, $sellerId], true)) {
             abort(403, 'この取引を評価できません。');
         }
 
-        // 評価値
         $rating = (int) $request->input('rating');
-
-        // 評価対象（相手）
         $rateeUserId = ($myId === $buyerId) ? $sellerId : $buyerId;
 
         if ($rateeUserId <= 0) {
@@ -290,21 +391,18 @@ class ChatPreviewController extends Controller
         }
 
         DB::transaction(function () use ($transaction, $myId, $rateeUserId, $rating, $buyerId, $sellerId) {
-            // 二重評価防止（updateOrCreate）
-            // ※ ratee_user_id は NOT NULL のため必須
             TransactionRating::updateOrCreate(
                 [
                     'transaction_id' => (int) $transaction->id,
                     'rater_user_id'  => $myId,
                 ],
                 [
-                    'ratee_user_id'  => $rateeUserId,
-                    'rating'         => $rating,
-                    'rated_at'       => now(), // モデルにrated_atがあるので記録しておく
+                    'ratee_user_id' => $rateeUserId,
+                    'rating'        => $rating,
+                    'rated_at'      => now(),
                 ]
             );
 
-            // 両者評価が揃ったら completed にする
             $ratedUserIds = TransactionRating::query()
                 ->where('transaction_id', (int) $transaction->id)
                 ->pluck('rater_user_id')
@@ -319,7 +417,6 @@ class ChatPreviewController extends Controller
                     'status' => 'completed',
                 ];
 
-                // 初回のみ completed_at を入れる（上書きしない）
                 if (empty($transaction->completed_at)) {
                     $updatePayload['completed_at'] = now();
                 }
@@ -328,11 +425,13 @@ class ChatPreviewController extends Controller
             }
         });
 
-        // 要件：評価送信後は商品一覧画面へ
         return redirect()->route('item')
             ->with('status', '評価を送信しました。');
     }
 
+    /**
+     * 相手メッセージを既読化
+     */
     private function markMessagesAsRead(Transaction $transaction, int $userId): void
     {
         $messageIds = $transaction->messages()
@@ -352,6 +451,9 @@ class ChatPreviewController extends Controller
         }
     }
 
+    /**
+     * 取引参加者チェック
+     */
     private function authorizeParticipant(Transaction $transaction): void
     {
         $userId = auth()->id();
@@ -360,13 +462,63 @@ class ChatPreviewController extends Controller
             abort(401);
         }
 
-        if ((int) $transaction->seller_id !== (int) $userId && (int) $transaction->buyer_id !== (int) $userId) {
+        if (
+            (int) $transaction->seller_id !== (int) $userId
+            && (int) $transaction->buyer_id !== (int) $userId
+        ) {
             abort(403, 'この取引にアクセスできません。');
         }
     }
 
+    /**
+     * メッセージ所有者チェック（編集/削除は送信者のみ）
+     */
+    private function authorizeMessageOwner(ChatMessage $message, int $userId): void
+    {
+        if ((int) $message->user_id !== $userId) {
+            abort(403, 'このメッセージを操作できません。');
+        }
+    }
+
+    /**
+     * 役割に応じてチャット画面へ戻す
+     */
+    private function redirectToChatByUserRole(Transaction $transaction, int $userId): RedirectResponse
+    {
+        $routeName = ((int) $transaction->buyer_id === $userId)
+            ? 'chat.buyer'
+            : 'chat.seller';
+
+        return redirect()->route($routeName, [
+            'transaction' => $transaction->id,
+        ]);
+    }
+
+    /**
+     * 下書きセッションキー
+     */
     private function draftSessionKey(int $transactionId): string
     {
         return "chat_draft_transaction_{$transactionId}";
+    }
+
+    /**
+     * chat_messages の画像URL解決
+     * - DBは image_path 前提
+     * - 旧実装の image_url カラム/アクセサにも互換対応
+     */
+    private function resolveChatMessageImageUrl(ChatMessage $message): ?string
+    {
+        $rawPath = $message->image_url ?? $message->image_path ?? null;
+
+        if (empty($rawPath)) {
+            return null;
+        }
+
+        if (str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://')) {
+            return $rawPath;
+        }
+
+        return Storage::disk('public')->url(ltrim($rawPath, '/'));
     }
 }

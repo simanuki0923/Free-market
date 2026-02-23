@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatMessage extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'transaction_id',
@@ -21,6 +23,10 @@ class ChatMessage extends Model
 
     protected $casts = [
         'edited_at' => 'datetime',
+    ];
+
+    protected $appends = [
+        'image_url',
     ];
 
     public function transaction(): BelongsTo
@@ -35,16 +41,19 @@ class ChatMessage extends Model
 
     public function reads(): HasMany
     {
-        return $this->hasMany(ChatMessageRead::class);
+        return $this->hasMany(ChatMessageRead::class, 'chat_message_id');
     }
 
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image_path) {
+        if (empty($this->image_path)) {
             return null;
         }
 
-        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
+        if (
+            str_starts_with($this->image_path, 'http://')
+            || str_starts_with($this->image_path, 'https://')
+        ) {
             return $this->image_path;
         }
 
