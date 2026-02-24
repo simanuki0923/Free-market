@@ -23,12 +23,16 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 - email: demo-idle-user@example.com
 - password: password
 
+---
+
 ### Dockerビルド
 ```
 - git clone https://github.com/simanuki0923/Free-market.git
 - cd Free-market
 - docker compose up -d --build
 ```
+
+---
 
 ### Laravel環境構築
 
@@ -46,6 +50,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 - exit
 ```
 
+---
+
 ### .env設定設定変更
 ```
 - code .
@@ -53,6 +59,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 - QUEUE_CONNECTION=sync
 - CACHE_STORE=file
 ```
+
+---
 
 ## 使用技術
 - docker
@@ -63,6 +71,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 - fortify1.30
 - stripe15.8
 - mailtrap
+
+---
 
 ## テーブル仕様
 
