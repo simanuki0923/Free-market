@@ -143,8 +143,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| user_id | bigint |  |  | ○ | users.id |
-| product_id | bigint |  |  | ○ | products.id |
+| user_id | bigint |  | UNIQUE | ○ | users.id |
+| product_id | bigint |  | UNIQUE | ○ | products.id |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
 | (複合) user_id, product_id |  |  | UNIQUE |  |  |
@@ -190,8 +190,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| user_id | bigint |  |  | ○ | users.id |
-| sell_id | bigint |  |  | ○ | sells.id |
+| user_id | bigint |  | UNIQUE | ○ | users.id |
+| sell_id | bigint |  | UNIQUE | ○ | sells.id |
 | amount | unsignedInteger |  |  | ○ |  |
 | payment_method | string(50) |  |  | ○ |  |
 | purchased_at | timestamp default current |  |  | ○ |  |
@@ -256,8 +256,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| chat_message_id | bigint |  |  | ○ | chat_messages.id |
-| user_id | bigint |  |  | ○ | users.id |
+| chat_message_id | bigint |  | UNIQUE | ○ | chat_messages.id |
+| user_id | bigint |  | UNIQUE | ○ | users.id |
 | read_at | timestamp |  |  |  |  |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
@@ -270,8 +270,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| transaction_id | bigint |  |  | ○ | transactions.id |
-| rater_user_id | bigint |  |  | ○ | users.id |
+| transaction_id | bigint |  | UNIQUE | ○ | transactions.id |
+| rater_user_id | bigint |  | UNIQUE | ○ | users.id |
 | ratee_user_id | bigint |  |  | ○ | users.id |
 | rating | unsignedTinyInteger |  |  | ○ |  |
 | comment | string(500) |  |  |  |  |
