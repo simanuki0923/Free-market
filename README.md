@@ -281,10 +281,3 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 ![alt text](img/取引チャットER図.png)
 
 ---
-
-## PHPUnitテスト
-
-```
-docker compose exec php bash
-php artisan test tests/Feature
-```
