@@ -12,13 +12,6 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 
 ---
 
-### Dockerビルド
-- git clone https://github.com/simanuki0923/Free-market.git
-- cd Free-market
-- docker compose up -d --build
-
----
-
 ## テストアカウント
 - name: デモ出品者A（1-5）
 - email: demo-seller-a@example.com
@@ -30,8 +23,8 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 - email: demo-idle-user@example.com
 - password: password
 
-```
 ### Dockerビルド
+```
 - git clone https://github.com/simanuki0923/Free-market.git
 - cd Free-market
 - docker compose up -d --build
