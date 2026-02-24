@@ -82,7 +82,7 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
 | name | string |  |  | ○ |  |
-| email | string |  | UNIQUE | ○ |  |
+| email | string |  | ○ | ○ |  |
 | email_verified_at | timestamp |  |  |  |  |
 | password | string |  |  | ○ |  |
 | remember_token | string(100) |  |  |  |  |
@@ -97,7 +97,7 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
 | name | string |  |  | ○ |  |
-| slug | string |  | UNIQUE | ○ |  |
+| slug | string |  | ○ | ○ |  |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
 
@@ -108,7 +108,7 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| user_id | bigint |  | UNIQUE | ○ | users.id |
+| user_id | bigint |  | ○ | ○ | users.id |
 | postal_code | string(16) |  |  |  |  |
 | address1 | string |  |  |  |  |
 | address2 | string |  |  |  |  |
@@ -143,11 +143,10 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| user_id | bigint |  | UNIQUE | ○ | users.id |
-| product_id | bigint |  | UNIQUE | ○ | products.id |
+| user_id | bigint |  | ○ | ○ | users.id |
+| product_id | bigint |  | ○ | ○ | products.id |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
-| (複合) user_id, product_id |  |  | UNIQUE |  |  |
 
 ---
 
@@ -190,14 +189,13 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| user_id | bigint |  | UNIQUE | ○ | users.id |
-| sell_id | bigint |  | UNIQUE | ○ | sells.id |
+| user_id | bigint |  | ○ | ○ | users.id |
+| sell_id | bigint |  | ○ | ○ | sells.id |
 | amount | unsignedInteger |  |  | ○ |  |
 | payment_method | string(50) |  |  | ○ |  |
 | purchased_at | timestamp default current |  |  | ○ |  |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
-| (複合) user_id, sell_id |  |  | UNIQUE |  |  |
 
 ---
 
@@ -221,7 +219,7 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| purchase_id | bigint |  | UNIQUE | ○ | purchases.id |
+| purchase_id | bigint |  | ○ | ○ | purchases.id |
 | sell_id | bigint |  |  | ○ | sells.id |
 | product_id | bigint |  |  | ○ | products.id |
 | seller_id | bigint |  |  | ○ | users.id |
@@ -256,12 +254,11 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| chat_message_id | bigint |  | UNIQUE | ○ | chat_messages.id |
-| user_id | bigint |  | UNIQUE | ○ | users.id |
+| chat_message_id | bigint |  | ○ | ○ | chat_messages.id |
+| user_id | bigint |  | ○ | ○ | users.id |
 | read_at | timestamp |  |  |  |  |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
-| (複合) chat_message_id, user_id |  |  | UNIQUE |  |  |
 
 ---
 
@@ -270,15 +267,14 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 | カラム名 | 型 | primary key | unique key | not null | foreign key |
 |---|---|---|---|---|---|
 | id | bigint | PK |  | ○ |  |
-| transaction_id | bigint |  | UNIQUE | ○ | transactions.id |
-| rater_user_id | bigint |  | UNIQUE | ○ | users.id |
+| transaction_id | bigint |  | ○ | ○ | transactions.id |
+| rater_user_id | bigint |  | ○ | ○ | users.id |
 | ratee_user_id | bigint |  |  | ○ | users.id |
 | rating | unsignedTinyInteger |  |  | ○ |  |
 | comment | string(500) |  |  |  |  |
 | rated_at | timestamp |  |  |  |  |
 | created_at | timestamp |  |  | ○ |  |
 | updated_at | timestamp |  |  | ○ |  |
-| (複合) transaction_id, rater_user_id |  |  | UNIQUE |  |  |
 ---
 
 ## ER図
