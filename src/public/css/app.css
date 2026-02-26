@@ -1,5 +1,3 @@
-/* app.css */
-
 /* ====== base ====== */
 *,
 *::before,
@@ -18,7 +16,6 @@ img {
   max-width: 100%;
 }
 
-/* ====== header ====== */
 .header {
   height: 80px;
   background: #000;
@@ -27,24 +24,18 @@ img {
 .header__inner {
   width: 100%;
   height: 80px;
-
   display: flex;
   align-items: center;
-
   padding: 0 40px;
   gap: 32px;
 }
 
-/* ====== logo ====== */
 .header__logo {
   width: 320px;
-  /* 調整済 */
   height: 36px;
-
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-
   text-decoration: none;
 }
 
@@ -54,12 +45,9 @@ img {
   object-fit: contain;
 }
 
-/* ====== search ====== */
-/* form.header__search -> input の構造に合わせる */
 .header__search {
   flex: 1;
   height: 50px;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,22 +56,15 @@ img {
 .header__search input {
   width: 480px;
   height: 50px;
-
   border-radius: 5px;
   border: none;
   outline: none;
-
   background: #fff;
   color: #000;
-
   font-size: 24px;
   font-weight: 400;
-
-  /* ここがズレ防止の重要ポイント */
   line-height: 50px;
-  /* 高さと一致 */
   padding: 0 16px;
-
   -webkit-appearance: none;
   appearance: none;
 }
@@ -93,7 +74,6 @@ img {
   opacity: 1;
 }
 
-/* ====== nav ====== */
 .header__nav {
   flex: 0 0 auto;
 }
@@ -116,70 +96,49 @@ img {
 .nav__form {
   margin: 0;
   display: flex;
-  /* formの高さズレ防止 */
   align-items: center;
 }
 
-/* button と a を完全に同じ箱にしてズレ防止 */
 .nav__item-link {
   height: 50px;
-  /* 出品ボタンと同じ基準 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   font-size: 24px;
   font-weight: 400;
-
-  /* ここがズレ防止の重要ポイント */
   line-height: 50px;
-  /* 高さと一致 */
-
   padding: 0;
   margin: 0;
-
   color: #fff;
   background: transparent;
   border: none;
   text-decoration: none;
-
   white-space: nowrap;
   cursor: pointer;
-
   -webkit-appearance: none;
   appearance: none;
 }
 
 .nav__item-button {
   height: 50px;
-  /* 出品ボタンと同じ基準 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   font-size: 24px;
   font-weight: 400;
-
-  /* ここがズレ防止の重要ポイント */
   line-height: 50px;
-  /* 高さと一致 */
-
   padding: 0;
   margin-top: 5px;
-
   color: #fff;
   background: transparent;
   border: none;
   text-decoration: none;
-
   white-space: nowrap;
   cursor: pointer;
-
   -webkit-appearance: none;
   appearance: none;
 }
 
-/* 出品ボタン */
 .nav__item-link-sell {
   width: 100px;
   height: 50px;
@@ -195,9 +154,6 @@ img {
   white-space: nowrap;
 }
 
-/* =========================================================
-   Responsive: 1400px〜1540px の範囲だけ調整
-   ========================================================= */
 @media (min-width: 1400px) and (max-width: 1540px) {
   .header__inner {
     padding: 0 24px;
@@ -226,35 +182,27 @@ img {
   .header__inner {
     height: 70px;
     padding: 0 16px;
-    /* 余白を縮める */
     gap: 12px;
-    /* 要素間も縮める */
   }
 
-  /* ロゴを縮める */
   .header__logo {
     width: 180px;
     height: 28px;
   }
 
-  /* 検索欄も縮める（flexは維持） */
   .header__search {
     height: 40px;
     justify-content: flex-start;
-    /* 中央寄せだと詰まるので左寄せ */
   }
 
   .header__search input {
     width: 260px;
-    /* ここが効く：画面幅に合わせて縮小 */
     height: 40px;
-
     font-size: 16px;
     line-height: 40px;
     padding: 0 12px;
   }
 
-  /* ナビの文字を縮めて詰める */
   .nav__list {
     gap: 12px;
   }
@@ -266,7 +214,6 @@ img {
     line-height: 40px;
   }
 
-  /* 出品ボタンも縮める */
   .nav__item-link-sell {
     width: 72px;
     height: 40px;

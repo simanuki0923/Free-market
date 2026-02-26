@@ -73,10 +73,6 @@ class Transaction extends Model
         });
     }
 
-    /**
-     * 現在ユーザー向け未読数を付与
-     * -> unread_messages_count
-     */
     public function scopeWithUnreadCountFor(Builder $query, int $userId): Builder
     {
         return $query->withCount([

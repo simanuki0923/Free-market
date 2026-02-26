@@ -20,10 +20,6 @@ class ProductsTableSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // ------------------------------------------------------------
-            // 1) デモユーザ作成（3ユーザのみ）
-            // ------------------------------------------------------------
-            // 1〜5の商品を出品するユーザ
             $sellerA = User::firstOrCreate(
                 ['email' => 'demo-seller-a@example.com'],
                 [
@@ -33,7 +29,6 @@ class ProductsTableSeeder extends Seeder
                 ]
             );
 
-            // 6〜10の商品を出品するユーザ
             $sellerB = User::firstOrCreate(
                 ['email' => 'demo-seller-b@example.com'],
                 [
@@ -43,8 +38,6 @@ class ProductsTableSeeder extends Seeder
                 ]
             );
 
-            // 3人目ユーザ（購入者としてチャット確認に使用）
-            // ※ もともとの「未紐づけ」ユーザを購入者兼用にする
             $buyerUser = User::firstOrCreate(
                 ['email' => 'demo-idle-user@example.com'],
                 [
@@ -54,9 +47,6 @@ class ProductsTableSeeder extends Seeder
                 ]
             );
 
-            // ------------------------------------------------------------
-            // 2) カテゴリ準備
-            // ------------------------------------------------------------
             $catMap = [
                 '家電'         => ['ノートPC', 'マイク', 'HDD'],
                 'ファッション' => ['腕時計', '革靴', 'ショルダーバッグ'],
@@ -74,10 +64,6 @@ class ProductsTableSeeder extends Seeder
                 );
             }
 
-            // ------------------------------------------------------------
-            // 3) 商品データ（ダミーユーザ作成.txt の1〜10）
-            // ------------------------------------------------------------
-            // [番号, 商品名, 価格, ブランド, 説明, 画像URL, 状態]
             $rows = [
                 [1, '腕時計',           15000, 'Rolax',     'スタイリッシュなデザインのメンズ腕時計', 'https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/Armani+Mens+Clock.jpg', '良好'],
                 [2, 'HDD',               5000, '西芝',      '高速で信頼性の高いハードディスク',       'https://coachtech-matter.s3.ap-northeast-1.amazonaws.com/image/HDD+Hard+Disk.jpg', '目立った傷や汚れなし'],
@@ -103,20 +89,12 @@ class ProductsTableSeeder extends Seeder
                 return null;
             };
 
-            // ------------------------------------------------------------
-            // 4) Product / Sell 作成
-            // ------------------------------------------------------------
             $createdSellIdsForChat = [];
 
             foreach ($rows as [$seq, $name, $price, $brand, $description, $imageUrl, $condition]) {
-                // 1〜5は sellerA、6〜10は sellerB
                 $seller = ($seq <= 5) ? $sellerA : $sellerB;
-
-                // チャット確認用に売却済みを避けるため、今回は全部 false にしておく
                 $isSold = false;
-
                 $categoryId = $guessCategoryId($name);
-
                 $product = Product::updateOrCreate(
                     [
                         'user_id' => $seller->id,
@@ -150,17 +128,11 @@ class ProductsTableSeeder extends Seeder
                     ]
                 );
 
-                // チャット用取引を作る対象（1,2,6,7の商品）を記録
                 if (in_array($seq, [1, 2, 6, 7], true)) {
                     $createdSellIdsForChat[] = $sell->id;
                 }
             }
 
-            // ------------------------------------------------------------
-            // 5) チャット動作確認用の Purchase / Transaction を作成
-            // ------------------------------------------------------------
-            // ルートは /chat/buyer/{transaction}, /chat/seller/{transaction}
-            // transaction が無いと 404 になるため、ここで用意する
             if (Schema::hasTable('purchases') && Schema::hasTable('transactions')) {
                 $targetSells = Sell::query()
                     ->whereIn('id', $createdSellIdsForChat)
@@ -168,7 +140,6 @@ class ProductsTableSeeder extends Seeder
                     ->get();
 
                 foreach ($targetSells as $sell) {
-                    // Purchase（購入者は3人目ユーザを利用）
                     $purchase = Purchase::firstOrCreate(
                         [
                             'user_id' => $buyerUser->id,
@@ -181,7 +152,6 @@ class ProductsTableSeeder extends Seeder
                         ]
                     );
 
-                    // Transaction（purchase_id単位で一意想定）
                     Transaction::firstOrCreate(
                         [
                             'purchase_id' => $purchase->id,
@@ -198,18 +168,12 @@ class ProductsTableSeeder extends Seeder
                 }
             }
 
-            // ------------------------------------------------------------
-            // 6) （任意）チャットメッセージのダミー作成
-            // ------------------------------------------------------------
-            // プロジェクト側に chat_messages テーブル/モデルが存在する場合だけ作成
-            // ※ カラム構成が環境差分で違う可能性があるため、最低限の安全な条件分岐にしています
             if (Schema::hasTable('chat_messages')) {
                 $transactions = Schema::hasTable('transactions')
                     ? DB::table('transactions')->select('id', 'buyer_id', 'seller_id')->orderBy('id')->get()
                     : collect();
 
                 foreach ($transactions as $tx) {
-                    // 既にメッセージがあるならスキップ
                     $exists = DB::table('chat_messages')
                         ->where('transaction_id', $tx->id)
                         ->exists();
@@ -222,8 +186,6 @@ class ProductsTableSeeder extends Seeder
 
                     $row1 = [];
                     $row2 = [];
-
-                    // 必須想定カラムを柔軟に埋める
                     if (in_array('transaction_id', $columns, true)) {
                         $row1['transaction_id'] = $tx->id;
                         $row2['transaction_id'] = $tx->id;
@@ -249,11 +211,8 @@ class ProductsTableSeeder extends Seeder
                         $row2['updated_at'] = now();
                     }
 
-                    // bodyがない構成だとinsert失敗しやすいので、最低限 body がある時だけ投入
                     if (array_key_exists('body', $row1)) {
                         DB::table('chat_messages')->insert([$row1, $row2]);
-
-                        // transactions.last_message_at がある場合は更新
                         if (Schema::hasColumn('transactions', 'last_message_at')) {
                             DB::table('transactions')
                                 ->where('id', $tx->id)

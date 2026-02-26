@@ -17,7 +17,6 @@
                 <img src="{{ asset('img/logo.svg') }}" alt="COACHTECHロゴ">
             </a>
 
-            {{-- ★ 検索 → item ルート / パラメータ名 keyword --}}
             <form action="{{ route('item') }}" method="GET" class="header__search">
                 <input
                     type="text"

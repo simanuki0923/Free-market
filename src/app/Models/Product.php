@@ -33,10 +33,6 @@ class Product extends Model
         'category_ids_json'=> 'array',
     ];
 
-    /**
-     * 商品キーワード検索（部分一致）
-     * - name / brand / description を対象に LIKE 検索
-     */
     public function scopeKeywordSearch(Builder $query, ?string $keyword): Builder
     {
         $keyword = trim((string) $keyword);
@@ -85,7 +81,7 @@ class Product extends Model
     }
 
     public function transactions(): HasMany
-{
-    return $this->hasMany(Transaction::class);
-}
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

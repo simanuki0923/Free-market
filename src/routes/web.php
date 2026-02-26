@@ -1,17 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatDraftController;
+use App\Http\Controllers\ChatMessageController;
+use App\Http\Controllers\ChatScreenController;
+use App\Http\Controllers\ChatTransactionController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\MypageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\MypageController;
-use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseAddressController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellController;
-use App\Http\Controllers\ChatPreviewController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ItemController::class, 'index'])
     ->name('item');
@@ -20,7 +23,7 @@ Route::get('/item/{item_id}', [ProductController::class, 'show'])
     ->whereNumber('item_id')
     ->name('item.show');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function (): void {
     Route::get('/mypage', [MypageController::class, 'index'])->name('mypage');
 
     Route::get('/mypage/profile', [ProfileController::class, 'edit'])->name('mypage.profile');
@@ -52,51 +55,35 @@ Route::middleware('auth')->group(function () {
     Route::get('/sell', [SellController::class, 'create'])->name('sell.create');
     Route::post('/sell', [SellController::class, 'store'])->name('sell.store');
 
-    /**
-     * 取引チャット（購入者 / 出品者）
-     */
-    Route::get('/chat/buyer/{transaction}', [ChatPreviewController::class, 'buyer'])
+    Route::get('/chat/buyer/{transaction}', [ChatScreenController::class, 'buyer'])
         ->whereNumber('transaction')
         ->name('chat.buyer');
 
-    Route::get('/chat/seller/{transaction}', [ChatPreviewController::class, 'seller'])
+    Route::get('/chat/seller/{transaction}', [ChatScreenController::class, 'seller'])
         ->whereNumber('transaction')
         ->name('chat.seller');
 
-    /**
-     * メッセージ送信 / 編集（更新） / 削除
-     * ※ インライン編集化により chat.message.edit (GET) は不要
-     */
-    Route::post('/chat/{transaction}/message', [ChatPreviewController::class, 'storeMessage'])
+    Route::post('/chat/{transaction}/message', [ChatMessageController::class, 'store'])
         ->whereNumber('transaction')
         ->name('chat.message.store');
 
-    Route::patch('/chat/message/{message}', [ChatPreviewController::class, 'updateMessage'])
+    Route::patch('/chat/message/{message}', [ChatMessageController::class, 'update'])
         ->whereNumber('message')
         ->name('chat.message.update');
 
-    Route::delete('/chat/message/{message}', [ChatPreviewController::class, 'destroyMessage'])
+    Route::delete('/chat/message/{message}', [ChatMessageController::class, 'destroy'])
         ->whereNumber('message')
         ->name('chat.message.destroy');
 
-    /**
-     * 本文下書き保存（本文のみ）
-     */
-    Route::post('/chat/{transaction}/draft', [ChatPreviewController::class, 'saveDraft'])
+    Route::post('/chat/{transaction}/draft', [ChatDraftController::class, 'store'])
         ->whereNumber('transaction')
         ->name('chat.draft.save');
 
-    /**
-     * 取引完了（購入者）
-     */
-    Route::post('/chat/{transaction}/complete', [ChatPreviewController::class, 'completeTransaction'])
+    Route::post('/chat/{transaction}/complete', [ChatTransactionController::class, 'complete'])
         ->whereNumber('transaction')
         ->name('chat.complete');
 
-    /**
-     * 評価送信（購入者 / 出品者）
-     */
-    Route::post('/chat/{transaction}/rate', [ChatPreviewController::class, 'storeRating'])
+    Route::post('/chat/{transaction}/rate', [ChatTransactionController::class, 'rate'])
         ->whereNumber('transaction')
         ->name('chat.rate');
 });

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>取引完了通知</title>
+    <title>COACHTECH</title>
 </head>
 <body style="margin:0; padding:24px; font-family: Arial, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif; color:#222; background:#f8f8f8;">
     <div style="max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e5e5; border-radius:8px; padding:24px;">

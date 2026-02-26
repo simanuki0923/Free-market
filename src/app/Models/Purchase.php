@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Purchase extends Model
 {
@@ -17,17 +19,22 @@ class Purchase extends Model
         'purchased_at',
     ];
 
-    public function payment()
+    protected $casts = [
+        'amount' => 'integer',
+        'purchased_at' => 'datetime',
+    ];
+
+    public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
     }
 
-    public function sell()
+    public function sell(): BelongsTo
     {
         return $this->belongsTo(Sell::class);
     }
 
-    public function buyer()
+    public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

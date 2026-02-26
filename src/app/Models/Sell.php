@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Sell extends Model
@@ -27,7 +29,7 @@ class Sell extends Model
     ];
 
     protected $casts = [
-        'price'   => 'integer',
+        'price' => 'integer',
         'is_sold' => 'boolean',
         'category_ids_json' => 'array',
     ];
@@ -52,22 +54,22 @@ class Sell extends Model
         return $this->hasMany(Purchase::class);
     }
 
-    public function latestPurchase()
+    public function latestPurchase(): HasOne
     {
         return $this->hasOne(Purchase::class)->latestOfMany('purchased_at');
     }
 
-    public function scopeByUser($query, int $userId)
+    public function scopeByUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
-    public function scopeAvailable($query)
+    public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('is_sold', false);
     }
 
-    public function scopeSold($query)
+    public function scopeSold(Builder $query): Builder
     {
         return $query->where('is_sold', true);
     }
@@ -76,7 +78,7 @@ class Sell extends Model
     {
         $path = $this->image_path;
 
-        if (!$path && $this->relationLoaded('product') && $this->product) {
+        if (empty($path) && $this->relationLoaded('product') && $this->product) {
             $path = $this->product->image_url
                 ?? $this->product->image_path
                 ?? null;
@@ -86,6 +88,7 @@ class Sell extends Model
             if (Str::startsWith($path, ['http://', 'https://'])) {
                 return $path;
             }
+
             return asset('storage/' . ltrim($path, '/'));
         }
 
@@ -93,7 +96,7 @@ class Sell extends Model
     }
 
     public function transactions(): HasMany
-{
-    return $this->hasMany(Transaction::class);
-}
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

@@ -14,7 +14,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
-
             $table->unique(['chat_message_id', 'user_id']);
             $table->index(['user_id', 'read_at']);
         });
