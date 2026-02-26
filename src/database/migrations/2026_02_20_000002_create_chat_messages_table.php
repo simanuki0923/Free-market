@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('body');
+            $table->text('body')->nullable();
             $table->string('image_path')->nullable();
             $table->timestamp('edited_at')->nullable();
             $table->softDeletes();
