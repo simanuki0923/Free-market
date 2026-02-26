@@ -27,9 +27,9 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 
 ### Dockerビルド
 ```
-- git clone https://github.com/simanuki0923/Free-market.git
-- cd Free-market
-- docker compose up -d --build
+git clone https://github.com/simanuki0923/Free-market.git
+cd Free-market
+docker compose up -d --build
 ```
 
 ---
@@ -37,17 +37,17 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 ### Laravel環境構築
 
 ```
-- sudo chmod -R 777 src/*
-- cp src/.env.local src/.env
-- sudo chmod -R 777 src/.env
-- docker-compose exec php bash
-- composer install
-- php artisan key:generate
-- php artisan storage:link
-- chmod -R ug+rw storage bootstrap/cache
-- php artisan migrate
-- php artisan db:seed
-- exit
+sudo chmod -R 777 src/*
+cp src/.env.local src/.env
+sudo chmod -R 777 src/.env
+docker-compose exec php bash
+composer install
+php artisan key:generate
+php artisan storage:link
+chmod -R ug+rw storage bootstrap/cache
+php artisan migrate
+php artisan db:seed
+exit
 ```
 
 ---
