@@ -15,20 +15,13 @@ class TransactionCompletedMail extends Mailable
 
     public Transaction $transaction;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(Transaction $transaction)
     {
-        // メール本文で seller / buyer / product を使うので、必要なら読み込む
         $transaction->loadMissing(['seller', 'buyer', 'product']);
 
         $this->transaction = $transaction;
     }
 
-    /**
-     * メール件名
-     */
     public function envelope(): Envelope
     {
         $productName = $this->transaction->product?->name ?? '商品';
@@ -38,9 +31,6 @@ class TransactionCompletedMail extends Mailable
         );
     }
 
-    /**
-     * メール本文で使う Blade を指定
-     */
     public function content(): Content
     {
         return new Content(
@@ -48,9 +38,6 @@ class TransactionCompletedMail extends Mailable
         );
     }
 
-    /**
-     * 添付ファイル（今回はなし）
-     */
     public function attachments(): array
     {
         return [];

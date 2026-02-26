@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ChatMessageStoreRequest extends FormRequest
 {
+    private const MESSAGE_BODY_MAX_LENGTH = 400;
+
     public function authorize(): bool
     {
         return auth()->check();
@@ -14,30 +16,37 @@ class ChatMessageStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body'  => ['required', 'string', 'max:400'],
-            'image' => ['nullable', 'file', 'mimes:jpeg,png'],
+            'body' => [
+                'nullable',
+                'string',
+                'max:' . self::MESSAGE_BODY_MAX_LENGTH,
+                'required_without:image',
+            ],
+            'image' => [
+                'nullable',
+                'file',
+                'mimes:jpeg,png',
+                'required_without:body',
+            ],
         ];
     }
 
     public function messages(): array
     {
         return [
-            // 本文
-            'body.required' => '本文を入力してください',
-            'body.string'   => '本文を入力してください',
-            'body.max'      => '本文は400文字以内で入力してください',
-
-            // 画像
-            'image.file'    => '画像ファイルを選択してください',
-            'image.mimes'   => '「.png」または「.jpeg」形式でアップロードしてください',
+            'body.required_without' => '本文を入力してください。',
+            'body.max' => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
+            'image.required_without' => '画像を選択してください。',
+            'image.mimes' => '「.png」または「.jpeg」形式でアップロードしてください。',
         ];
     }
 
-    public function attributes(): array
+    protected function prepareForValidation(): void
     {
-        return [
-            'body'  => '本文',
-            'image' => '画像',
-        ];
+        $this->merge([
+            'body' => is_string($this->input('body'))
+                ? trim($this->input('body'))
+                : $this->input('body'),
+        ]);
     }
 }
