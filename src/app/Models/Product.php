@@ -28,10 +28,15 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price'            => 'integer',
-        'is_sold'          => 'boolean',
-        'category_ids_json'=> 'array',
+        'price'             => 'integer',
+        'is_sold'           => 'boolean',
+        'category_ids_json' => 'array',
     ];
+
+    public function getDisplayIdAttribute(): string
+    {
+        return 'CO' . str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
+    }
 
     public function scopeKeywordSearch(Builder $query, ?string $keyword): Builder
     {
@@ -40,10 +45,18 @@ class Product extends Model
         if ($keyword !== '') {
             $like = '%' . $keyword . '%';
 
-            $query->where(function (Builder $q) use ($like) {
+            $query->where(function (Builder $q) use ($like, $keyword) {
+
                 $q->where('name', 'LIKE', $like)
                   ->orWhere('brand', 'LIKE', $like)
                   ->orWhere('description', 'LIKE', $like);
+
+                if (preg_match('/^CO(\d+)$/i', $keyword, $m) === 1) {
+                    $id = (int) $m[1];
+                    if ($id > 0) {
+                        $q->orWhere('id', $id);
+                    }
+                }
             });
         }
 
