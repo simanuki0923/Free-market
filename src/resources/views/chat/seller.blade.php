@@ -55,9 +55,7 @@
                 </h1>
             </div>
 
-            <div class="trade-chat__header-right">
-                {{-- seller側は購入者が完了処理を行う --}}
-            </div>
+            <div class="trade-chat__header-right"></div>
         </header>
 
         <section class="trade-chat__product">
@@ -145,7 +143,6 @@
                                     <textarea
                                         name="body"
                                         class="trade-chat__message-edit-textarea"
-                                        maxlength="400"
                                         rows="3"
                                         required
                                     >{{ old('body', $message->body ?? '') }}</textarea>
@@ -204,7 +201,6 @@
                     value="{{ old('body', $draftBody ?? '') }}"
                     placeholder="取引メッセージを記入してください"
                     autocomplete="off"
-                    maxlength="400"
                 >
 
                 <label class="trade-chat__image-add">
@@ -304,6 +300,59 @@
                     view.hidden = false;
                 }
             });
+        });
+
+        const composerInput = document.querySelector('.trade-chat__composer input[name="body"]');
+        const draftUrl = "{{ route('chat.draft.save', ['transaction' => $transaction->id ?? 0]) }}";
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        async function saveDraft() {
+            if (!composerInput || !csrf) return;
+
+            const body = composerInput.value ?? '';
+
+            try {
+                await fetch(draftUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: new URLSearchParams({ body }),
+                    credentials: 'same-origin',
+                });
+            } catch (e) {
+                console.warn('draft save failed', e);
+            }
+        }
+
+        document.querySelectorAll('.trade-chat__side-product').forEach(function (a) {
+            a.addEventListener('click', async function (ev) {
+                if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                ev.preventDefault();
+                await saveDraft();
+                window.location.href = a.href;
+            });
+        });
+
+        const logoLink = document.querySelector('.header__logo');
+        if (logoLink) {
+            logoLink.addEventListener('click', async function (ev) {
+                if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                ev.preventDefault();
+                await saveDraft();
+                window.location.href = logoLink.href;
+            });
+        }
+
+        window.addEventListener('beforeunload', function () {
+            if (!composerInput || !csrf) return;
+            const body = composerInput.value ?? '';
+            const payload = new URLSearchParams({ body }).toString();
+            navigator.sendBeacon(
+                draftUrl,
+                new Blob([payload], { type: 'application/x-www-form-urlencoded' })
+            );
         });
     });
 </script>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class ChatMessageUpdateRequest extends FormRequest
 {
@@ -39,5 +40,16 @@ class ChatMessageUpdateRequest extends FormRequest
                 ? trim($this->input('body'))
                 : $this->input('body'),
         ]);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $body = (string) $this->input('body', '');
+
+            if ($body !== '' && mb_strlen($body, 'UTF-8') > self::MESSAGE_BODY_MAX_LENGTH) {
+                $validator->errors()->add('body', '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。');
+            }
+        });
     }
 }

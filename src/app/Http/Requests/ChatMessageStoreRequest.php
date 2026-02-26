@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class ChatMessageStoreRequest extends FormRequest
 {
@@ -25,7 +26,8 @@ class ChatMessageStoreRequest extends FormRequest
             'image' => [
                 'nullable',
                 'file',
-                'mimes:jpeg,png',
+                'image',
+                'mimetypes:image/png,image/jpeg',
                 'required_without:body',
             ],
         ];
@@ -33,11 +35,14 @@ class ChatMessageStoreRequest extends FormRequest
 
     public function messages(): array
     {
+        $typeMsg = '「.png」または「.jpeg」形式でアップロードしてください。';
+
         return [
-            'body.required_without' => '本文を入力してください。',
-            'body.max' => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
+            'body.required_without'  => '本文を入力してください。',
+            'body.max'               => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
             'image.required_without' => '画像を選択してください。',
-            'image.mimes' => '「.png」または「.jpeg」形式でアップロードしてください。',
+            'image.image'            => '画像ファイルを選択してください。',
+            'image.mimetypes'        => $typeMsg,
         ];
     }
 
@@ -48,5 +53,32 @@ class ChatMessageStoreRequest extends FormRequest
                 ? trim($this->input('body'))
                 : $this->input('body'),
         ]);
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $body = (string) $this->input('body', '');
+            if ($body !== '' && mb_strlen($body, 'UTF-8') > self::MESSAGE_BODY_MAX_LENGTH) {
+                $validator->errors()->add(
+                    'body',
+                    '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。'
+                );
+            }
+
+            $file = $this->file('image');
+            if ($file) {
+                $ext = strtolower((string) $file->getClientOriginalExtension());
+                if (!in_array($ext, ['png', 'jpeg'], true)) {
+                    $validator->errors()->add('image', '「.png」または「.jpeg」形式でアップロードしてください。');
+                    return;
+                }
+
+                $info = @getimagesize($file->getRealPath());
+                if ($info === false) {
+                    $validator->errors()->add('image', '「.png」または「.jpeg」形式でアップロードしてください。');
+                }
+            }
+        });
     }
 }
