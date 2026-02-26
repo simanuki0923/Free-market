@@ -241,7 +241,7 @@ exit
 | transaction_id | bigint |  |  | ○ | transactions.id |
 | user_id | bigint |  |  | ○ | users.id |
 | body | text |  |  | ○ |  |
-| image_path | string |  |  |  |  |
+| image_path | string |  |  | ○ |  |
 | edited_at | timestamp |  |  |  |  |
 | deleted_at | timestamp (softDeletes) |  |  |  |  |
 | created_at | timestamp |  |  | ○ |  |
