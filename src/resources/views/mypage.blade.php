@@ -59,12 +59,6 @@
         @endfor
       </div>
 
-      <div class="user-rating-summary" aria-label="評価の概要">
-        <span class="user-rating-average">{{ number_format($ratingRaw, 1) }}</span>
-        <span class="user-rating-count">({{ $ratingCount }}件)</span>
-      </div>
-    </div>
-
     <a href="{{ route('mypage.profile') }}" class="edit-profile-btn">プロフィールを編集</a>
   </section>
 
