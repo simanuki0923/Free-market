@@ -13,10 +13,10 @@ Laravel + Docker（Nginx / PHP / MySQL）で動くフリマアプリです。
 ---
 
 ## テストアカウント
-- name: デモ出品者A（1-5）
+- name: デモ出品者A（CO01-CO05）
 - email: demo-seller-a@example.com
 - password: password
-- name: デモ出品者B（6-10）
+- name: デモ出品者B（CO06-CO10）
 - email: demo-seller-b@example.com
 - password: password
 - name: デモ未紐づけユーザ（購入確認兼用）
