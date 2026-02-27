@@ -52,12 +52,22 @@ exit
 
 ---
 
-### .env設定設定変更
+### .env設定変更
 ```
 - code .
 - SESSION_DRIVER=file
 - QUEUE_CONNECTION=sync
 - CACHE_STORE=file
+```
+
+---
+
+### .env設定（mailtrap・stripe）設定
+```
+- MAIL_USERNAME=YOUR_MAILTRAP_USER
+- MAIL_PASSWORD=YOUR_MAILTRAP_PASS
+- STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
+- STRIPE_PUBLIC_KEY=YOUR_STRIPE_PUBLIC_KEY
 ```
 
 ---
