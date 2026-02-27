@@ -24,7 +24,7 @@ class ProductsTableSeeder extends Seeder
             $sellerA = User::firstOrCreate(
                 ['email' => 'demo-seller-a@example.com'],
                 [
-                    'name'              => 'デモ出品者A（1-5）',
+                    'name'              => 'デモ出品者A（CO01-CO05）',
                     'password'          => Hash::make('password'),
                     'email_verified_at' => now(),
                 ]
@@ -33,7 +33,7 @@ class ProductsTableSeeder extends Seeder
             $sellerB = User::firstOrCreate(
                 ['email' => 'demo-seller-b@example.com'],
                 [
-                    'name'              => 'デモ出品者B（6-10）',
+                    'name'              => 'デモ出品者B（CO06-CO10）',
                     'password'          => Hash::make('password'),
                     'email_verified_at' => now(),
                 ]
