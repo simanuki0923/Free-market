@@ -4,18 +4,17 @@
 }
 
 .mypage__main.container {
-  max-width: 1540px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .profile-section {
+  position: relative;
   display: grid;
-  grid-template-columns: 150px 1fr auto;
+  grid-template-columns: 150px 1fr;
   align-items: center;
   column-gap: 32px;
-  max-width: 1100px;
   margin: 0 auto 28px;
-  padding: 0 8px;
 }
 
 .profile-icon {
@@ -25,7 +24,6 @@
   border-radius: 50%;
   overflow: hidden;
   background: #d9d9d9;
-  flex-shrink: 0;
 }
 
 .profile-icon img {
@@ -39,6 +37,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-right: 340px;
 }
 
 .user-name {
@@ -48,7 +47,6 @@
   font-weight: 700;
   line-height: 1.2;
   word-break: break-word;
-  transform: translateY(30px);
 }
 
 .user-rating {
@@ -56,7 +54,6 @@
   align-items: center;
   gap: 4px;
   min-height: 40px;
-  transform: translateY(30px);
 }
 
 .rating-star {
@@ -67,13 +64,15 @@
 }
 
 .edit-profile-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 310px;
-  min-width: 310px;
   height: 59px;
-  padding: 0 20px;
   border: 2px solid #ff5555;
   border-radius: 10px;
   background: transparent;
@@ -82,25 +81,30 @@
   font-size: 26px;
   font-weight: 700;
   line-height: 1;
-  justify-self: end;
-  align-self: center;
   white-space: nowrap;
-  margin-left: 750px;
-  transform: translateY(-50px);
 }
 
 .toggle-links {
-  max-width: 1540px;
+  position: relative;
   margin: 0 auto 32px;
-  padding: 0 8px 12px;
-
+  padding: 0 0 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 56px;
+  border-bottom: none;
+}
 
-  border-bottom: 2px solid #5f5f5f;
-  transform: translateY(20px);
+.toggle-links::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 2px;
+  background: #5f5f5f;
+  pointer-events: none;
 }
 
 .toggle-link {
@@ -114,40 +118,32 @@
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
-  padding: 0 4px;
-  transform: translateX(-180px);
 }
 
 .toggle-link.active {
   color: #ff0000;
 }
 
-.trade-count,
 .trade-tab-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   width: 27px;
   height: 26px;
-  min-width: 27px;
-  min-height: 26px;
   border-radius: 10px;
   background: #ff0000;
   color: #fff;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1;
-  flex: 0 0 auto;
 }
 
 .product-list {
-  max-width: 1100px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 200px));
+  grid-template-columns: repeat(auto-fit, 200px);
   justify-content: center;
-  gap: 44px 44px;
+  gap: 44px;
 }
 
 .product-item {
@@ -176,21 +172,6 @@
   object-fit: cover;
 }
 
-.product-thumb--trading .trade-dot {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #ff0000;
-  box-shadow: 0 0 0 2px #f5f5f5 inset;
-}
-
-.product-thumb--trading {
-  position: relative;
-}
-
 .trade-unread-dot {
   position: absolute;
   top: 6px;
@@ -207,45 +188,25 @@
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
-  box-shadow: 0 0 0 1px #f5f5f5;
-  z-index: 2;
-  pointer-events: none;
-}
 
-.trade-unread-dot.is-double,
-.trade-unread-dot[data-digits="2"],
-.trade-unread-dot[data-digits="3"] {
-  width: auto;
-  min-width: 18px;
-  padding: 0 3px;
-  border-radius: 999px;
 }
 
 .sold-out-label {
   position: absolute;
   top: 8px;
   left: 8px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-width: 62px;
   height: 30px;
   padding: 0 10px;
-
   border-radius: 4px;
   background: #ff0000;
   color: #fff;
-
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
-  text-transform: uppercase;
-}
-
-.product-meta {
-  min-height: 24px;
 }
 
 .product-name {
@@ -257,35 +218,14 @@
   word-break: break-word;
 }
 
-.empty-note {
-  grid-column: 1 / -1;
-  text-align: center;
-  margin: 24px 0 0;
-  color: #555;
-  font-size: 18px;
-}
-
-.pager {
-  grid-column: 1 / -1;
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
-}
-
 @media (min-width: 1400px) and (max-width: 1540px) {
   .mypage__main {
     padding: 44px 24px 72px;
   }
 
-  .mypage__main.container {
-    max-width: 1540px;
-  }
-
   .profile-section {
-    max-width: 1060px;
     column-gap: 28px;
     margin-bottom: 24px;
-    padding: 0 6px;
   }
 
   .profile-icon {
@@ -293,9 +233,12 @@
     height: 140px;
   }
 
+  .profile-info {
+    padding-right: 320px;
+  }
+
   .user-name {
     font-size: 34px;
-    margin-bottom: 8px;
   }
 
   .rating-star {
@@ -305,82 +248,31 @@
 
   .edit-profile-btn {
     width: 290px;
-    min-width: 290px;
     height: 56px;
     font-size: 24px;
-    border-radius: 10px;
   }
 
   .toggle-links {
-    max-width: 1500px;
     gap: 44px;
-    padding: 0 6px 12px;
     margin-bottom: 28px;
-    transform: translateY(16px);
   }
 
   .toggle-link {
     font-size: 22px;
-    gap: 8px;
-    transform: translateX(-140px);
-  }
-
-  .trade-count,
-  .trade-tab-count {
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
-    min-height: 26px;
-    font-size: 15px;
   }
 
   .product-list {
-    max-width: 1048px;
-    grid-template-columns: repeat(4, minmax(0, 194px));
+    grid-template-columns: repeat(auto-fit, 194px);
     gap: 40px 30px;
   }
 
   .product-thumb {
     width: 194px;
     height: 194px;
-    margin-bottom: 10px;
-  }
-
-  .product-thumb--trading .trade-dot {
-    width: 18px;
-    height: 18px;
-    top: 6px;
-    left: 6px;
-  }
-
-  .trade-unread-dot {
-    top: 6px;
-    left: 6px;
-    width: 13px;
-    height: 13px;
-    min-width: 13px;
-    font-size: 8px;
-    box-shadow: 0 0 0 1px #f5f5f5;
-  }
-
-  .trade-unread-dot.is-double,
-  .trade-unread-dot[data-digits="2"],
-  .trade-unread-dot[data-digits="3"] {
-    min-width: 16px;
-    padding: 0 2px;
-  }
-
-  .sold-out-label {
-    min-width: 58px;
-    height: 28px;
-    font-size: 13px;
-    top: 7px;
-    left: 7px;
   }
 
   .product-name {
     font-size: 22px;
-    line-height: 1.3;
   }
 }
 
@@ -389,18 +281,10 @@
     padding: 28px 20px 56px;
   }
 
-  .mypage__main.container {
-    max-width: 850px;
-  }
-
   .profile-section {
-    grid-template-columns: 100px 1fr auto;
+    grid-template-columns: 100px 1fr;
     column-gap: 16px;
-    row-gap: 8px;
-    max-width: 100%;
-    margin: 0 auto 20px;
-    padding: 0 4px;
-    align-items: center;
+    margin-bottom: 20px;
   }
 
   .profile-icon {
@@ -409,18 +293,17 @@
   }
 
   .profile-info {
-    min-width: 0;
+    padding-right: 190px;
   }
 
   .user-name {
     font-size: 24px;
     margin: 0 0 6px;
-    line-height: 1.25;
   }
 
   .user-rating {
-    gap: 2px;
     min-height: 26px;
+    gap: 2px;
   }
 
   .rating-star {
@@ -428,125 +311,49 @@
     height: 24px;
   }
 
-  .user-rating-summary {
-    margin-top: 4px;
-    gap: 4px;
-  }
-
-  .user-rating-average {
-    font-size: 13px;
-  }
-
-  .user-rating-count {
-    font-size: 12px;
-  }
-
   .edit-profile-btn {
     width: 170px;
-    min-width: 170px;
     height: 40px;
-    padding: 0 12px;
+    font-size: 14px;
     border-width: 1.5px;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    justify-self: end;
-    align-self: center;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .toggle-links {
-    max-width: 100%;
-    margin: 0 auto 20px;
-    padding: 0 2px 10px;
     justify-content: flex-start;
     gap: 22px;
-    transform: translateY(0);
     overflow-x: auto;
-    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
   }
 
   .toggle-link {
     font-size: 16px;
     gap: 6px;
-    padding: 0 2px;
-    transform: translateX(190px);
     flex: 0 0 auto;
   }
 
-  .trade-count,
   .trade-tab-count {
     width: 22px;
     height: 22px;
-    min-width: 22px;
-    min-height: 22px;
     font-size: 12px;
   }
 
   .product-list {
-    max-width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 165px));
-    justify-content: center;
+    grid-template-columns: repeat(auto-fit, 165px);
     gap: 26px 40px;
   }
 
   .product-thumb {
     width: 165px;
     height: 165px;
-    margin: 0 0 8px;
-    border-radius: 4px;
-  }
-
-  .product-thumb--trading .trade-dot {
-    width: 16px;
-    height: 16px;
-    top: 5px;
-    left: 5px;
-    box-shadow: 0 0 0 1.5px #f5f5f5 inset;
-  }
-
-  .trade-unread-dot {
-    top: 5px;
-    left: 5px;
-    width: 12px;
-    height: 12px;
-    min-width: 12px;
-    font-size: 8px;
-    box-shadow: 0 0 0 1px #f5f5f5;
-  }
-
-  .trade-unread-dot.is-double,
-  .trade-unread-dot[data-digits="2"],
-  .trade-unread-dot[data-digits="3"] {
-    min-width: 15px;
-    padding: 0 2px;
-  }
-
-  .sold-out-label {
-    min-width: 50px;
-    height: 24px;
-    padding: 0 8px;
-    font-size: 11px;
-    top: 6px;
-    left: 6px;
-    border-radius: 3px;
-  }
-
-  .product-meta {
-    min-height: 20px;
+    margin-bottom: 8px;
   }
 
   .product-name {
     font-size: 16px;
-    line-height: 1.35;
-  }
-
-  .empty-note {
-    margin-top: 16px;
-    font-size: 14px;
-  }
-
-  .pager {
-    margin-top: 8px;
   }
 }
