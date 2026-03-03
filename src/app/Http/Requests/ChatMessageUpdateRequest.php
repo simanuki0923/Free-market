@@ -46,7 +46,6 @@ class ChatMessageUpdateRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $body = (string) $this->input('body', '');
-
             if ($body !== '' && mb_strlen($body, 'UTF-8') > self::MESSAGE_BODY_MAX_LENGTH) {
                 $validator->errors()->add('body', '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。');
             }

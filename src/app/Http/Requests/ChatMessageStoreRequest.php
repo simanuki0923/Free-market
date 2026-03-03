@@ -28,7 +28,6 @@ class ChatMessageStoreRequest extends FormRequest
                 'file',
                 'image',
                 'mimetypes:image/png,image/jpeg',
-                'required_without:body',
             ],
         ];
     }
@@ -40,7 +39,6 @@ class ChatMessageStoreRequest extends FormRequest
         return [
             'body.required_without'  => '本文を入力してください。',
             'body.max'               => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
-            'image.required_without' => '画像を選択してください。',
             'image.image'            => '画像ファイルを選択してください。',
             'image.mimetypes'        => $typeMsg,
         ];
