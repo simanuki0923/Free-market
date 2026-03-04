@@ -710,8 +710,8 @@ select {
     }
 
     .trade-chat__side {
-        width: 240px;
-        flex: 0 0 240px;
+        width: 220px;
+        flex: 0 0 220px;
     }
 
     .trade-chat__side-head {
@@ -731,8 +731,8 @@ select {
     }
 
     .trade-chat__side-product {
-        width: calc(100% - 24px);
-        margin: 0 12px;
+        width: calc(100% - 40px);
+        margin: 0 25px;
         min-height: 44px;
         font-size: 22px;
         border-radius: 6px;
@@ -744,8 +744,8 @@ select {
     }
 
     .trade-chat__avatar--md {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
     }
 
     .trade-chat__title {
@@ -768,8 +768,8 @@ select {
     }
 
     .trade-chat__product-image img {
-        width: 140px;
-        height: 140px;
+        width: 110px;
+        height: 113px;
     }
 
     .trade-chat__product-name {
