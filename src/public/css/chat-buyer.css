@@ -703,6 +703,10 @@ select {
         border-radius: 6px;
     }
 
+    .trade-chat__badge {
+        margin-top: 18px;
+    }
+
     .trade-chat__header {
         padding: 12px 14px;
         gap: 10px;
