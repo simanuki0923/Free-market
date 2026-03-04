@@ -323,12 +323,18 @@
   }
 
   .toggle-links {
-    justify-content: flex-start;
     gap: 22px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
+    border-bottom: none;
+    margin-right: 70px;
   }
+
+    .toggle-links::after {
+      width: 100%;
+      max-width: 100%;
+    }
 
   .toggle-link {
     font-size: 16px;

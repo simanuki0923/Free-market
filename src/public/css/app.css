@@ -168,6 +168,7 @@ img {
   .header__search {
     height: 40px;
     justify-content: flex-start;
+    margin-left: 20px;
   }
 
   .header__search input {
