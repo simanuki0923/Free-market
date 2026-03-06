@@ -178,11 +178,15 @@
         </section>
 
         <footer class="trade-chat__composer">
-            @if($errors->any())
+            @if($errors->has('body') || $errors->has('image'))
                 <div class="trade-chat__errors">
-                    @foreach($errors->all() as $error)
-                        <p class="trade-chat__error">{{ $error }}</p>
-                    @endforeach
+                    @error('body')
+                        <p class="trade-chat__error">{{ $message }}</p>
+                    @enderror
+
+                    @error('image')
+                        <p class="trade-chat__error">{{ $message }}</p>
+                    @enderror
                 </div>
             @endif
 
@@ -209,9 +213,16 @@
                 >
 
                 <label class="trade-chat__image-add">
-                    <input type="file" name="image" accept=".png,.jpeg,image/png,image/jpeg">
+                    <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        id="chat-image-input"
+                    >
                     <span>画像を追加</span>
                 </label>
+
+                <p class="trade-chat__selected-file" id="chat-image-file-name"></p>
 
                 <button type="submit" class="trade-chat__modal-submit" aria-label="送信">
                     <img src="{{ asset('img/inputbuttun.png') }}" alt="送信">
@@ -359,6 +370,16 @@
                 new Blob([payload], { type: 'application/x-www-form-urlencoded' })
             );
         });
+
+        const imageInput = document.getElementById('chat-image-input');
+        const fileNameArea = document.getElementById('chat-image-file-name');
+
+        if (imageInput && fileNameArea) {
+            imageInput.addEventListener('change', function () {
+                const file = this.files && this.files[0] ? this.files[0] : null;
+                fileNameArea.textContent = file ? file.name : '';
+            });
+        }
     });
 </script>
 

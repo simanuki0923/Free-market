@@ -21,26 +21,20 @@ class ChatMessageStoreRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:' . self::MESSAGE_BODY_MAX_LENGTH,
-                'required_without:image',
             ],
             'image' => [
                 'nullable',
                 'file',
                 'image',
-                'mimetypes:image/png,image/jpeg',
             ],
         ];
     }
 
     public function messages(): array
     {
-        $typeMsg = '「.png」または「.jpeg」形式でアップロードしてください。';
-
         return [
-            'body.required_without'  => '本文を入力してください。',
-            'body.max'               => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
-            'image.image'            => '画像ファイルを選択してください。',
-            'image.mimetypes'        => $typeMsg,
+            'body.max'    => '本文は' . self::MESSAGE_BODY_MAX_LENGTH . '文字以内で入力してください。',
+            'image.image' => '「.png」または「.jpeg」形式でアップロードしてください。',
         ];
     }
 
@@ -57,6 +51,13 @@ class ChatMessageStoreRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $body = (string) $this->input('body', '');
+            $file = $this->file('image');
+
+            if ($body === '' && $file === null) {
+                $validator->errors()->add('body', '本文を入力してください。');
+                return;
+            }
+
             if ($body !== '' && mb_strlen($body, 'UTF-8') > self::MESSAGE_BODY_MAX_LENGTH) {
                 $validator->errors()->add(
                     'body',
@@ -64,9 +65,9 @@ class ChatMessageStoreRequest extends FormRequest
                 );
             }
 
-            $file = $this->file('image');
-            if ($file) {
+            if ($file !== null) {
                 $ext = strtolower((string) $file->getClientOriginalExtension());
+
                 if (!in_array($ext, ['png', 'jpeg'], true)) {
                     $validator->errors()->add('image', '「.png」または「.jpeg」形式でアップロードしてください。');
                     return;
