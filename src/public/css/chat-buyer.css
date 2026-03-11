@@ -581,8 +581,6 @@ select {
     justify-content: center;
     font-size: 0;
     line-height: 0;
-    flex: 0 0 auto;
-    align-self: center;
 }
 
 .trade-chat__modal-submit img {
@@ -594,6 +592,24 @@ select {
 
 .trade-chat__modal-submit:hover {
     filter: brightness(0.95);
+}
+
+.trade-chat__errors {
+    margin-bottom: 10px;
+}
+
+.trade-chat__error {
+    margin: 0 0 4px;
+    color: #d33;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trade-chat__status {
+    margin-bottom: 10px;
+    color: #1a7f37;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .trade-chat__modal-overlay {
@@ -609,41 +625,192 @@ select {
 
 .trade-chat__modal {
     width: 598px;
-    max-width: calc(100vw - 32px);
     min-height: 367px;
-    height: auto;
     background: #FDFCE6;
     border: 1px solid #000000;
     border-radius: 15px;
+    box-sizing: border-box;
     overflow: hidden;
     padding: 0;
     box-shadow: none;
 }
 
+.trade-chat__modal form {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
 .trade-chat__modal-title {
     margin: 0;
     padding: 21px 23px 20px;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
     font-size: 35px;
     line-height: 1.2;
     font-weight: 400;
     color: #000000;
-    border-bottom: 1px solid #000000;
+    border-bottom: 1px solid #000;
 }
 
 .trade-chat__modal-text {
     margin: 0;
     padding: 44px 23px 0;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
     font-size: 20px;
-    line-height: 1.6;
+    line-height: 1.2;
     font-weight: 400;
-    color: #000000;
+    color: #868686;
+    transform: translateY(-10px);
+}
+
+.trade-chat__modal .trade-chat__errors {
+    margin: 8px 23px 0;
+}
+
+.trade-chat__modal .trade-chat__error {
+    margin: 0;
+    color: #d33;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trade-chat__rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 13px;
+    margin: 22px 23px 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    min-height: 100px;
+}
+
+.trade-chat__rating-input {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    appearance: none !important;
+}
+
+.trade-chat__rating-star {
+    width: 100px;
+    height: 100px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 78px;
+    line-height: 1;
+    color: #D9D9D9;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.12s ease, transform 0.12s ease;
+    margin-top: -40px;
+}
+
+.trade-chat__rating-star:hover,
+.trade-chat__rating-star:hover~.trade-chat__rating-star {
+    color: #FFF048;
+    transform: translateY(-1px);
+}
+
+.trade-chat__rating-input:checked~.trade-chat__rating-star {
+    color: #FFF048;
+}
+
+.trade-chat__stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 13px;
+    margin: 22px 23px 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    min-height: 100px;
+}
+
+.trade-chat__stars input {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    appearance: none !important;
+}
+
+.trade-chat__stars label {
+    width: 100px;
+    height: 100px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 78px;
+    line-height: 1;
+    color: #D9D9D9;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.12s ease, transform 0.12s ease;
+}
+
+.trade-chat__stars label:hover,
+.trade-chat__stars label:hover~label {
+    color: #FFF048;
+    transform: translateY(-1px);
+}
+
+.trade-chat__stars input:checked~label {
+    color: #FFF048;
 }
 
 .trade-chat__modal-actions {
+    margin-top: 10px;
+    border-top: 1px solid #000;
+    min-height: 72px;
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 42px 23px 28px;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 11px 16px 12px 16px;
+    background: #FDFCE6;
+}
+
+.trade-chat__modal-submit-btn {
+    appearance: none;
+    width: 127px;
+    height: 49px;
+    border: 0;
+    border-radius: 5px;
+    background: #FF8282;
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 400;
+    cursor: pointer;
+    transition: opacity 0.12s ease, transform 0.08s ease;
+    margin-top: 10px;
+}
+
+.trade-chat__modal-submit-btn:hover {
+    opacity: 0.92;
+}
+
+.trade-chat__modal-submit-btn:active {
+    transform: translateY(1px);
+}
+
+.trade-chat__modal .trade-chat__modal-submit {
+    margin-top: 10px;
+    margin-left: auto;
 }
 
 @media (min-width: 1400px) and (max-width: 1540px) {
